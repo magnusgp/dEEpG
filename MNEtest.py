@@ -1,5 +1,5 @@
 import os
-import numpy as np
+#import numpy as np
 import mne
 
 sample_data_folder = mne.datasets.sample.data_path(path="/Users/magnus/Desktop/DTU/4. semester/Fagprojekt")
