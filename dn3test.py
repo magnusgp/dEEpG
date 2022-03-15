@@ -19,7 +19,7 @@ class Loader(yaml.SafeLoader):
 
 Loader.add_constructor('!include', Loader.include)
 
-experiment = ExperimentConfig("my_config.yml")
+experiment = ExperimentConfig("BENDR/configs/downstream.yml")
 for ds_name, ds_config in experiment.datasets():
     dataset = ds_config.auto_construct_dataset()
     # Do some awesome things
