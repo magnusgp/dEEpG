@@ -19,6 +19,8 @@ class Loader(yaml.SafeLoader):
 
 Loader.add_constructor('!include', Loader.include)
 
+print(filename)
+
 experiment = ExperimentConfig("my_config.yml")
 for ds_name, ds_config in experiment.datasets():
     dataset = ds_config.auto_construct_dataset()
