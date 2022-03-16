@@ -39,12 +39,13 @@ class TUH_data:
             EEG_raw_dict[id] = self.loadOneRaw(id)
         self.EEG_raw_dict=EEG_raw_dict
 
-path="D:/fagprojekt_data"
+path="TUH_data_sample"
 TUH=TUH_data()
 TUH.findEdf(path=path)
-David.label_TUH(annoPath='\\'+os.path.split(TUH.EEG_dict[0]['csvpath'])[1],saveDir=os.path.split(TUH.EEG_dict[0]['csvpath'])[0])
+#David.label_TUH(annoPath='\\'+os.path.split(TUH.EEG_dict[0]['csvpath'])[1],saveDir=os.path.split(TUH.EEG_dict[0]['csvpath'])[0])
 print(TUH.EEG_dict)
 TUH.loadAllRaw()
 print(TUH.EEG_raw_dict)
-TUH.EEG_raw_dict[0].plot(duration=4)
+#TUH.EEG_raw_dict[0].plot(duration=1)
+#TUH.EEG_raw_dict[0].plot_psd(fmax=50)
 
