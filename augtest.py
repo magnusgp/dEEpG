@@ -79,12 +79,12 @@ for ax in axs.flat:
 """
 hlp.plot1d(x_train[0], title="Original Data")
 
-hlp.plot1d(x_train[0], aug.jitter(x_train)[0], title="Jitter Augmentation")
+#hlp.plot1d(x_train[0], aug.jitter(x_train)[0], title="Jitter Augmentation")
 
-hlp.plot1d(x_train[0], aug.scaling(x_train)[0], title="Scaling Augmentation")
+#hlp.plot1d(x_train[0], aug.scaling(x_train)[0], title="Scaling Augmentation")
 
-hlp.plot1d(x_train[0], aug.permutation(x_train)[0])
-
+hlp.plot1d(x_train[0], aug.permutation(x_train)[0], title="Permutation Augmentation")
+"""
 hlp.plot1d(x_train[0], aug.magnitude_warp(x_train)[0])
 
 hlp.plot1d(x_train[0], aug.time_warp(x_train)[0])
@@ -102,3 +102,4 @@ hlp.plot1d(x_train[0], aug.wdba(x_train, y_train)[0])
 hlp.plot1d(x_train[0], aug.random_guided_warp(x_train, y_train)[0])
 
 hlp.plot1d(x_train[0], aug.discriminative_guided_warp(x_train, y_train)[0])
+"""
