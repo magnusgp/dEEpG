@@ -1,0 +1,32 @@
+History:	52 year old woman with liver failure, now with episodes of left face and arm
+Medications:	no AEDs, meropenem
+Sedation:
+EEG Type:	Extended, >60 min, portable
+Technique:	International 10-20 System; standard 21 electrodes with T1/T2 electrodes and EKG
+electrodes, comatose
+Description:
+There is no PDR or AP gradient.  The background consists of attenuated very slow delta activity and
+frequent high amplitude independent bilateral posterior quadrant sharp waves with aftergoing
+slow waves.  Frequent electrographic seizures are captured over the bilateral posterior quadrants,
+right>>left.  They last from ~ 25 seconds to up to 5 minutes.  Right hemispheric seizures start with
+O2 (and O2/P4) low amplitude rhythmic activity in the sleep-spindle range that frequently evolves
+and spreads to T6 lead.  Similar activity is seen over the reciprocal left hemispheric leads during
+the left hemispheric seizures.  These seizures occur multiple times per hour.
+Hyperventilation and photic stimulation are not performed.
+Summary of Findings:
+Diffuse slowing, polymorphic, severe
+Sharp waves, frequent, bilateral posterior
+Status epilepticus, bilateral (R>L) posterior
+Interpretation:
+This is an ABNORMAL ~2 hour continuous video EEG due to (1) severe diffuse slowing, (2) frequent
+independent bilateral posterior quadrant epileptiform discharges and (3) frequent recurrent
+synchronous and independent bilateral posterior quadrant (right> left) seizures without clinical
+correlate.  This finding is indicative of moderate to severe diffuse cerebral dysfunction, which is
+etiologically nonspecific.  There are epileptogenic structural foci over the posterior quadrants.
+These findings were conveyed to the neurology consult team and  patient was placed on
+continuous EEG monitoring.  However, the decision was made to withdraw care, so the prolonged
+
+
+
+
+

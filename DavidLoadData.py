@@ -1,4 +1,4 @@
-#### FROM https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG #####
+#### ##FROM https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG #####
 
 import os, re, glob, json, sys
 import pandas as pd
@@ -9,7 +9,7 @@ def jsonLoad(path = False):
     if path is False:
         sys.exit("no path were given to load Json")
     else:
-        with open(path, "r") as read_file:
+        with open(path, "r", encoding="Latin-1") as read_file:
             edfDefDict = json.load(read_file)
     print("\npaths found for loading")
     return edfDefDict

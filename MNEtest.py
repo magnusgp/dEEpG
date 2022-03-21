@@ -12,8 +12,8 @@ print("Raw data file loaded")
 print(raw)
 print(raw.info)
 
-#raw.plot_psd(fmax=50)
-#raw.plot(duration=5, n_channels=30)
+raw.plot_psd(fmax=50)
+raw.plot(duration=5, n_channels=30)
 
 # set up and fit the ICA
 ica = mne.preprocessing.ICA(n_components=20, random_state=97, max_iter=800)
