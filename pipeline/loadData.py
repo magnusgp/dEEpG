@@ -1,6 +1,8 @@
-import os
 import os.path
 import mne
+from collections import defaultdict
+import os, re, glob, json, sys
+import pandas as pd
 
 class TUH_data:
     def __init__(self):
@@ -22,9 +24,30 @@ class TUH_data:
                 id_path_split=os.path.split(patient_path_split[0])
                 EEG_dict.update({EEG_count: {"id": id_path_split[1], "patient_id": patient_path_split[1], "session":  session_path_split[1],
                                           "path": os.path.join(dirpath, filename),"csvpath": os.path.join(dirpath, os.path.splitext(filename)[0]+'.csv')}})
-                EEG_count+=1
+                EEG_count += 1
         self.EEG_dict = EEG_dict
-        self.EEG_count=EEG_count
+        self.EEG_count = EEG_count
+
+    # crawls a path for all .edf files
+    def findEdfDavid(path=False, selectOpt=False, saveDir=False):
+        # bypass personal dictionaries
+        pathRootInt = len(list(filter(None, saveDir.split('\\'))))
+        # find all .edf files in path
+        pathList = ['\\'.join(fDir.split('\\')[pathRootInt:]) for fDir in
+                    glob.glob(saveDir + path + "**/*.edf", recursive=True)]
+        # construct defaultDict for data setting
+        edfDict = defaultdict(dict)
+        for path in pathList:
+            file = path.split('\\')[-1]
+            if file in edfDict.keys():
+                edfDict[file]["path"].append(path)
+                edfDict[file]["deathFlag"] = True
+            else:
+                edfDict[file]["path"] = []
+                edfDict[file]["deathFlag"] = False
+                edfDict[file]["path"].append(path)
+            edfDict[file]["Files named %s" % file] = len(edfDict[file]["path"])
+        return edfDict
 
     def loadOneRaw(self,id):
         return mne.io.read_raw_edf(self.EEG_dict[id]["path"], preload=True)
