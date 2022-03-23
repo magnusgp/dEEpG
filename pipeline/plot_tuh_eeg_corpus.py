@@ -16,6 +16,8 @@ import tempfile
 import numpy as np
 import matplotlib.pyplot as plt
 import mne
+from torch.utils.data import DataLoader, random_split
+from torch import Generator
 
 from braindecode.datasets import TUH
 from braindecode.preprocessing import (
@@ -112,6 +114,7 @@ tuh = select_by_duration(tuh, tmin, tmax)
 # recordings with 'le' and 'ar' reference which we will have to consider. Data
 # is not loaded here.
 
+"""
 short_ch_names = sorted([
     'A1', 'A2',
     'FP1', 'FP2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
@@ -124,6 +127,20 @@ ar_ch_names = sorted([
     'EEG T6-REF', 'EEG FZ-REF', 'EEG CZ-REF', 'EEG PZ-REF'])
 le_ch_names = sorted([
     'EEG A1-LE', 'EEG A2-LE',
+    'EEG FP1-LE', 'EEG FP2-LE', 'EEG F3-LE', 'EEG F4-LE', 'EEG C3-LE',
+    'EEG C4-LE', 'EEG P3-LE', 'EEG P4-LE', 'EEG O1-LE', 'EEG O2-LE',
+    'EEG F7-LE', 'EEG F8-LE', 'EEG T3-LE', 'EEG T4-LE', 'EEG T5-LE',
+    'EEG T6-LE', 'EEG FZ-LE', 'EEG CZ-LE', 'EEG PZ-LE'])
+"""
+short_ch_names = sorted([
+    'FP1', 'FP2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
+    'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'FZ', 'CZ', 'PZ'])
+ar_ch_names = sorted([
+    'EEG FP1-REF', 'EEG FP2-REF', 'EEG F3-REF', 'EEG F4-REF', 'EEG C3-REF',
+    'EEG C4-REF', 'EEG P3-REF', 'EEG P4-REF', 'EEG O1-REF', 'EEG O2-REF',
+    'EEG F7-REF', 'EEG F8-REF', 'EEG T3-REF', 'EEG T4-REF', 'EEG T5-REF',
+    'EEG T6-REF', 'EEG FZ-REF', 'EEG CZ-REF', 'EEG PZ-REF'])
+le_ch_names = sorted([
     'EEG FP1-LE', 'EEG FP2-LE', 'EEG F3-LE', 'EEG F4-LE', 'EEG C3-LE',
     'EEG C4-LE', 'EEG P3-LE', 'EEG P4-LE', 'EEG O1-LE', 'EEG O2-LE',
     'EEG F7-LE', 'EEG F8-LE', 'EEG T3-LE', 'EEG T4-LE', 'EEG T5-LE',
@@ -142,11 +159,12 @@ def select_by_channels(ds, ch_mapping):
         ref = 'ar' if d.raw.ch_names[0].endswith('-REF') else 'le'
         # these are the channels we are looking for
         seta = set(ch_mapping[ref].keys())
-        # these are the channels of the recoding
+        # these are the channels of the recording
         setb = set(d.raw.ch_names)
         # if recording contains all channels we are looking for, include it
         if seta.issubset(setb):
             split_ids.append(i)
+    #return ds.split(split_ids)['0']
     return ds.split(split_ids)['0']
 
 
@@ -241,3 +259,100 @@ tuh_windows = create_fixed_length_windows(
 
 for x, y, ind in tuh_windows:
     break
+
+
+
+#PyTorch model training
+dl = DataLoader(
+    dataset=tuh_windows,
+    batch_size=4,
+)
+
+for batch_X, batch_y, batch_ind in dl:
+    pass
+print('batch_X:', batch_X)
+print('batch_y:', batch_y)
+print('batch_ind:', batch_ind)
+
+train_size = int(0.8 * len(dl))
+test_size = len(dl) - train_size
+
+train_dataset, test_dataset = random_split(dl, [train_size, test_size])
+#print(train_dataset, test_dataset)
+
+#PyTorch CNN
+import torch
+import torchvision
+import torchvision.transforms as transforms
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = torch.flatten(x, 1) # flatten all dimensions except batch
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+
+net = Net()
+
+testloader = test_dataset
+trainloader = train_dataset
+
+import torch.optim as optim
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
+for epoch in range(2):  # loop over the dataset multiple times
+
+    running_loss = 0.0
+    for i, data in enumerate(trainloader, 0):
+        # get the inputs; data is a list of [inputs, labels]
+        inputs, labels = data
+
+        # zero the parameter gradients
+        optimizer.zero_grad()
+
+        # forward + backward + optimize
+        outputs = net(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+        # print statistics
+        running_loss += loss.item()
+        if i % 2000 == 1999:    # print every 2000 mini-batches
+            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+            running_loss = 0.0
+
+print('Finished Training')
+
+correct = 0
+total = 0
+# since we're not training, we don't need to calculate the gradients for our outputs
+with torch.no_grad():
+    for data in testloader:
+        images, labels = data
+        # calculate outputs by running images through the network
+        outputs = net(images)
+        # the class with the highest energy is what we choose as prediction
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+print(f'Accuracy of the network on the 10000 test images: {100 * correct // total} %')
