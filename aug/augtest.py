@@ -77,11 +77,11 @@ axs[1, 1].set_title('Permutation')
 for ax in axs.flat:
     ax.label_outer()
 """
-hlp.plot1d(x_train[0], title="Original Data")
+hlp.plot1d(x_train[0])
 
-hlp.plot1d(x_train[0], aug.jitter(x_train)[0], title="Jitter Augmentation")
+hlp.plot1d(x_train[0], aug.jitter(x_train)[0])
 
-hlp.plot1d(x_train[0], aug.scaling(x_train)[0], title="Scaling Augmentation")
+hlp.plot1d(x_train[0], aug.scaling(x_train)[0])
 
 hlp.plot1d(x_train[0], aug.permutation(x_train)[0])
 
