@@ -187,8 +187,9 @@ def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45
         t_start = i/edf_fS
         t_end = (i+window_width)/edf_fS
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
-        window_data = spectrogramMake(EEG_series["rawData"], t0=i, tWindow=window_width,
-                                      FFToverlap=FFToverlap, crop_fq=crop_fq) # , show_chan_num=0) #)
+        #window_data = spectrogramMake(EEG_series["rawData"], t0=i, tWindow=window_width,
+        #                              FFToverlap=FFToverlap, crop_fq=crop_fq) # , show_chan_num=0) #)
+        window_data = EEG_series["rawData"][i:i+window_width]
         window_label = label_TUH(annoPath=label_path, window=[t_start, t_end], saveDir=annoDir)
         window_EEG[window_key] = (window_data, window_label)
     # window_N segments (by negative lookahead)
@@ -264,3 +265,8 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
 
 # ############ TODO:
 #
+
+if __name__ == "__main__":
+    edfPath = '/Users/magnus/Desktop/DTU/EEG2/TUH_data_sample/131/00013103/s2001_2015_09_30/'
+    mne_raw = mne.io.read_raw_edf(edfPath, preload=True)
+    slidingWindow(MNE_raw=mne_raw, tN=0, tStep=0, localSave={"sliceSave":False, "saveDir":os.getcwd()})
