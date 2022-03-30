@@ -122,7 +122,7 @@ def label_TUH(annoPath=False, window=[0,0], header=None): #saveDir=os.getcwd(),
     label_TUH = df[df[2].between(window[0], window[1]) |
                    df[3].between(window[0], window[1]) |
                    (within_con0 & within_con1)]
-    label_df = label_TUH.rename(columns={0: 't_start', 1: 't_end', 2: 'label', 3: 'confidence'})["label"] #Renamer headers i pandas dataen
+    label_df = label_TUH.rename(columns={2: 't_start', 3: 't_end', 4: 'label', 5: 'confidence'})["label"] #Renamer headers i pandas dataen
     return_list = label_df.to_numpy().tolist() #Outputter kun listen af label navne i vinduet, fx ["eyem", "null"]
     return return_list
 
