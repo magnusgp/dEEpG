@@ -2,13 +2,13 @@
 #import David_LoadTUHData_Andreas as loadTUH
 import DavidLoadData as David
 #import DavidPreprocessing
-import os
+import os, mne, time
 import os.path
-import mne
 from mne.io import read_raw_edf
 from collections import defaultdict
 from datetime import datetime, timezone
 import torch, re, warnings
+import pandas as pd
 import numpy as np
 from scipy import signal, stats
 import matplotlib.pyplot as plt
@@ -72,29 +72,16 @@ class TUH_data:
 
         return edfDict
 
-    def label_TUH(annoPath=False, window=[0, 0], saveDir=os.getcwd(), header=None):
-        ## From https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG/blob/0bfd1a9349f60f44e6f7df5aa6820434e44263a2/Transfer%20learning%20project/eegLoader.py#L52 ##
-        if type(saveDir) is str:
-            df = pd.read_csv(saveDir + annoPath, sep=" ", skiprows=1, header=header)
-            df.fillna('null', inplace=True)
-            within_con0 = (df[0] <= window[0]) & (window[0] <= df[1])
-            within_con1 = (df[0] <= window[1]) & (window[1] <= df[1])
-            label_TUH = df[df[0].between(window[0], window[1]) |
-                           df[1].between(window[0], window[1]) |
-                           (within_con0 & within_con1)]
-            label_df = label_TUH.rename(columns={0: 't_start', 1: 't_end', 2: 'label', 3: 'confidence'})["label"]
-            return_list = label_df.to_numpy().tolist()
-        else:
-            return_list = saveDir
-        return return_list
-
-    def prep(self):
+    def prep(self, saveDir):
+        tic = time.time()
         subjects_TUAR19 = defaultdict(dict)
+        Xraw=[]
+        Y=[]
         for k in range(len(self.EEG_dict)):
             subjects_TUAR19[k] = {'path':self.EEG_dict[k]['path']}
 
             proc_subject = subjects_TUAR19[k]
-            proc_subject = self.readRawEdf(proc_subject, tWindow=1, tStep=1*.25,read_raw_edf_param={'preload': True})
+            proc_subject = self.readRawEdf(proc_subject, tWindow=100, tStep=100*.25,read_raw_edf_param={'preload': True})
 
             proc_subject["rawData"] = TUH_rename_ch(proc_subject["rawData"])
             TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
@@ -105,18 +92,111 @@ class TUH_data:
             pipeline(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
                      downSam=250)  # "standard_1005" "easycap-M1"
 
-            print('done')
+            # Generate output windows for (X,y) as (tensor, label)
+            proc_subject["preprocessing_output"] = slidingRawWindow(proc_subject, t_max=proc_subject["rawData"].times[-1],
+                                                                 tStep=proc_subject["tStep"], FFToverlap=0.75,
+                                                                 crop_fq=24,
+                                                                 annoDir=self.EEG_dict[k]['csvpath'],
+                                                                 localSave={"sliceSave": True,
+                                                                            "saveDir": saveDir + r'/tensor',
+                                                                            "local_return": False})
 
-path="D:/fagprojekt/fagprojekt_data"
+            for window in proc_subject["preprocessing_output"].values():
+                Xraw.append(window[0])
+                Y.append(window[1])
+                #Xraw=np.concatenate((Xraw,np.array([window[0]])))
+                #Y=np.concatenate((Y,np.array([window[1]])))
+
+        toc = time.time()
+        print("\n~~~~~~~~~~~~~~~~~~~~\n"
+              "it took %imin:%is to run preprocess-pipeline for %i patients\n with window length [%.2fs] and t_step [%.2fs]"
+              "\n~~~~~~~~~~~~~~~~~~~~\n"% (int((toc-tic)/60), int((toc-tic) % 60), len(subjects_TUAR19),
+                                           subjects_TUAR19[k]["tWindow"], subjects_TUAR19[k]["tStep"]))
+
+        self.Xraw=Xraw
+        self.Y=Y
+
+def label_TUH(annoPath=False, window=[0,0], header=None): #saveDir=os.getcwd(),
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+    df.fillna('null', inplace=True)
+    within_con0 = (df[2] <= window[0]) & (window[0] <= df[3])
+    within_con1 = (df[2] <= window[1]) & (window[1] <= df[3])
+    label_TUH = df[df[2].between(window[0], window[1]) |
+                   df[3].between(window[0], window[1]) |
+                   (within_con0 & within_con1)]
+    label_df = label_TUH.rename(columns={0: 't_start', 1: 't_end', 2: 'label', 3: 'confidence'})["label"] #Renamer headers i pandas dataen
+    return_list = label_df.to_numpy().tolist() #Outputter kun listen af label navne i vinduet, fx ["eyem", "null"]
+    return return_list
+
+def makeRawWindow(MNE_raw=None, t0=0, tWindow=120):
+    #take a raw signal and make a window given time specifications.
+    chWindows = MNE_raw.get_data(start=int(t0), stop=int(t0+tWindow), reject_by_annotation="omit", picks=['eeg'])
+    return chWindows
+
+def slidingRawWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45, annoDir=None,
+                  localSave={"sliceSave":False, "saveDir":os.getcwd(), "local_return":False}):
+    # catch correct sample frequency and end sample
+    edf_fS = EEG_series["rawData"].info["sfreq"]
+    t_N = int(t_max*edf_fS)
+
+    # ensure window-overlaps progress in sample interger
+    if float(tStep*edf_fS) == float(int(tStep*edf_fS)):
+        t_overlap = int(tStep*edf_fS)
+    else:
+        t_overlap = int(tStep*edf_fS)
+        overlap_change = 100-(t_overlap/edf_fS)*100
+        print("\n  tStep [%.3f], overlap does not equal an interger [%f] and have been rounded to %i"
+              "\n  equaling to %.1f%% overlap or %.3fs time steps\n\n"
+              % (tStep, tStep*edf_fS, t_overlap, overlap_change, t_overlap/edf_fS))
+
+    # initialize variables for segments
+    window_EEG = defaultdict(tuple)
+    window_width = int(EEG_series["tWindow"]*edf_fS)
+    label_path = EEG_series['path'].split(".edf")[0] + ".csv"
+
+    # segment all N-1 windows (by positive lookahead)
+    for i in range(0, t_N-window_width, t_overlap):
+        t_start = i/edf_fS
+        t_end = (i+window_width)/edf_fS
+        window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
+        window_data = makeRawWindow(EEG_series["rawData"], t0=i, tWindow=window_width) # , show_chan_num=0) #)
+        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])#, saveDir=annoDir)
+        window_EEG[window_key] = (window_data, window_label)
+    # window_N segments (by negative lookahead)
+    if t_N % t_overlap != 0:
+        t_start = (t_N - window_width)/edf_fS
+        t_end = t_N/edf_fS
+        window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
+        window_data = makeRawWindow(EEG_series["rawData"], t0=i, tWindow=window_width)
+        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])#, saveDir=annoDir)
+        window_EEG[window_key] = (window_data, window_label)
+
+    return window_EEG
+    # save in RAM, disk or not
+    """    if localSave["sliceSave"]:
+        idDir = EEG_series["rawData"].filenames[0].split('\\')[-1].split('.')[0]
+        if not os.path.exists(localSave["saveDir"] + "tempData\\"):
+            os.mkdir(localSave["saveDir"] + "tempData\\")
+        if not os.path.exists(localSave["saveDir"] + "tempData\\" + idDir):
+            os.mkdir(localSave["saveDir"] + "tempData\\" + idDir)
+        for k, v in window_EEG.items():
+            torch.save(v, localSave["saveDir"] + "tempData\\%s\\%s.pt" % (idDir, k)) # for np del torch.save
+    if not localSave["sliceSave"] or localSave["local_return"] is True:
+        windowOut = window_EEG.copy()
+    else:
+        windowOut = None
+    
+    return windowOut"""
+
+path="TUH_data_sample"
 save_dir="D:/fagprojekt"
 TUH=TUH_data()
 TUH.findEdf(path=path)
-#David.label_TUH(annoPath='\\'+os.path.split(TUH.EEG_dict[0]['csvpath'])[1],saveDir=os.path.split(TUH.EEG_dict[0]['csvpath'])[0])
 print(TUH.EEG_dict)
-#TUH.loadAllRaw()
-TUH.prep()
-
+TUH.loadAllRaw()
+TUH.prep(saveDir=save_dir)
 
 #print(TUH.EEG_raw_dict)
-#TUH.EEG_raw_dict[0].plot(duration=4)
-
+#TUH.EEG_raw_dict[0].plot_psd()
+TUH.EEG_raw_dict[0].plot(duration=4)
+plt.show()
