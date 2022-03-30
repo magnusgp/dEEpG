@@ -11,6 +11,7 @@ import numpy as np
 from scipy import signal, stats
 import matplotlib.pyplot as plt
 from eegProcess import TUH_rename_ch, nonPipeline, spectrogramMake, slidingWindow, pipeline
+from braindecode.datasets import create_from_X_y
 
 class TUH_data:
     def __init__(self):
@@ -73,8 +74,8 @@ class TUH_data:
     def prep(self, saveDir):
         tic = time.time()
         subjects_TUAR19 = defaultdict(dict)
-        Xraw=[]
-        Y=[]
+        Xwindows=[]
+        Ywindows=[]
         for k in range(len(self.EEG_dict)):
             subjects_TUAR19[k] = {'path':self.EEG_dict[k]['path']}
 
@@ -86,6 +87,11 @@ class TUH_data:
                         'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz'] #A1, A2 removed
             proc_subject["rawData"].pick_channels(ch_names=TUH_pick)
             proc_subject["rawData"].reorder_channels(TUH_pick)
+
+            if k == 0:
+                self.sfreq = proc_subject["rawData"].info["sfreq"]
+                self.ch_names = proc_subject["rawData"].info["ch_names"]
+
 
             pipeline(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
                      downSam=250)  # "standard_1005" "easycap-M1"
@@ -100,8 +106,8 @@ class TUH_data:
                                                                             "local_return": False})
 
             for window in proc_subject["preprocessing_output"].values():
-                Xraw.append(window[0])
-                Y.append(window[1])
+                Xwindows.append(window[0])
+                Ywindows.append(window[1])
                 #Xraw=np.concatenate((Xraw,np.array([window[0]])))
                 #Y=np.concatenate((Y,np.array([window[1]])))
 
@@ -111,8 +117,8 @@ class TUH_data:
               "\n~~~~~~~~~~~~~~~~~~~~\n"% (int((toc-tic)/60), int((toc-tic) % 60), len(subjects_TUAR19),
                                            subjects_TUAR19[k]["tWindow"], subjects_TUAR19[k]["tStep"]))
 
-        self.Xraw=Xraw
-        self.Y=Y
+        self.Xwindows=Xwindows
+        self.Ywindows=Ywindows
 
 def label_TUH(annoPath=False, window=[0,0], header=None): #saveDir=os.getcwd(),
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
@@ -194,7 +200,16 @@ print(TUH.EEG_dict)
 TUH.loadAllRaw()
 TUH.prep(saveDir=save_dir)
 
+windows_dataset = create_from_X_y(
+    TUH.Xwindows, TUH.Ywindows, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
+    window_stride_samples=len(TUH.Xwindows[0][0]),
+    window_size_samples=len(TUH.Xwindows[0][0]),
+)
+
+windows_dataset.description
+
+
 #print(TUH.EEG_raw_dict)
 #TUH.EEG_raw_dict[0].plot_psd()
-TUH.EEG_raw_dict[0].plot(duration=4)
-plt.show()
+#TUH.EEG_raw_dict[0].plot(duration=4)
+#plt.show()
