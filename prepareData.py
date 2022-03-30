@@ -187,7 +187,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq
     return windowOut"""
 
 path="TUH_data_sample"
-save_dir="D:/fagprojekt"
+save_dir=os.getcwd()
 TUH=TUH_data()
 TUH.findEdf(path=path)
 print(TUH.EEG_dict)
@@ -196,5 +196,5 @@ TUH.prep(saveDir=save_dir)
 
 #print(TUH.EEG_raw_dict)
 #TUH.EEG_raw_dict[0].plot_psd()
-TUH.EEG_raw_dict[0].plot(duration=4)
-plt.show()
+#TUH.EEG_raw_dict[0].plot(duration=4)
+#plt.show()
