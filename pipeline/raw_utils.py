@@ -87,10 +87,27 @@ def raw2array(raw, preproc_params, win_params, window_size_samples=10 ,window_st
 
     return windows
 
-def oneHotEncoder(labels, n_classes):
+def oneHotEncoder(labels, all_labels = ['musc', 'eyem']):
     """
-    Encode labels to one-hot encoding.
+    Encode data using one-hot encoding. Currently broken
     """
-    one_hot = np.zeros((len(labels), n_classes))
+    char_to_int = dict((c, i) for i, c in enumerate(all_labels))
+    int_to_char = dict((i, c) for i, c in enumerate(all_labels))
+
+    encoded = [char_to_int[char] for char in labels]
+    one_hot = np.zeros((len(labels), len(all_labels)))
+
     one_hot[np.arange(len(labels)), labels] = 1
     return one_hot
+
+def labelInt(labels):
+    all_labels = ['musc', 'eyem', 'elec', 'eyem_musc', 'musc_elec', 'chew', 'eyem_elev',
+                  'eyem_chew', 'shiv', 'chew_musc', 'elpp', 'chew_elec', 'eyem_shiv', 'shiv_elec']
+    encoded = []
+    for i in range(len(labels)):
+        for j in range(len(all_labels)):
+            if labels[i] == all_labels[j]:
+                encoded.append(j+1)
+    return encoded
+
+#print(labelInt(['musc', 'eyem'], ['musc', 'eyem', 'rest', 'none']))
