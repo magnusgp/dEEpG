@@ -159,7 +159,7 @@ def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45
     # initialize variables for segments
     window_EEG = defaultdict(tuple)
     window_width = int(EEG_series["tWindow"]*edf_fS)
-    label_path = EEG_series['path'][-1].split(".edf")[0] + ".tse"
+    label_path = EEG_series['path'].split(".edf")[0] + ".csv"
 
     # segment all N-1 windows (by positive lookahead)
     for i in range(0, t_N-window_width, t_overlap):
@@ -168,7 +168,7 @@ def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
         window_data = spectrogramMake(EEG_series["rawData"], t0=i, tWindow=window_width,
                                       FFToverlap=FFToverlap, crop_fq=crop_fq) # , show_chan_num=0) #)
-        window_label = eegLoader.label_TUH(annoPath=label_path, window=[t_start, t_end], saveDir=annoDir)
+        window_label = eegLoader.label_TUH(annoPath=label_path, window=[t_start, t_end])#, saveDir=annoDir)
         window_EEG[window_key] = (window_data, window_label)
     # window_N segments (by negative lookahead)
     if t_N % t_overlap != 0:
@@ -177,7 +177,7 @@ def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
         window_data = spectrogramMake(EEG_series["rawData"], t0=t_start, tWindow=window_width,
                                                  FFToverlap=FFToverlap, crop_fq=crop_fq)
-        window_label = eegLoader.label_TUH(annoPath=label_path, window=[t_start, t_end], saveDir=annoDir)
+        window_label = eegLoader.label_TUH(annoPath=label_path, window=[t_start, t_end])#, saveDir=annoDir)
         window_EEG[window_key] = (window_data, window_label)
 
     # save in RAM, disk or not

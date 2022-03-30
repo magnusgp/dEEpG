@@ -52,7 +52,7 @@ mne.set_log_level('ERROR')  # avoid messages everytime a window is extracted
 # a `BaseConcatDataset` of `BaseDatasets` each holding a single
 # `nme.io.Raw` which is fully compatible with other braindecode functionalities.
 
-TUH_PATH = '/Users/magnus/Desktop/DTU/EEG2/TUH_data_sample'
+TUH_PATH = 'D:/fagprojekt/fagprojekt_data'
 N_JOBS = 1  # specify the number of jobs for loading and windowing
 tuh = TUH(
     path=TUH_PATH,
@@ -281,8 +281,8 @@ train_dataset, test_dataset = random_split(dl, [train_size, test_size])
 
 #PyTorch CNN
 import torch
-import torchvision
-import torchvision.transforms as transforms
+#import torchvision
+#import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.nn.functional as F
 

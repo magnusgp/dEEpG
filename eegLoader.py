@@ -49,19 +49,20 @@ def label_BC(ID=int(), edf_name=str()):
     return list()
 
 # reads all labels existing in a time window
-def label_TUH(annoPath=False, window=[0,0], saveDir=os.getcwd(), header=None):
-    if type(saveDir) is str:
-        df = pd.read_csv(saveDir+annoPath, sep=" ", skiprows=1, header=header)
-        df.fillna('null', inplace=True)
-        within_con0 = (df[0] <= window[0]) & (window[0] <= df[1])
-        within_con1 = (df[0] <= window[1]) & (window[1] <= df[1])
-        label_TUH = df[df[0].between(window[0], window[1]) |
-                       df[1].between(window[0], window[1]) |
-                       (within_con0 & within_con1)]
-        label_df = label_TUH.rename(columns={0: 't_start', 1: 't_end', 2: 'label', 3: 'confidence'})["label"]
-        return_list = label_df.to_numpy().tolist()
-    else:
-        return_list = saveDir
+def label_TUH(annoPath=False, window=[0,0], header=None): #saveDir=os.getcwd(),
+    #if type(saveDir) is str:
+    #df = pd.read_csv(saveDir+annoPath, sep=" ", skiprows=1, header=header)
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+    df.fillna('null', inplace=True)
+    within_con0 = (df[2] <= window[0]) & (window[0] <= df[3])
+    within_con1 = (df[2] <= window[1]) & (window[1] <= df[3])
+    label_TUH = df[df[2].between(window[0], window[1]) |
+                   df[3].between(window[0], window[1]) |
+                   (within_con0 & within_con1)]
+    label_df = label_TUH.rename(columns={0: 't_start', 1: 't_end', 2: 'label', 3: 'confidence'})["label"] #Renamer headers i pandas dataen
+    return_list = label_df.to_numpy().tolist() #Outputter kun listen af label navne i vinduet, fx ["eyem", "null"]
+    #else:
+     #   return_list = saveDir
     return return_list
 
 def label_TUH_full(annoPath=False, window=[0,0], saveDir=os.getcwd(), header=None):

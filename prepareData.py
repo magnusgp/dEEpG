@@ -1,7 +1,5 @@
 
-#import David_LoadTUHData_Andreas as loadTUH
-import DavidLoadData as David
-#import DavidPreprocessing
+
 import os, mne, time
 import os.path
 from mne.io import read_raw_edf

@@ -1,13 +1,11 @@
-#### FROM https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG #####
-
 import os, mne, torch, re, warnings
 from collections import defaultdict
 from datetime import datetime, timezone
 from mne.io import read_raw_edf
 import numpy as np
-# from ../LoadFarrahTueData.loadData import jsonLoad
-import DavidLoadData
-# import NovelEEG.SampleCode.loadData
+# from ../LoadFarrahTueData.eegLoader import jsonLoad
+import eegLoader
+# import NovelEEG.SampleCode.eegLoader
 from scipy import signal, stats
 import matplotlib.pyplot as plt
 
@@ -24,29 +22,29 @@ def readRawEdf(edfDict=None, saveDir='', tWindow=120, tStep=30,
             edfDict["tN"] = datetime.fromtimestamp(t_last, tz=timezone.utc)
         else:
             t_last = t_start.timestamp() + edfDict["rawData"]._last_time + 1 / edfDict["fS"]
-            edfDict["t0"] = t_start # datetime.fromtimestamp(t_start.timestamp(), tz=timezone.utc)
+            edfDict["t0"] = t_start  # datetime.fromtimestamp(t_start.timestamp(), tz=timezone.utc)
             edfDict["tN"] = datetime.fromtimestamp(t_last, tz=timezone.utc)
 
         edfDict["tWindow"] = float(tWindow) # width of EEG sample window, given in (sec)
         edfDict["tStep"] = float(tStep) # step/overlap between EEG sample windows, given in (sec)
 
-        header = mne.io.edf.edf._read_edf_header(fname=edfDict["rawData"].filenames[0], exclude=[])
-        id_tmp = header[0]["subject_info"]["id"]
-        with open(saveDir + edfDict["path"][-1], encoding="latin-1") as fp:
-            first_line = fp.readline()
-
-        # regex_found = re.findall(r"%s \S+" % id_tmp, first_line)
-        subject_gender = re.search(r"%s \w+" % id_tmp, first_line).group().split(" ")[1]
-        subject_age = re.search(r"%s (Age:\d+)" % id_tmp, first_line).group().split(":")[1]
-        edfDict["gender"] = subject_gender
-        edfDict["age"] = int(subject_age)
+        # header = mne.io.edf.edf._read_edf_header(fname=edfDict["rawData"].filenames[0], exclude=[])
+        # id_tmp = header[0]["subject_info"]["id"]
+        # with open(saveDir + edfDict["path"][-1], encoding="latin-1") as fp:
+        #     first_line = fp.readline()
+        #
+        # # regex_found = re.findall(r"%s \S+" % id_tmp, first_line)
+        # subject_gender = re.search(r"%s \w+" % id_tmp, first_line).group().split(" ")[1]
+        # subject_age = re.search(r"%s (Age:\d+)" % id_tmp, first_line).group().split(":")[1]
+        # edfDict["gender"] = subject_gender
+        # edfDict["age"] = int(subject_age)
     except:
-        print("error break plese inspect:\n %s\n~~~~~~~~~~~~" % edfDict["rawData"].filenames[0])
+        print("error break please inspect:\n %s\n~~~~~~~~~~~~" % edfDict["rawData"].filenames[0])
 
     return edfDict
 
 # pre-processing pipeline single file
-def pipeline(MNE_raw=None, lpfq=1, hpfq=40, notchfq=50, downSam=100, type="easycap-M1"):
+def pipeline(MNE_raw=None, lpfq=1, hpfq=40, notchfq=50, downSam=100, cap_setup="easycap-M1"):
     # Follows Makoto's_Preprocessing_Pipeline recommended for EEGlab's ICA
     # combined with Early State Preprocessing: PREP
     # Step 1 & 2: Check paths and import data -> is completed in readRawEdf
@@ -57,27 +55,55 @@ def pipeline(MNE_raw=None, lpfq=1, hpfq=40, notchfq=50, downSam=100, type="easyc
     #  MNE_raw.plot_sensors(show_names=True)
     #
     # Step 4: HP-filter [1Hz] -> BP-filter [1Hz; 40Hz] for this study
+    # Roy BP(0.1, 70)?, our BP(1, 40)
     MNE_raw.filter(lpfq, hpfq, fir_design='firwin')
     # Step 5: Import channel info -> configure cap setup and channel names
-    MNE_raw.set_montage(mne.channels.make_standard_montage(kind=type, head_size=0.095), on_missing="warn")
+    # Roy TCP-montage 22-channels, our mean-average-montage
+    MNE_raw.set_montage(mne.channels.make_standard_montage(kind=cap_setup, head_size=0.095), on_missing="warn")
     # Step 6 utilizing data knowledge for line-noise removal
+    # Roy none?, our notch(cut=60, width=5)
     MNE_raw.notch_filter(freqs=notchfq, notch_widths=5)
 
-    # Step : Downsample # TODO: error introduced after MNE -- update
+    # Step : Downsample
     MNE_raw.resample(sfreq=downSam)
+    # Roy 200, our 250
 
     # Step 7 inference statistics to annotate bad channels
     # TODO: "BADS" code from MNEi & PREP
     # TUTORIAL: https://mne.tools/stable/auto_tutorials/preprocessing/plot_15_handling_bad_channels.html?highlight=interpolate_bads
     # Step 7.1 TUH (write detailed)
     # Step 8
-    # MNE_raw.interpolate_bads(reset_bads=True, origin='auto')    # Step 9 Re-reference the data to average
+    # MNE_raw.interpolate_bads(reset_bads=True, origin='auto')
+    # Step 9 Re-reference the data to average
     MNE_raw.set_eeg_reference()
     # Re-reference math proff
     # https://sccn.ucsd.edu/wiki/Makoto's_preprocessing_pipeline#Why_should_we_add_zero-filled_channel_before_average_referencing.3F_.2808.2F09.2F2020_Updated.3B_prayer_for_Nagasaki.29
     # Step 10 through 15 is conducted in separate ICLabel or ANN
 
     return MNE_raw
+
+
+def nonPipeline(MNE_raw=None, hp_cut=1, down_sam=250, cap_setup="easycap-M1"):
+    # IDEA -> mne.hp.montage.downsamle.reref
+    # To inspect the raw signal make the following calls as required
+    # MNE_raw.plot()
+    # MNE_raw.plot_psd()
+    # MNE_raw.plot_sensors(show_names=True)
+    #
+    # Import channel info -> configure cap setup and channel names
+    # Roy TCP-montage 22-channels
+
+    # apply high-pass
+    MNE_raw.filter(l_freq=hp_cut, h_freq=None, fir_design='firwin')
+    # load channels to 10_05 standard system
+    MNE_raw.set_montage(mne.channels.make_standard_montage(kind=cap_setup, head_size=0.095), on_missing="warn")
+    # downsample to equal 250hz
+    MNE_raw.resample(sfreq=down_sam)
+    # set common reference
+    MNE_raw.set_eeg_reference()
+
+    return MNE_raw
+
 
 # calculate STFT, FFT or Spectrogram of EEG channels
 def spectrogramMake(MNE_raw=None, t0=0, tWindow=120, crop_fq=45, FFToverlap=None, show_chan_num=None):
@@ -88,14 +114,14 @@ def spectrogramMake(MNE_raw=None, t0=0, tWindow=120, crop_fq=45, FFToverlap=None
         if FFToverlap is None:
             specOption = {"x": chWindows, "fs": edfFs, "mode": "psd"}
         else:
-            window = signal.get_window(window=('tukey', 0.25), Nx=tWindow)
+            window = signal.get_window(window=('tukey', 0.25), Nx=int(tWindow))  # TODO: error in 'Nx' & 'noverlap' proportions
             specOption = {"x": chWindows, "fs": edfFs, "window": window, "noverlap": int(tWindow*FFToverlap), "mode": "psd"}
 
         fAx, tAx, Sxx = signal.spectrogram(**specOption)
         normSxx = stats.zscore(np.log(Sxx[:, fAx <= crop_fq, :] + np.finfo(float).eps))
         if isinstance(show_chan_num, int):
             plot_spec = plotSpec(ch_names=MNE_raw.info['ch_names'], chan=show_chan_num,
-                                fAx=fAx[fAx <= crop_fq], tAx=tAx, Sxx=normSxx)
+                                 fAx=fAx[fAx <= crop_fq], tAx=tAx, Sxx=normSxx)
             plot_spec.show()
     except:
         print("pause here")
@@ -107,7 +133,11 @@ def spectrogramMake(MNE_raw=None, t0=0, tWindow=120, crop_fq=45, FFToverlap=None
         # plt.ylim(0,45)
         # plt.show()
 
-    return torch.tensor(normSxx) # for np delete torch.tensor
+    return torch.tensor(normSxx.astype(np.float16)) # for np delete torch.tensor
+# TODO benchmark feature
+# foo = normSxx.reshape([19,241]) full FFT (cutted)
+# eig_foo = np.linalg.eig(np.cov(foo))
+# feat_extract_bench = eig_foo[1]
 
 # Segment EEG into designated windows
 def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45, annoDir=None,
@@ -129,7 +159,7 @@ def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45
     # initialize variables for segments
     window_EEG = defaultdict(tuple)
     window_width = int(EEG_series["tWindow"]*edf_fS)
-    label_path = EEG_series['path'][-1].split(".edf")[0] + ".tse"
+    label_path = EEG_series['path'][-1].split(".edf")[0] + ".csv" # changed tse to csv
 
     # segment all N-1 windows (by positive lookahead)
     for i in range(0, t_N-window_width, t_overlap):
@@ -138,7 +168,7 @@ def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
         window_data = spectrogramMake(EEG_series["rawData"], t0=i, tWindow=window_width,
                                       FFToverlap=FFToverlap, crop_fq=crop_fq) # , show_chan_num=0) #)
-        window_label = loadData.label_TUH(annoPath=label_path, window=[t_start, t_end], saveDir=annoDir)
+        window_label = eegLoader.label_TUH(annoPath=label_path, window=[t_start, t_end], saveDir=annoDir)
         window_EEG[window_key] = (window_data, window_label)
     # window_N segments (by negative lookahead)
     if t_N % t_overlap != 0:
@@ -147,7 +177,7 @@ def slidingWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq=45
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
         window_data = spectrogramMake(EEG_series["rawData"], t0=t_start, tWindow=window_width,
                                                  FFToverlap=FFToverlap, crop_fq=crop_fq)
-        window_label = loadData.label_TUH(annoPath=label_path, window=[t_start, t_end], saveDir=annoDir)
+        window_label = eegLoader.label_TUH(annoPath=label_path, window=[t_start, t_end], saveDir=annoDir)
         window_EEG[window_key] = (window_data, window_label)
 
     # save in RAM, disk or not
@@ -171,7 +201,7 @@ def TUH_rename_ch(MNE_raw=False):
     # MNE_raw
     # mne.channels.rename_channels(MNE_raw.info, {"PHOTIC-REF": "PROTIC"})
     for i in MNE_raw.info["ch_names"]:
-        reSTR = r"(?<=EEG )(.*)(?=-)" # working reSTR = r"(?<=EEG )(.*)(?=-REF)"
+        reSTR = r"(?<=EEG )(\S*)(?=-REF)"  # working reSTR = r"(?<=EEG )(.*)(?=-REF)"
         reLowC = ['FP1', 'FP2', 'FZ', 'CZ', 'PZ']
 
         if re.search(reSTR, i) and re.search(reSTR, i).group() in reLowC:
@@ -194,19 +224,22 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
     plt.pcolormesh(tAx, fAx, Sxx[chan, :, :])
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
-    plt.title("channel spectrogram: "+ch_names[chan])
+    plt.title("channel spectrogram: " + ch_names[chan])
 
     return plt
 
 # THIS FUNCTION IS CURRENTLY BROKEN!
-def completePrep(tWin=120, tStep=30, localSave={"sliceSave":False, "saveDir":os.getcwd()},
-                 notchFQ=50, lpFQ=1, hpFQ=40):
-    for edf in edfDict.keys():
-        edfDict[edf] = readRawEdf(edfDict[edf], tWindow=tWin, tStep=tStep)
-        pipeline(edfDict[edf]["rawData"], lpfq=lpFQ, hpfq=hpFQ, notchfq=notchFQ)
-        tLastN = edfDict[fi]["rawData"].last_samp
-        windowDict = slidingWindow(MNE_raw=edfDict[edf], tN=tLastN, tStep=tStep, localSave=localSave)
-        edfDict[edf]["tensors"] = windowDict
-
-    return edfDict
+# def completePrep(tWin=120, tStep=30, localSave={"sliceSave":False, "saveDir":os.getcwd()},
+#                  notchFQ=50, lpFQ=1, hpFQ=40):
+#     for edf in edfDict.keys():
+#         edfDict[edf] = readRawEdf(edfDict[edf], tWindow=tWin, tStep=tStep)
+#         pipeline(edfDict[edf]["rawData"], lpfq=lpFQ, hpfq=hpFQ, notchfq=notchFQ)
+#         tLastN = edfDict[fi]["rawData"].last_samp
+#         windowDict = slidingWindow(MNE_raw=edfDict[edf], tN=tLastN, tStep=tStep, localSave=localSave)
+#         edfDict[edf]["tensors"] = windowDict
+#
+#     return edfDict
 # THIS FUNCTION IS CURRENTLY BROKEN!
+
+# ############ TODO:
+#
