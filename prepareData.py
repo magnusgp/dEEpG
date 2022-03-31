@@ -12,6 +12,7 @@ from scipy import signal, stats
 import matplotlib.pyplot as plt
 from eegProcess import TUH_rename_ch, nonPipeline, spectrogramMake, slidingWindow, pipeline
 from braindecode.datasets import create_from_X_y
+from pipeline.raw_utils import labelInt
 
 class TUH_data:
     def __init__(self):
@@ -192,8 +193,8 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq
     
     return windowOut"""
 
-path="TUH_data_sample"
-save_dir="D:/fagprojekt"
+path="/Users/magnus/Desktop/DTU/EEG2"
+save_dir=os.getcwd()
 TUH=TUH_data()
 TUH.findEdf(path=path)
 print(TUH.EEG_dict)
@@ -201,7 +202,7 @@ TUH.loadAllRaw()
 TUH.prep(saveDir=save_dir)
 
 windows_dataset = create_from_X_y(
-    TUH.Xwindows, TUH.Ywindows, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
+    TUH.Xwindows, labelInt(TUH.Ywindows), drop_last_window=True, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
     window_stride_samples=len(TUH.Xwindows[0][0]),
     window_size_samples=len(TUH.Xwindows[0][0]),
 )
