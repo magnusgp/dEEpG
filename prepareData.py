@@ -94,7 +94,7 @@ class TUH_data:
 
 
             pipeline(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
-                     downSam=250)  # "standard_1005" "easycap-M1"
+                     downSam=250)
 
             # Generate output windows for (X,y) as (tensor, label)
             proc_subject["preprocessing_output"] = slidingRawWindow(proc_subject, t_max=proc_subject["rawData"].times[-1],
