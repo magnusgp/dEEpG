@@ -69,7 +69,7 @@ class TUH_data:
 
         return edfDict
 
-    def prep(self,tWindow=100, tStep=100 * .25,plot=False):
+    def prep(self, tWindow=100, tStep=100 * .25,plot=False):
         tic = time.time()
         subjects_TUAR19 = defaultdict(dict)
         Xwindows = []
