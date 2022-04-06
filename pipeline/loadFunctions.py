@@ -7,6 +7,8 @@ import numpy as np
 import torch
 from preprocessFunctions import preprocessRaw
 import matplotlib.pyplot as plt
+from scipy import signal, stats
+
 plt.rcParams["font.family"] = "Times New Roman"
 
 ##These functions are either inspired from or modified copies of code written by David Nyrnberg:
@@ -71,7 +73,9 @@ class TUH_data:
 
         return edfDict
 
-    def prep(self, tWindow=100, tStep=100 * .25,plot=False):
+    def prep(self, tWindow=100, tStep=100 *.25,plot=False):
+        self.tWindow=tWindow
+        self.tStep=tStep
         tic = time.time()
         subjects_TUAR19 = defaultdict(dict)
         Xwindows = []
@@ -124,13 +128,14 @@ class TUH_data:
         self.Ywindows = Ywindows
 
     def specMaker(self):
-
         Xwindows=self.Xwindows
-        Ywindows=self.Ywindows
         Freq = self.sfreq
+        tWindow=self.tWindow
+        tStep=self.tStep
+        overlap=(tWindow-tStep)/tWindow #The amount of the window that overlaps with the next window.
 
         for k in range(len(Xwindows)):
-            spectrogramMake(Xwindows[k], Freq)
+            spectrogramMake(Xwindows[k], Freq,FFToverlap=overlap,tWindow=tWindow, show_chan_num=1,chan_names=self.ch_names)
 
 # renames TUH channels to conventional 10-20 system
 def TUH_rename_ch(MNE_raw=False):
@@ -258,10 +263,10 @@ def annotate_TUH(raw,annoPath=False, header=None):
     raw_anno=raw.set_annotations(anno)
     return raw_anno
 
-def spectrogramMake(MNE_raw=None, freq = None, tWindow=120, crop_fq=45, FFToverlap=None, show_chan_num=None):
+def spectrogramMake(MNE_window=None, freq = None, tWindow=100, crop_fq=45, FFToverlap=None, show_chan_num=None,chan_names=None):
     try:
         edfFs = freq
-        chWindows = MNE_raw
+        chWindows = MNE_window
 
         if FFToverlap is None:
             specOption = {"x": chWindows, "fs": edfFs, "mode": "psd"}
@@ -270,9 +275,9 @@ def spectrogramMake(MNE_raw=None, freq = None, tWindow=120, crop_fq=45, FFToverl
             specOption = {"x": chWindows, "fs": edfFs, "window": window, "noverlap": int(tWindow*FFToverlap), "mode": "psd"}
 
         fAx, tAx, Sxx = signal.spectrogram(**specOption)
-        normSxx = stats.zscore(np.log(Sxx[:, fAx <= crop_fq, :] + np.finfo(float).eps))
+        normSxx = stats.zscore(np.log(Sxx[:, fAx <= crop_fq, :] + 2**-52)) #np.finfo(float).eps))
         if isinstance(show_chan_num, int):
-            plot_spec = plotSpec(ch_names=MNE_raw.info['ch_names'], chan=show_chan_num,
+            plot_spec = plotSpec(ch_names=chan_names, chan=show_chan_num,
                                  fAx=fAx[fAx <= crop_fq], tAx=tAx, Sxx=normSxx)
             plot_spec.show()
     except:

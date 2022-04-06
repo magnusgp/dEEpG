@@ -19,6 +19,7 @@ def preprocessRaw(MNE_raw=None, lpfq=1, hpfq=40, notchfq=60, downSam=100, cap_se
     # Re-reference the raw signal to average of all channels
     MNE_raw.set_eeg_reference()
 
+    #We probably don't want ICA, so should maybe be deleted.
     if ICA:
         ica=mne.preprocessing.ICA(n_components=20)
         ica.fit(MNE_raw)
