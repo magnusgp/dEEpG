@@ -4,6 +4,8 @@ from collections import defaultdict
 from datetime import datetime, timezone
 import pandas as pd
 from preprocessFunctions import preprocessRaw
+import matplotlib.pyplot as plt
+plt.rcParams["font.family"] = "Times New Roman"
 
 ##These functions are either inspired from or modified copies of code written by David Nyrnberg:
 # https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG/tree/0bfd1a9349f60f44e6f7df5aa6820434e44263a2/Transfer%20learning%20project
@@ -24,9 +26,11 @@ class TUH_data:
                 session_path_split = os.path.split(dirpath)
                 patient_path_split = os.path.split(session_path_split[0])
                 id_path_split = os.path.split(patient_path_split[0])
-                EEG_dict.update({EEG_count: {"id": id_path_split[1], "patient_id": patient_path_split[1],
+                EEG_dict.update({EEG_count: {"id": id_path_split[1],
+                                             "patient_id": patient_path_split[1],
                                              "session": session_path_split[1],
-                                             "path": os.path.join(dirpath, filename)}})
+                                             "path": os.path.join(dirpath, filename),
+                                             "csvpath": os.path.join(dirpath, os.path.splitext(filename)[0]+'.csv')}})
                 EEG_count += 1
         self.EEG_dict = EEG_dict
         self.EEG_count = EEG_count
@@ -65,7 +69,7 @@ class TUH_data:
 
         return edfDict
 
-    def prep(self,tWindow=100, tStep=100 * .25):
+    def prep(self,tWindow=100, tStep=100 * .25,plot=False):
         tic = time.time()
         subjects_TUAR19 = defaultdict(dict)
         Xwindows = []
@@ -83,12 +87,20 @@ class TUH_data:
             proc_subject["rawData"].pick_channels(ch_names=TUH_pick)
             proc_subject["rawData"].reorder_channels(TUH_pick)
 
-            if k == 0:
-                self.sfreq = proc_subject["rawData"].info["sfreq"]
-                self.ch_names = proc_subject["rawData"].info["ch_names"]
+            if k == 0 and plot:
+                    raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
+                    raw_anno.plot()
+                    plt.show()
 
             preprocessRaw(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
                      downSam=250)
+            if k == 0:
+                self.sfreq = proc_subject["rawData"].info["sfreq"]
+                self.ch_names = proc_subject["rawData"].info["ch_names"]
+                if plot:
+                    raw_anno = annotate_TUH(proc_subject["rawData"], annoPath=self.EEG_dict[k]["csvpath"])
+                    raw_anno.plot()
+                    plt.show()
 
             # Generate output windows for (X,y) as (array, label)
             proc_subject["preprocessing_output"] = slidingRawWindow(proc_subject,
@@ -142,7 +154,7 @@ def label_TUH(annoPath=False, window=[0, 0], header=None):  # saveDir=os.getcwd(
     return return_list
 
 
-def makeRawWindow(MNE_raw=None, t0=0, tWindow=120):
+def makeArrayWindow(MNE_raw=None, t0=0, tWindow=120):
     # take a raw signal and make a window given time specifications. Outputs an array, because of raw.get_data().
     chWindows = MNE_raw.get_data(start=int(t0), stop=int(t0 + tWindow), reject_by_annotation="omit", picks=['eeg'])
     return chWindows
@@ -173,7 +185,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1):
         t_start = i / edf_fS
         t_end = (i + window_width) / edf_fS
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
-        window_data = makeRawWindow(EEG_series["rawData"], t0=i, tWindow=window_width)  # , show_chan_num=0) #)
+        window_data = makeArrayWindow(EEG_series["rawData"], t0=i, tWindow=window_width)  # , show_chan_num=0) #)
         window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
         window_EEG[window_key] = (window_data, window_label)
     # window_N segments (by negative lookahead)
@@ -181,8 +193,55 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1):
         t_start = (t_N - window_width) / edf_fS
         t_end = t_N / edf_fS
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
-        window_data = makeRawWindow(EEG_series["rawData"], t0=i, tWindow=window_width)
+        window_data = makeArrayWindow(EEG_series["rawData"], t0=i, tWindow=window_width)
         window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
         window_EEG[window_key] = (window_data, window_label)
 
     return window_EEG
+
+def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
+    edf_fS = EEG_series["rawData"].info["sfreq"]
+    t_N = int(t_max * edf_fS)
+    window_width = int(EEG_series["tWindow"] * edf_fS)
+    label_path = EEG_series['path'].split(".edf")[0] + ".csv"
+
+    for i in range(0, t_N - window_width, t_overlap):
+        t_start = i / edf_fS
+        t_end = (i + window_width) / edf_fS
+        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])
+        if len(window_label)==1 & window_label[0]==label:
+            EEG_series["rawData"].plot(t_start=t_start, t_end=t_end)
+
+def annotate_TUH(raw,annoPath=False, header=None):
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+    t_start=df[2].to_numpy()
+    dura=df[3].to_numpy()-t_start
+    labels=df[4].to_numpy().tolist()
+    chan_names=df[1].to_numpy().tolist()
+    t_start=t_start.tolist()
+    dura=dura.tolist()
+
+    delete=[]
+    low_char={'FP1':'Fp1', 'FP2':'Fp2', 'FZ':'Fz', 'CZ':'Cz', 'PZ':'Pz'}
+    for i in range(len(chan_names)):
+        #remove numbers behind channel names:
+        chan_names[i]=[chan_names[i][:-3]]
+        # Change certain channels to have smaller letters:
+        if chan_names[i][0] in low_char:
+            chan_names[i][0]=low_char[chan_names[i][0]]
+
+        if chan_names[i][0] not in raw.ch_names:
+            delete.append(i)
+
+    #removes every annotation that cannot be handled backwards:
+    for ele in sorted(delete,reverse=True):
+        print(f"Annotation {labels[ele]} on non-existing channel {chan_names[ele]} removed from annotations.")
+        del t_start[ele], dura[ele],labels[ele],chan_names[ele]
+
+    anno=mne.Annotations(onset=t_start,
+                            duration=dura,
+                              description=labels,
+                                ch_names=chan_names)
+
+    raw_anno=raw.set_annotations(anno)
+    return raw_anno

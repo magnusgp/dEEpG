@@ -193,24 +193,44 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1, FFToverlap=None, crop_fq
     
     return windowOut"""
 
-path="/Users/magnus/Desktop/DTU/EEG2"
+def annotate_TUH(raw,annoPath=False, header=None):
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+    t_start=df[2].to_numpy()
+    dura=df[3].to_numpy()-t_start
+    labels=df[4].to_numpy().tolist()
+
+    anno=mne.Annotations(onset=t_start.tolist(),
+                            duration=dura.tolist(),
+                              description=labels)
+
+    raw_anno=raw.set_annotations(anno)
+    return raw_anno
+
+path="TUH_data_sample"
 save_dir=os.getcwd()
 TUH=TUH_data()
 TUH.findEdf(path=path)
 print(TUH.EEG_dict)
 TUH.loadAllRaw()
-TUH.prep(saveDir=save_dir)
 
-windows_dataset = create_from_X_y(
-    TUH.Xwindows, labelInt(TUH.Ywindows), drop_last_window=True, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
-    window_stride_samples=len(TUH.Xwindows[0][0]),
-    window_size_samples=len(TUH.Xwindows[0][0]),
-)
+raw_anno=annotate_TUH(TUH.EEG_raw_dict[0],annoPath=TUH.EEG_dict[0]['csvpath'])
+raw_anno.plot(start=689,duration=30)
+plt.show()
 
-windows_dataset.description
+#windows_dataset = create_from_X_y(
+ #   TUH.Xwindows, labelInt(TUH.Ywindows), drop_last_window=True, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
+  #  window_stride_samples=len(TUH.Xwindows[0][0]),
+   # window_size_samples=len(TUH.Xwindows[0][0]),
+#)
 
+#windows_dataset.description
+
+
+#TUH.EEG_raw_dict[0].plot(start=689,duration=10)
+#plt.show()
 
 #print(TUH.EEG_raw_dict)
 #TUH.EEG_raw_dict[0].plot_psd()
 #TUH.EEG_raw_dict[0].plot(duration=4)
 #plt.show()
+
