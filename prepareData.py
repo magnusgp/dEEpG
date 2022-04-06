@@ -12,7 +12,7 @@ from scipy import signal, stats
 import matplotlib.pyplot as plt
 from eegProcess import TUH_rename_ch, nonPipeline, spectrogramMake, slidingWindow, pipeline
 from braindecode.datasets import create_from_X_y
-from pipeline.raw_utils import labelInt
+from pipeline.raw_utils import labelInt, oneHotEncoder
 
 class TUH_data:
     def __init__(self):
@@ -120,6 +120,16 @@ class TUH_data:
 
         self.Xwindows=Xwindows
         self.Ywindows=Ywindows
+
+    def specMaker(self):
+
+        Xwindows=self.Xwindows
+        Ywindows=self.Ywindows
+        Freq = self.sfreq
+
+        for k in range(len(Xwindows)):
+            spectrogramMake(Xwindows[k], Freq)
+
 
 def label_TUH(annoPath=False, window=[0,0], header=None): #saveDir=os.getcwd(),
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)

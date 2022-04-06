@@ -106,10 +106,10 @@ def nonPipeline(MNE_raw=None, hp_cut=1, down_sam=250, cap_setup="easycap-M1"):
 
 
 # calculate STFT, FFT or Spectrogram of EEG channels
-def spectrogramMake(MNE_raw=None, t0=0, tWindow=120, crop_fq=45, FFToverlap=None, show_chan_num=None):
+def spectrogramMake(MNE_raw=None, freq = None, tWindow=120, crop_fq=45, FFToverlap=None, show_chan_num=None):
     try:
-        edfFs = MNE_raw.info["sfreq"]
-        chWindows = MNE_raw.get_data(start=int(t0), stop=int(t0+tWindow), reject_by_annotation="omit", picks=['eeg'])
+        edfFs = freq
+        chWindows = MNE_raw
 
         if FFToverlap is None:
             specOption = {"x": chWindows, "fs": edfFs, "mode": "psd"}

@@ -95,8 +95,10 @@ def oneHotEncoder(labels):
                   'eyem_chew', 'shiv', 'chew_musc', 'elpp', 'chew_elec', 'eyem_shiv', 'shiv_elec']
     n_classes = len(all_labels)
     one_hot_labels = np.zeros((len(labels), n_classes))
-    for i, label in enumerate(labels):
-        one_hot_labels[i, all_labels.index(label)] = 1
+    for i in range(len(labels)):
+        for j, label in enumerate(labels):
+            if label in all_labels:
+                one_hot_labels[i, j] = 1
     return one_hot_labels
 
 def labelInt(labels):
