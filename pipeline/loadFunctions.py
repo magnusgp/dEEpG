@@ -3,6 +3,8 @@ from mne.io import read_raw_edf
 from collections import defaultdict
 from datetime import datetime, timezone
 import pandas as pd
+import numpy as np
+import torch
 from preprocessFunctions import preprocessRaw
 import matplotlib.pyplot as plt
 plt.rcParams["font.family"] = "Times New Roman"
@@ -94,6 +96,7 @@ class TUH_data:
 
             preprocessRaw(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
                      downSam=250)
+
             if k == 0:
                 self.sfreq = proc_subject["rawData"].info["sfreq"]
                 self.ch_names = proc_subject["rawData"].info["ch_names"]
@@ -119,6 +122,15 @@ class TUH_data:
 
         self.Xwindows = Xwindows
         self.Ywindows = Ywindows
+
+    def specMaker(self):
+
+        Xwindows=self.Xwindows
+        Ywindows=self.Ywindows
+        Freq = self.sfreq
+
+        for k in range(len(Xwindows)):
+            spectrogramMake(Xwindows[k], Freq)
 
 # renames TUH channels to conventional 10-20 system
 def TUH_rename_ch(MNE_raw=False):
@@ -245,3 +257,42 @@ def annotate_TUH(raw,annoPath=False, header=None):
 
     raw_anno=raw.set_annotations(anno)
     return raw_anno
+
+def spectrogramMake(MNE_raw=None, freq = None, tWindow=120, crop_fq=45, FFToverlap=None, show_chan_num=None):
+    try:
+        edfFs = freq
+        chWindows = MNE_raw
+
+        if FFToverlap is None:
+            specOption = {"x": chWindows, "fs": edfFs, "mode": "psd"}
+        else:
+            window = signal.get_window(window=('tukey', 0.25), Nx=int(tWindow))  # TODO: error in 'Nx' & 'noverlap' proportions
+            specOption = {"x": chWindows, "fs": edfFs, "window": window, "noverlap": int(tWindow*FFToverlap), "mode": "psd"}
+
+        fAx, tAx, Sxx = signal.spectrogram(**specOption)
+        normSxx = stats.zscore(np.log(Sxx[:, fAx <= crop_fq, :] + np.finfo(float).eps))
+        if isinstance(show_chan_num, int):
+            plot_spec = plotSpec(ch_names=MNE_raw.info['ch_names'], chan=show_chan_num,
+                                 fAx=fAx[fAx <= crop_fq], tAx=tAx, Sxx=normSxx)
+            plot_spec.show()
+    except:
+        print("pause here")
+        # fTemp, tTemp, SxxTemp = signal.spectrogram(chWindows[0], fs=edfFs)
+        # plt.pcolormesh(tTemp, fTemp, np.log(SxxTemp))
+        # plt.ylabel('Frequency [Hz]')
+        # plt.xlabel('Time [sec]')
+        # plt.title("channel spectrogram: "+MNE_raw.ch_names[0])
+        # plt.ylim(0,45)
+        # plt.show()
+
+    return torch.tensor(normSxx.astype(np.float16)) # for np delete torch.tensor
+
+def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
+    # fTemp, tTemp, SxxTemp = signal.spectrogram(chWindows[0], fs=edfFs)
+    # normSxx = stats.zscore(np.log(Sxx[:, fAx <= cropFq, :] + np.finfo(float).eps))
+    plt.pcolormesh(tAx, fAx, Sxx[chan, :, :])
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.title("channel spectrogram: " + ch_names[chan])
+
+    return plt

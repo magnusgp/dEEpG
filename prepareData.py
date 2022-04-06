@@ -121,6 +121,16 @@ class TUH_data:
         self.Xwindows=Xwindows
         self.Ywindows=Ywindows
 
+    def specMaker(self):
+
+        Xwindows=self.Xwindows
+        Ywindows=self.Ywindows
+        Freq = self.sfreq
+
+        for k in range(len(Xwindows)):
+            spectrogramMake(Xwindows[k], Freq)
+
+
 def label_TUH(annoPath=False, window=[0,0], header=None): #saveDir=os.getcwd(),
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
     df.fillna('null', inplace=True)
