@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="Preprocess modified">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="Spectrogram maker works">
+      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadData.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadData.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/preprocessFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/preprocessFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -290,7 +292,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649246342681</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Spectrogram maker works">
+      <created>1649248703473</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1649248703473</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -313,7 +322,8 @@
     <MESSAGE value="Dataset of windows with labels" />
     <MESSAGE value="Code to load dataset as windows with labels" />
     <MESSAGE value="Preprocess modified" />
-    <option name="LAST_COMMIT_MESSAGE" value="Preprocess modified" />
+    <MESSAGE value="Spectrogram maker works" />
+    <option name="LAST_COMMIT_MESSAGE" value="Spectrogram maker works" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -357,6 +367,16 @@
           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
           <line>17</line>
           <option name="timeStamp" value="72" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>251</line>
+          <option name="timeStamp" value="86" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>255</line>
+          <option name="timeStamp" value="93" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

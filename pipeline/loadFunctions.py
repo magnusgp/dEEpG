@@ -94,17 +94,23 @@ class TUH_data:
             proc_subject["rawData"].reorder_channels(TUH_pick)
 
             if k == 0 and plot:
-                    raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
-                    raw_anno.plot()
-                    plt.show()
+                #Plot the energy voltage potential against frequency.
+                proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+
+                raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
+                raw_anno.plot()
+                plt.show()
 
             preprocessRaw(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
                      downSam=250)
 
             if k == 0:
+
                 self.sfreq = proc_subject["rawData"].info["sfreq"]
                 self.ch_names = proc_subject["rawData"].info["ch_names"]
                 if plot:
+                    proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+
                     raw_anno = annotate_TUH(proc_subject["rawData"], annoPath=self.EEG_dict[k]["csvpath"])
                     raw_anno.plot()
                     plt.show()
@@ -227,7 +233,8 @@ def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
         t_end = (i + window_width) / edf_fS
         window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])
         if len(window_label)==1 & window_label[0]==label:
-            EEG_series["rawData"].plot(t_start=t_start, t_end=t_end)
+            return EEG_series["rawData"].plot(t_start=t_start, t_end=t_end)
+    return None
 
 def annotate_TUH(raw,annoPath=False, header=None):
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
@@ -242,13 +249,23 @@ def annotate_TUH(raw,annoPath=False, header=None):
     low_char={'FP1':'Fp1', 'FP2':'Fp2', 'FZ':'Fz', 'CZ':'Cz', 'PZ':'Pz'}
     for i in range(len(chan_names)):
         #remove numbers behind channel names:
-        chan_names[i]=[chan_names[i][:-3]]
-        # Change certain channels to have smaller letters:
-        if chan_names[i][0] in low_char:
-            chan_names[i][0]=low_char[chan_names[i][0]]
+        chan_names[i]=[chan_names[i][:-3],chan_names[i][-2:]]
 
-        if chan_names[i][0] not in raw.ch_names:
+        # Loop through all channel names in reverse order, so if something is removed it does not affect other index.
+        # Change certain channels to have smaller letters:
+        for k in range(len(chan_names[i])-1,-1,-1):
+            if chan_names[i][k] in low_char:
+                chan_names[i][k]=low_char[chan_names[i][k]]
+
+            # If channel names are not in the raw info their are removed from an annotation:
+            if chan_names[i][k] not in raw.ch_names:
+                chan_names[i].remove(chan_names[i][k])
+
+        # If no channel names are left for an annotation its index is saved for later removal entirely:
+        # (It could potentially just be annotated for the whole signal)
+        if not chan_names[i]:
             delete.append(i)
+
 
     #removes every annotation that cannot be handled backwards:
     for ele in sorted(delete,reverse=True):
