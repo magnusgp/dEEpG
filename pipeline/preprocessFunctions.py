@@ -10,15 +10,16 @@ def preprocessRaw(MNE_raw=None, lpfq=1, hpfq=40, notchfq=60, downSam=100, cap_se
     # In america there is a line-noise at around 60 Hz, which i
     MNE_raw.notch_filter(freqs=notchfq, notch_widths=5)
 
-    # Step 7: Downsample
+    # Resample so all signals have the same sampling frequency
     MNE_raw.resample(sfreq=downSam)
 
-    # Step 8
+    # Before re-referencing we need to remove bad channels, which means we first need to classify the elec artifacts.
     #MNE_raw.interpolate_bads(reset_bads=True, origin='auto')
 
     # Re-reference the raw signal to average of all channels
     MNE_raw.set_eeg_reference()
 
+    #We probably don't want ICA, so should maybe be deleted.
     if ICA:
         ica=mne.preprocessing.ICA(n_components=20)
         ica.fit(MNE_raw)
