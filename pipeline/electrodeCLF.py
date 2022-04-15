@@ -2,7 +2,7 @@ from clfs import electrodeCLF
 import mne
 #from autoreject import AutoReject, get_rejection_threshold, Ransac
 from loadFunctions import TUH_data
-from raw_utils import oneHotEncoder
+from raw_utils import oneHotEncoder, labelInt
 from braindecode.datasets import create_from_X_y
 
 # Create EEG dataset
@@ -36,4 +36,5 @@ for i in range(len(X)):
         Xnew.append(X[i][j])
     #X2.append(Xnew)
 
-score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=True))
+#score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=False))
+score = electrodeCLF(Xnew, labelInt(y))
