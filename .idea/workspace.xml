@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="Spectrogram maker works">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="montageTest">
       <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadData.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadData.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/preprocessFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/preprocessFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +25,7 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="origin/pipeline_dev" />
+    <option name="BRANCH" value="origin/main" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -163,9 +164,9 @@
     </configuration>
     <list>
       <item itemvalue="Python.BC_TUH_script" />
-      <item itemvalue="Python.LoadWithBraindecode" />
       <item itemvalue="Python.inputScript" />
       <item itemvalue="Python.loadData" />
+      <item itemvalue="Python.LoadWithBraindecode" />
       <item itemvalue="Python.prepareData" />
     </list>
     <recent_temporary>
@@ -306,7 +307,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649248703473</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="montageTest">
+      <created>1650014226240</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1650014226240</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -330,7 +338,8 @@
     <MESSAGE value="Code to load dataset as windows with labels" />
     <MESSAGE value="Preprocess modified" />
     <MESSAGE value="Spectrogram maker works" />
-    <option name="LAST_COMMIT_MESSAGE" value="Spectrogram maker works" />
+    <MESSAGE value="montageTest" />
+    <option name="LAST_COMMIT_MESSAGE" value="montageTest" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -367,23 +376,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
-          <line>23</line>
+          <line>28</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
-          <line>17</line>
+          <line>22</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
-          <line>251</line>
-          <option name="timeStamp" value="86" />
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>33</line>
+          <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
-          <line>255</line>
-          <option name="timeStamp" value="93" />
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>54</line>
+          <option name="timeStamp" value="106" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

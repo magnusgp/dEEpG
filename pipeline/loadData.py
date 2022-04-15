@@ -1,5 +1,6 @@
 from loadFunctions import TUH_data
 from braindecode.datasets import create_from_X_y
+from clfs import electrodeCLF
 
 # Define path of outer directory for samples:
 path="../TUH_data_sample"
@@ -9,10 +10,15 @@ save_dir="D:/fagprojekt"
 # Create class for data and find all edf files in path, and save in EEG_dict:
 TUH=TUH_data(path=path)
 
-# Load edf to raw, preprocess, make Xwindows (all windows as arrays) and Ywindows (labels as list of strings)
-TUH.prep(tWindow=100, tStep=100 * .25,plot=True)
+# Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
+# Ywindows (labels as list of strings) to use for electrode artifact classifier:
+elecX,elecY=TUH.electrodeCLFPrep(tWindow=100, tStep=100 * .25,plot=False)
+# Find the best electrode artifact classifier:
+electrodeCLF(elecX,elecY,"all")
 
-#TUH.specMaker()
+# Load edf to raw, full preprocess with electrode classifier, make Xwindows (all windows
+# as arrays) and Ywindows (labels as list of strings) to use for data augmentation.
+TUH.prep(tWindow=100, tStep=100 * .25,plot=True)
 
 # Make Braindecode windows dataset from Xwindows and Ywindows:
 windows_dataset = create_from_X_y(
