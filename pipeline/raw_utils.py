@@ -91,19 +91,29 @@ def oneHotEncoder(labels, enumerate_labels=False):
     """
     Encode labels to one-hot encoding.
     """
+    one_hot_labels = []
+    all_labels = ['musc', 'eyem', 'elec', 'eyem_musc', 'musc_elec', 'chew', 'eyem_elev',
+                  'eyem_chew', 'shiv', 'chew_musc', 'elpp', 'chew_elec', 'eyem_shiv', 'shiv_elec']
+    n_classes = len(all_labels)
+    #labels = [item for sublist in labels for item in sublist]
+    for i in range(len(labels)):
+        one_hot_labels.append(np.zeros((len(labels[i]), n_classes)))
+    for j, label in enumerate(labels):
+        for k in range(len(labels[j])):
+            if label[k] in all_labels:
+                #one_hot_labels[j, all_labels.index(label[k])] = 1
+                one_hot_labels[j][k][all_labels.index(label[k])] = 1
+                continue
+
     if enumerate_labels:
-        one_hot_labels = labelInt(labels)
-    else:
-        all_labels = ['musc', 'eyem', 'elec', 'eyem_musc', 'musc_elec', 'chew', 'eyem_elev',
-                      'eyem_chew', 'shiv', 'chew_musc', 'elpp', 'chew_elec', 'eyem_shiv', 'shiv_elec']
-        n_classes = len(all_labels)
-        one_hot_labels = np.zeros((len(labels), n_classes))
-        #for i in range(len(labels)):
-        for j, label in enumerate(labels):
-            for k in range(len(labels[j])):
-                if label[k] in all_labels:
-                    one_hot_labels[j][all_labels.index(label[k])] = 1
-                    break
+        lab = []
+        for l in range(len(one_hot_labels)):
+            lab2 = []
+            for m in range(len(one_hot_labels[l])):
+                lab2.append(np.where(one_hot_labels[l][m] == 1)[0].item())
+            lab.append(lab2)
+        return lab
+
     return one_hot_labels
 
 def labelInt(labels):
