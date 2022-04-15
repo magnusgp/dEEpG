@@ -37,4 +37,4 @@ for i in range(len(X)):
     #X2.append(Xnew)
 
 #score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=False))
-score = electrodeCLF(Xnew, labelInt(y))
+score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=True), name = "all")
