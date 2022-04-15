@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="montageTest">
-      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="gitignore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/loadData.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadData.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/preprocessFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/preprocessFunctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/electrodeCLF.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/electrodeCLF.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/raw_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/raw_utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,16 +22,31 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="origin/main" />
+    <option name="BRANCH" value="origin/pipeline_dev" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="25W0Gvvo5KunPrCnT8lbZPNy557" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -44,7 +56,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="ToolWindowPython Packages.ShowToolbar" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/David" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -56,28 +68,7 @@
       <recent name="C:\Users\marie\PycharmProjects\dEEpG" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.loadData">
-    <configuration name="BC_TUH_script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="dEEpG" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/David" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/David/BC_TUH_script.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.electrodeCLF">
     <configuration name="LoadWithBraindecode" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dEEpG" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -99,7 +90,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="inputScript" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="clfs" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dEEpG" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -107,11 +98,32 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/David" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/David/inputScript.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/clfs.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="electrodeCLF" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="dEEpG" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/electrodeCLF.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -127,7 +139,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\marie\AppData\Local\Programs\Python\Python310\python.exe" />
+      <option name="SDK_HOME" value="$USER_HOME$/opt/anaconda3/bin/python" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -163,19 +175,19 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.BC_TUH_script" />
-      <item itemvalue="Python.inputScript" />
-      <item itemvalue="Python.loadData" />
       <item itemvalue="Python.LoadWithBraindecode" />
       <item itemvalue="Python.prepareData" />
+      <item itemvalue="Python.loadData" />
+      <item itemvalue="Python.clfs" />
+      <item itemvalue="Python.electrodeCLF" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.electrodeCLF" />
+        <item itemvalue="Python.clfs" />
         <item itemvalue="Python.loadData" />
         <item itemvalue="Python.prepareData" />
         <item itemvalue="Python.LoadWithBraindecode" />
-        <item itemvalue="Python.inputScript" />
-        <item itemvalue="Python.BC_TUH_script" />
       </list>
     </recent_temporary>
   </component>
@@ -307,14 +319,56 @@
       <option name="project" value="LOCAL" />
       <updated>1649248703473</updated>
     </task>
-    <task id="LOCAL-00018" summary="montageTest">
-      <created>1650014226240</created>
+    <task id="LOCAL-00018" summary="new classifyer function added">
+      <created>1650010444222</created>
       <option name="number" value="00018" />
       <option name="presentableId" value="LOCAL-00018" />
       <option name="project" value="LOCAL" />
-      <updated>1650014226240</updated>
+      <updated>1650010444222</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="minor workspace changes">
+      <created>1650010469065</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1650010469065</updated>
+    </task>
+    <task id="LOCAL-00020" summary="updated classifier function with table formatting and example">
+      <created>1650012156323</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1650012156323</updated>
+    </task>
+    <task id="LOCAL-00021" summary="tracking changes">
+      <created>1650012171408</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1650012171408</updated>
+    </task>
+    <task id="LOCAL-00022" summary="updated label encoder with enumeration option (for K-class classification)">
+      <created>1650017349034</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1650017349034</updated>
+    </task>
+    <task id="LOCAL-00023" summary="added electrode pop classifier and dataset creation script">
+      <created>1650017389219</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1650017389219</updated>
+    </task>
+    <task id="LOCAL-00024" summary="gitignore">
+      <created>1650017398622</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1650017398622</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -338,8 +392,14 @@
     <MESSAGE value="Code to load dataset as windows with labels" />
     <MESSAGE value="Preprocess modified" />
     <MESSAGE value="Spectrogram maker works" />
-    <MESSAGE value="montageTest" />
-    <option name="LAST_COMMIT_MESSAGE" value="montageTest" />
+    <MESSAGE value="new classifyer function added" />
+    <MESSAGE value="minor workspace changes" />
+    <MESSAGE value="updated classifier function with table formatting and example" />
+    <MESSAGE value="tracking changes" />
+    <MESSAGE value="updated label encoder with enumeration option (for K-class classification)" />
+    <MESSAGE value="added electrode pop classifier and dataset creation script" />
+    <MESSAGE value="gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="gitignore" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -376,23 +436,38 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
-          <line>28</line>
+          <line>23</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
-          <line>22</line>
+          <line>17</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
-          <line>33</line>
-          <option name="timeStamp" value="105" />
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>251</line>
+          <option name="timeStamp" value="86" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>255</line>
+          <option name="timeStamp" value="93" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
           <line>54</line>
-          <option name="timeStamp" value="106" />
+          <option name="timeStamp" value="98" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="99" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/raw_utils.py</url>
+          <line>117</line>
+          <option name="timeStamp" value="109" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
