@@ -13,8 +13,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from tabulate import tabulate
 
-def electrodeCLF(X, y, name = ""):
+def electrodeCLF(X, y, name = "all"):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -42,13 +43,36 @@ def electrodeCLF(X, y, name = ""):
         GaussianNB(),
         QuadraticDiscriminantAnalysis(),
     ]
-    if name in names:
-        model = classifiers[names.index(name)]
-        model.fit(X,y)
-        score = model.score(X,y)
+
+    Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
+    score = {}
+    if name == "all":
+        # Iterate over all classifiers
+        score = {}
+        tabdata = []
+        for name, clf in zip(names, classifiers):
+            # Fit classifier
+            clf.fit(Xtrain, ytrain)
+            # Update scoring dictionary
+            score[name] = clf.score(Xtest, ytest)
+            # Append data to table
+            tabdata.append([name, str(score[name] * 100) + " %"])
+        # Print a formatted table of model performances
+        print("\n\nModel Performance Summary:")
+        print(tabulate(tabdata, headers=['Model name', 'Model score'], numalign='left', floatfmt=".3f"))
+
+    elif name in names:
+        classifiers[names.index(name)].fit(Xtrain, ytrain)
+        score[name] = classifiers[names.index(name)].score(Xtest, ytest)
+        print("{} score: {} %".format(name, str(score[name]) * 100))
+
     else:
         print("Error! Please select a classifier from the list: {}".format(names))
+        score = 0.0
+
     return score
 
-if __name__ = "__main__":
-    pass
+if __name__ == "__main__":
+    X, y = make_classification(n_features=3, n_redundant=0, n_informative=2,
+                               random_state=1, n_clusters_per_class=1)
+    score = electrodeCLF(X, y, name = "all")
