@@ -1,0 +1,18 @@
+Index: pipeline/preprocessFunctions.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import mne\n\ndef preprocessRaw(MNE_raw=None, lpfq=1, hpfq=40, notchfq=60, downSam=100, cap_setup=\"easycap-M1\",ICA=False):\n    #The raw signal is Band-pass filtered. Default is 1-100 (as to not remove the muscle artifacts of\n    MNE_raw.filter(lpfq, hpfq, fir_design='firwin')\n\n    # Channel names are set from the cap_setup\n    MNE_raw.set_montage(mne.channels.make_standard_montage(kind=cap_setup, head_size=0.095), on_missing=\"warn\")\n\n    # In america there is a line-noise at around 60 Hz, which i\n    MNE_raw.notch_filter(freqs=notchfq, notch_widths=5)\n\n    # Step 7: Downsample\n    MNE_raw.resample(sfreq=downSam)\n\n    # Step 8\n    #MNE_raw.interpolate_bads(reset_bads=True, origin='auto')\n\n    # Re-reference the raw signal to average of all channels\n    MNE_raw.set_eeg_reference()\n\n    if ICA:\n        ica=mne.preprocessing.ICA(n_components=20)\n        ica.fit(MNE_raw)\n        MNE_raw.load_data()\n        ica.apply(MNE_raw)\n\n    return MNE_raw
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pipeline/preprocessFunctions.py b/pipeline/preprocessFunctions.py
+--- a/pipeline/preprocessFunctions.py	(revision 5abf075f6366a276160052d8c41f12fb871c8d5b)
++++ b/pipeline/preprocessFunctions.py	(date 1649849829085)
+@@ -25,4 +25,5 @@
+         MNE_raw.load_data()
+         ica.apply(MNE_raw)
+ 
+-    return MNE_raw
+\ No newline at end of file
++    return MNE_raw
++

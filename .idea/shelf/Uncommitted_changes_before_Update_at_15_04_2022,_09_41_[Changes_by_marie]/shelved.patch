@@ -1,0 +1,117 @@
+Index: pipeline/preprocessFunctions.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import mne\n\ndef preprocessRaw(MNE_raw=None, lpfq=1, hpfq=40, notchfq=60, downSam=100, cap_setup=\"easycap-M1\",ICA=False):\n    #The raw signal is Band-pass filtered. Default is 1-100 (as to not remove the muscle artifacts of\n    MNE_raw.filter(lpfq, hpfq, fir_design='firwin')\n\n    # Channel names are set from the cap_setup\n    MNE_raw.set_montage(mne.channels.make_standard_montage(kind=cap_setup, head_size=0.095), on_missing=\"warn\")\n\n    # In america there is a line-noise at around 60 Hz, which i\n    MNE_raw.notch_filter(freqs=notchfq, notch_widths=5)\n\n    # Step 7: Downsample\n    MNE_raw.resample(sfreq=downSam)\n\n    # Step 8\n    #MNE_raw.interpolate_bads(reset_bads=True, origin='auto')\n\n    # Re-reference the raw signal to average of all channels\n    MNE_raw.set_eeg_reference()\n\n    if ICA:\n        ica=mne.preprocessing.ICA(n_components=20)\n        ica.fit(MNE_raw)\n        MNE_raw.load_data()\n        ica.apply(MNE_raw)\n\n    return MNE_raw
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pipeline/preprocessFunctions.py b/pipeline/preprocessFunctions.py
+--- a/pipeline/preprocessFunctions.py	(revision 5abf075f6366a276160052d8c41f12fb871c8d5b)
++++ b/pipeline/preprocessFunctions.py	(date 1649849829085)
+@@ -14,15 +14,9 @@
+     MNE_raw.resample(sfreq=downSam)
+ 
+     # Step 8
+-    #MNE_raw.interpolate_bads(reset_bads=True, origin='auto')
++    MNE_raw.interpolate_bads(reset_bads=True, origin='auto')
+ 
+     # Re-reference the raw signal to average of all channels
+     MNE_raw.set_eeg_reference()
+ 
+-    if ICA:
+-        ica=mne.preprocessing.ICA(n_components=20)
+-        ica.fit(MNE_raw)
+-        MNE_raw.load_data()
+-        ica.apply(MNE_raw)
+-
+     return MNE_raw
+\ No newline at end of file
+Index: pipeline/loadFunctions.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import os, mne, time, re\nfrom mne.io import read_raw_edf\nfrom collections import defaultdict\nfrom datetime import datetime, timezone\nimport pandas as pd\nfrom preprocessFunctions import preprocessRaw\nimport matplotlib.pyplot as plt\nplt.rcParams[\"font.family\"] = \"Times New Roman\"\n\n##These functions are either inspired from or modified copies of code written by David Nyrnberg:\n# https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG/tree/0bfd1a9349f60f44e6f7df5aa6820434e44263a2/Transfer%20learning%20project\n\n\nclass TUH_data:\n    def __init__(self, path):\n        ### Makes dictionary of all edf files\n        EEG_count = 0\n        EEG_dict = {}\n\n        for dirpath, dirnames, filenames in os.walk(path):\n            for filename in [f for f in filenames if f.endswith(\".edf\")]:\n                \"\"\"For every edf file found somewhere in the directory, it is assumed the folders hold the structure: \n                \".../id/patientId/sessionId/edfFile\".\n                Therefore the path is split backwards and the EEG_dict updated with the found ids/paths.\n                Furthermore it is expected that a csv file will always be found in the directory.\"\"\"\n                session_path_split = os.path.split(dirpath)\n                patient_path_split = os.path.split(session_path_split[0])\n                id_path_split = os.path.split(patient_path_split[0])\n                EEG_dict.update({EEG_count: {\"id\": id_path_split[1],\n                                             \"patient_id\": patient_path_split[1],\n                                             \"session\": session_path_split[1],\n                                             \"path\": os.path.join(dirpath, filename),\n                                             \"csvpath\": os.path.join(dirpath, os.path.splitext(filename)[0]+'.csv')}})\n                EEG_count += 1\n        self.EEG_dict = EEG_dict\n        self.EEG_count = EEG_count\n\n    \"\"\" These functions could probably be deleted, but are nice in case we want a quick plot of a raw file.\n    def loadOneRaw(self, id):\n        return mne.io.read_raw_edf(self.EEG_dict[id][\"path\"], preload=True)\n\n    def loadAllRaw(self):\n        EEG_raw_dict = {}\n        for id in range(self.EEG_count):\n            EEG_raw_dict[id] = self.loadOneRaw(id)\n        self.EEG_raw_dict = EEG_raw_dict\n        \"\"\"\n\n    def readRawEdf(self, edfDict=None, tWindow=120, tStep=30,\n                   read_raw_edf_param={'preload': True, \"stim_channel\": \"auto\"}):\n        try:\n            edfDict[\"rawData\"] = read_raw_edf(edfDict[\"path\"], **read_raw_edf_param)\n            edfDict[\"fS\"] = edfDict[\"rawData\"].info[\"sfreq\"]\n            t_start = edfDict[\"rawData\"].annotations.orig_time\n            if t_start.timestamp() <= 0:\n                edfDict[\"t0\"] = datetime.fromtimestamp(0, tz=timezone.utc)\n                t_last = edfDict[\"t0\"].timestamp() + edfDict[\"rawData\"]._last_time + 1 / edfDict[\"fS\"]\n                edfDict[\"tN\"] = datetime.fromtimestamp(t_last, tz=timezone.utc)\n            else:\n                t_last = t_start.timestamp() + edfDict[\"rawData\"]._last_time + 1 / edfDict[\"fS\"]\n                edfDict[\"t0\"] = t_start  # datetime.fromtimestamp(t_start.timestamp(), tz=timezone.utc)\n                edfDict[\"tN\"] = datetime.fromtimestamp(t_last, tz=timezone.utc)\n\n            edfDict[\"tWindow\"] = float(tWindow)  # width of EEG sample window, given in (sec)\n            edfDict[\"tStep\"] = float(tStep)  # step/overlap between EEG sample windows, given in (sec)\n\n        except:\n            print(\"error break please inspect:\\n %s\\n~~~~~~~~~~~~\" % edfDict[\"rawData\"].filenames[0])\n\n        return edfDict\n\n    def prep(self,tWindow=100, tStep=100 * .25,plot=False):\n        tic = time.time()\n        subjects_TUAR19 = defaultdict(dict)\n        Xwindows = []\n        Ywindows = []\n        for k in range(len(self.EEG_dict)):\n            subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}\n\n            proc_subject = subjects_TUAR19[k]\n            proc_subject = self.readRawEdf(proc_subject, tWindow=tWindow, tStep=tStep,\n                                           read_raw_edf_param={'preload': True})\n\n            proc_subject[\"rawData\"] = TUH_rename_ch(proc_subject[\"rawData\"])\n            TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',\n                        'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']  # A1, A2 removed\n            proc_subject[\"rawData\"].pick_channels(ch_names=TUH_pick)\n            proc_subject[\"rawData\"].reorder_channels(TUH_pick)\n\n            if k == 0 and plot:\n                    raw_anno = annotate_TUH(proc_subject[\"rawData\"],annoPath=self.EEG_dict[k][\"csvpath\"])\n                    raw_anno.plot()\n                    plt.show()\n\n            preprocessRaw(proc_subject[\"rawData\"], cap_setup=\"standard_1005\", lpfq=1, hpfq=40, notchfq=60,\n                     downSam=250)\n            if k == 0:\n                self.sfreq = proc_subject[\"rawData\"].info[\"sfreq\"]\n                self.ch_names = proc_subject[\"rawData\"].info[\"ch_names\"]\n                if plot:\n                    raw_anno = annotate_TUH(proc_subject[\"rawData\"], annoPath=self.EEG_dict[k][\"csvpath\"])\n                    raw_anno.plot()\n                    plt.show()\n\n            # Generate output windows for (X,y) as (array, label)\n            proc_subject[\"preprocessing_output\"] = slidingRawWindow(proc_subject,\n                                                                    t_max=proc_subject[\"rawData\"].times[-1],\n                                                                    tStep=proc_subject[\"tStep\"])\n\n            for window in proc_subject[\"preprocessing_output\"].values():\n                Xwindows.append(window[0])\n                Ywindows.append(window[1])\n\n        toc = time.time()\n        print(\"\\n~~~~~~~~~~~~~~~~~~~~\\n\"\n              \"it took %imin:%is to run preprocess-pipeline for %i patients\\n with window length [%.2fs] and t_step [%.2fs]\"\n              \"\\n~~~~~~~~~~~~~~~~~~~~\\n\" % (int((toc - tic) / 60), int((toc - tic) % 60), len(subjects_TUAR19),\n                                            tWindow, tStep))\n\n        self.Xwindows = Xwindows\n        self.Ywindows = Ywindows\n\n# renames TUH channels to conventional 10-20 system\ndef TUH_rename_ch(MNE_raw=False):\n    # MNE_raw\n    # mne.channels.rename_channels(MNE_raw.info, {\"PHOTIC-REF\": \"PROTIC\"})\n    for i in MNE_raw.info[\"ch_names\"]:\n        reSTR = r\"(?<=EEG )(\\S*)(?=-REF)\"  # working reSTR = r\"(?<=EEG )(.*)(?=-REF)\"\n        reLowC = ['FP1', 'FP2', 'FZ', 'CZ', 'PZ']\n\n        if re.search(reSTR, i) and re.search(reSTR, i).group() in reLowC:\n            lowC = i[0:5]+i[5].lower()+i[6:]\n            mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR, lowC)[0]})\n        elif i == \"PHOTIC-REF\":\n            mne.channels.rename_channels(MNE_raw.info, {i: \"PHOTIC\"})\n        elif re.search(reSTR, i):\n            mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR, i)[0]})\n        else:\n            continue\n            # print(i)\n    print(MNE_raw.info[\"ch_names\"])\n    return MNE_raw\n\ndef label_TUH(annoPath=False, window=[0, 0], header=None):  # saveDir=os.getcwd(),\n    df = pd.read_csv(annoPath, sep=\",\", skiprows=6, header=header)\n    df.fillna('null', inplace=True)\n    within_con0 = (df[2] <= window[0]) & (window[0] <= df[3])\n    within_con1 = (df[2] <= window[1]) & (window[1] <= df[3])\n    label_TUH = df[df[2].between(window[0], window[1]) |\n                   df[3].between(window[0], window[1]) |\n                   (within_con0 & within_con1)]\n    label_df = label_TUH.rename(columns={2: 't_start', 3: 't_end', 4: 'label', 5: 'confidence'})[\"label\"]  # Renamer headers i pandas dataen\n    return_list = label_df.to_numpy().tolist()  # Outputter kun listen af label navne i vinduet, fx [\"eyem\", \"null\"]\n    return return_list\n\n\ndef makeArrayWindow(MNE_raw=None, t0=0, tWindow=120):\n    # take a raw signal and make a window given time specifications. Outputs an array, because of raw.get_data().\n    chWindows = MNE_raw.get_data(start=int(t0), stop=int(t0 + tWindow), reject_by_annotation=\"omit\", picks=['eeg'])\n    return chWindows\n\n\ndef slidingRawWindow(EEG_series=None, t_max=0, tStep=1):\n    # catch correct sample frequency and end sample\n    edf_fS = EEG_series[\"rawData\"].info[\"sfreq\"]\n    t_N = int(t_max * edf_fS)\n\n    # ensure window-overlaps progress in sample interger\n    if float(tStep * edf_fS) == float(int(tStep * edf_fS)):\n        t_overlap = int(tStep * edf_fS)\n    else:\n        t_overlap = int(tStep * edf_fS)\n        overlap_change = 100 - (t_overlap / edf_fS) * 100\n        print(\"\\n  tStep [%.3f], overlap does not equal an interger [%f] and have been rounded to %i\"\n              \"\\n  equaling to %.1f%% overlap or %.3fs time steps\\n\\n\"\n              % (tStep, tStep * edf_fS, t_overlap, overlap_change, t_overlap / edf_fS))\n\n    # initialize variables for segments\n    window_EEG = defaultdict(tuple)\n    window_width = int(EEG_series[\"tWindow\"] * edf_fS)\n    label_path = EEG_series['path'].split(\".edf\")[0] + \".csv\"\n\n    # segment all N-1 windows (by positive lookahead)\n    for i in range(0, t_N - window_width, t_overlap):\n        t_start = i / edf_fS\n        t_end = (i + window_width) / edf_fS\n        window_key = \"window_%.3fs_%.3fs\" % (t_start, t_end)\n        window_data = makeArrayWindow(EEG_series[\"rawData\"], t0=i, tWindow=window_width)  # , show_chan_num=0) #)\n        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)\n        window_EEG[window_key] = (window_data, window_label)\n    # window_N segments (by negative lookahead)\n    if t_N % t_overlap != 0:\n        t_start = (t_N - window_width) / edf_fS\n        t_end = t_N / edf_fS\n        window_key = \"window_%.3fs_%.3fs\" % (t_start, t_end)\n        window_data = makeArrayWindow(EEG_series[\"rawData\"], t0=i, tWindow=window_width)\n        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)\n        window_EEG[window_key] = (window_data, window_label)\n\n    return window_EEG\n\ndef plotWindow(EEG_series,label=\"null\", t_max=0, t_step=1):\n    edf_fS = EEG_series[\"rawData\"].info[\"sfreq\"]\n    t_N = int(t_max * edf_fS)\n    window_width = int(EEG_series[\"tWindow\"] * edf_fS)\n    label_path = EEG_series['path'].split(\".edf\")[0] + \".csv\"\n\n    for i in range(0, t_N - window_width, t_overlap):\n        t_start = i / edf_fS\n        t_end = (i + window_width) / edf_fS\n        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])\n        if len(window_label)==1 & window_label[0]==label:\n            EEG_series[\"rawData\"].plot(t_start=t_start, t_end=t_end)\n\ndef annotate_TUH(raw,annoPath=False, header=None):\n    df = pd.read_csv(annoPath, sep=\",\", skiprows=6, header=header)\n    t_start=df[2].to_numpy()\n    dura=df[3].to_numpy()-t_start\n    labels=df[4].to_numpy().tolist()\n    chan_names=df[1].to_numpy().tolist()\n    t_start=t_start.tolist()\n    dura=dura.tolist()\n\n    delete=[]\n    low_char={'FP1':'Fp1', 'FP2':'Fp2', 'FZ':'Fz', 'CZ':'Cz', 'PZ':'Pz'}\n    for i in range(len(chan_names)):\n        #remove numbers behind channel names:\n        chan_names[i]=[chan_names[i][:-3]]\n        # Change certain channels to have smaller letters:\n        if chan_names[i][0] in low_char:\n            chan_names[i][0]=low_char[chan_names[i][0]]\n\n        if chan_names[i][0] not in raw.ch_names:\n            delete.append(i)\n\n    #removes every annotation that cannot be handled backwards:\n    for ele in sorted(delete,reverse=True):\n        print(f\"Annotation {labels[ele]} on non-existing channel {chan_names[ele]} removed from annotations.\")\n        del t_start[ele], dura[ele],labels[ele],chan_names[ele]\n\n    anno=mne.Annotations(onset=t_start,\n                            duration=dura,\n                              description=labels,\n                                ch_names=chan_names)\n\n    raw_anno=raw.set_annotations(anno)\n    return raw_anno
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pipeline/loadFunctions.py b/pipeline/loadFunctions.py
+--- a/pipeline/loadFunctions.py	(revision 5abf075f6366a276160052d8c41f12fb871c8d5b)
++++ b/pipeline/loadFunctions.py	(date 1649850114093)
+@@ -69,6 +69,52 @@
+ 
+         return edfDict
+ 
++    def electrodeClassifierPrep(self,tWindow=100, tStep=100 * .25,plot=False):
++        tic = time.time()
++        subjects_TUAR19 = defaultdict(dict)
++        Xwindows = []
++        Ywindows = []
++        for k in range(len(self.EEG_dict)):
++            subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
++
++            proc_subject = subjects_TUAR19[k]
++            proc_subject = self.readRawEdf(proc_subject, tWindow=tWindow, tStep=tStep,
++                                           read_raw_edf_param={'preload': True})
++
++            proc_subject["rawData"] = TUH_rename_ch(proc_subject["rawData"])
++            TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
++                        'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']  # A1, A2 removed
++            proc_subject["rawData"].pick_channels(ch_names=TUH_pick)
++            proc_subject["rawData"].reorder_channels(TUH_pick)
++
++            if k == 0:
++                self.sfreq = proc_subject["rawData"].info["sfreq"]
++                self.ch_names = proc_subject["rawData"].info["ch_names"]
++                if plot:
++                    raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
++                    raw_anno.plot()
++                    plt.show()
++
++            simplePreprocess(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
++                     downSam=250)
++
++            # Generate output windows for (X,y) as (array, label)
++            proc_subject["preprocessing_output"] = slidingRawWindow(proc_subject,
++                                                                    t_max=proc_subject["rawData"].times[-1],
++                                                                    tStep=proc_subject["tStep"])
++
++            for window in proc_subject["preprocessing_output"].values():
++                Xwindows.append(window[0])
++                Ywindows.append(window[1])
++
++        toc = time.time()
++        print("\n~~~~~~~~~~~~~~~~~~~~\n"
++              "it took %imin:%is to run preprocess-pipeline for %i patients\n with window length [%.2fs] and t_step [%.2fs]"
++              "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(subjects_TUAR19),
++                                            tWindow, tStep))
++
++        return Xwindows,Ywindows
++
+     def prep(self,tWindow=100, tStep=100 * .25,plot=False):
+         tic = time.time()
+         subjects_TUAR19 = defaultdict(dict)
+Index: pipeline/loadData.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from loadFunctions import TUH_data\nfrom braindecode.datasets import create_from_X_y\n\n# Define path of outer directory for samples:\npath=\"../TUH_data_sample\"\n# Define folder for potential saves:\nsave_dir=\"D:/fagprojekt\"\n\n# Create class for data and find all edf files in path, and save in EEG_dict:\nTUH=TUH_data(path=path)\n\n# Load edf to raw, preprocess, make Xwindows (all windows as arrays) and Ywindows (labels as list of strings)\nTUH.prep(tWindow=100, tStep=100 * .25,plot=True)\n\n# Make Braindecode windows dataset from Xwindows and Ywindows:\nwindows_dataset = create_from_X_y(\n    TUH.Xwindows, TUH.Ywindows, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,\n    window_stride_samples=len(TUH.Xwindows[0][0]),\n    window_size_samples=len(TUH.Xwindows[0][0]),\n)\n\nwindows_dataset.description\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pipeline/loadData.py b/pipeline/loadData.py
+--- a/pipeline/loadData.py	(revision 5abf075f6366a276160052d8c41f12fb871c8d5b)
++++ b/pipeline/loadData.py	(date 1649849829069)
+@@ -1,4 +1,5 @@
+ from loadFunctions import TUH_data
++from classifierFunctions import badChannelClf
+ from braindecode.datasets import create_from_X_y
+ 
+ # Define path of outer directory for samples:
+@@ -9,6 +10,9 @@
+ # Create class for data and find all edf files in path, and save in EEG_dict:
+ TUH=TUH_data(path=path)
+ 
++X,y=TUH.electrodeClassifierPrep(tWindow=100, tStep=100 * .25, plot=True)
++bestElecModel=badChannelClf(X,y)
++
+ # Load edf to raw, preprocess, make Xwindows (all windows as arrays) and Ywindows (labels as list of strings)
+ TUH.prep(tWindow=100, tStep=100 * .25,plot=True)
+ 
