@@ -87,7 +87,7 @@ def raw2array(raw, preproc_params, win_params, window_size_samples=10 ,window_st
 
     return windows
 
-def oneHotEncoder(labels):
+def oneHotEncoder(labels, enumerate_labels=False):
     """
     Encode labels to one-hot encoding.
     """
@@ -99,6 +99,8 @@ def oneHotEncoder(labels):
         for j, label in enumerate(labels):
             if label in all_labels:
                 one_hot_labels[i, j] = 1
+    if enumerate_labels:
+        return one_hot_labels.index(1)
     return one_hot_labels
 
 def labelInt(labels):
