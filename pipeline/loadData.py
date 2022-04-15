@@ -12,7 +12,7 @@ TUH=TUH_data(path=path)
 # Load edf to raw, preprocess, make Xwindows (all windows as arrays) and Ywindows (labels as list of strings)
 TUH.prep(tWindow=100, tStep=100 * .25,plot=True)
 
-TUH.specMaker()
+#TUH.specMaker()
 
 # Make Braindecode windows dataset from Xwindows and Ywindows:
 windows_dataset = create_from_X_y(

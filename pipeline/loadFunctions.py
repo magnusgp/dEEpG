@@ -109,12 +109,13 @@ class TUH_data:
                 self.sfreq = proc_subject["rawData"].info["sfreq"]
                 self.ch_names = proc_subject["rawData"].info["ch_names"]
                 if plot:
-                    proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+                    proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
 
                     raw_anno = annotate_TUH(proc_subject["rawData"], annoPath=self.EEG_dict[k]["csvpath"])
                     raw_anno.plot()
                     plt.show()
 
+            break
             # Generate output windows for (X,y) as (array, label)
             proc_subject["preprocessing_output"] = slidingRawWindow(proc_subject,
                                                                     t_max=proc_subject["rawData"].times[-1],
