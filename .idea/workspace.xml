@@ -161,6 +161,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.BC_TUH_script" />
+      <item itemvalue="Python.LoadWithBraindecode" />
+      <item itemvalue="Python.inputScript" />
+      <item itemvalue="Python.loadData" />
+      <item itemvalue="Python.prepareData" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.loadData" />
