@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="tracking changes">
-      <change afterPath="$PROJECT_DIR$/pipeline/electrodeCLF.py" afterDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="gitignore">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/electrodeCLF.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/electrodeCLF.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/raw_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/raw_utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -347,7 +347,28 @@
       <option name="project" value="LOCAL" />
       <updated>1650012171408</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="updated label encoder with enumeration option (for K-class classification)">
+      <created>1650017349034</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1650017349034</updated>
+    </task>
+    <task id="LOCAL-00023" summary="added electrode pop classifier and dataset creation script">
+      <created>1650017389219</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1650017389219</updated>
+    </task>
+    <task id="LOCAL-00024" summary="gitignore">
+      <created>1650017398622</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1650017398622</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -375,7 +396,10 @@
     <MESSAGE value="minor workspace changes" />
     <MESSAGE value="updated classifier function with table formatting and example" />
     <MESSAGE value="tracking changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="tracking changes" />
+    <MESSAGE value="updated label encoder with enumeration option (for K-class classification)" />
+    <MESSAGE value="added electrode pop classifier and dataset creation script" />
+    <MESSAGE value="gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="gitignore" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -439,6 +463,11 @@
           <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
           <line>46</line>
           <option name="timeStamp" value="99" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/raw_utils.py</url>
+          <line>117</line>
+          <option name="timeStamp" value="109" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
