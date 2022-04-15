@@ -13,6 +13,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.multioutput import MultiOutputClassifier
 from tabulate import tabulate
 
 def electrodeCLF(X, y, name = "all"):
@@ -52,6 +53,7 @@ def electrodeCLF(X, y, name = "all"):
         tabdata = []
         for name, clf in zip(names, classifiers):
             # Fit classifier
+            clf = MultiOutputClassifier(clf, n_jobs=-1)
             clf.fit(Xtrain, ytrain)
             # Update scoring dictionary
             score[name] = clf.score(Xtest, ytest)
