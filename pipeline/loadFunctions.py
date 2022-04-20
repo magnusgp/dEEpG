@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import pandas as pd
 import numpy as np
 import torch
-from preprocessFunctions import simplePreprocess, rereference
+from preprocessFunctions import simplePreprocess, rereference, preprocessRaw
 import matplotlib.pyplot as plt
 from scipy import signal, stats
 
