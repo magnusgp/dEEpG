@@ -80,6 +80,7 @@ class TUH_data:
         subjects_TUAR19 = defaultdict(dict)
         Xwindows = []
         Ywindows = []
+        windowInfo = []
         for k in tqdm(range(len(self.EEG_dict))):
             subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
 
@@ -127,6 +128,8 @@ class TUH_data:
             for window in proc_subject["preprocessing_output"].values():
                 Xwindows.append(window[0])
                 Ywindows.append(window[1])
+                #save info about which raw file and start time and end time this window is.
+                windowInfo.append(self.EEG_dict[k]['path'],window[2],window[3])
 
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
@@ -136,7 +139,7 @@ class TUH_data:
 
         Ywindows = oneHotEncoder(Ywindows, enumerate_labels=True, clfbin=True)
 
-        return Xwindows, Ywindows
+        return Xwindows, Ywindows,windowInfo
 
     def prep(self, tWindow=100, tStep=100 *.25,plot=False):
         self.tWindow=tWindow
@@ -308,7 +311,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
-                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label)
+                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
             window_label = label_TUH(annoPath=label_path, window=[t_start, t_end],channel=None)  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
@@ -323,7 +326,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
-                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label)
+                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
             window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)

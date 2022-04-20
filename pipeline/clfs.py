@@ -18,7 +18,7 @@ from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
 import pickle
-
+from collections import defaultdict
 from tqdm import *
 import time
 
@@ -111,6 +111,22 @@ def electrodeCLF(X, y, name = "all", multidim = True):
     pickle.dump(new_model, open(filename, 'wb'))
 
     return score
+
+def classifyElectrodeIntervals(X,windowInfo,bestmodel):
+
+    channels=['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2', 'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']
+
+    bads=defaultdict(dict)
+    for i in range(len(X)):
+        pred=bestmodel.predict(X[i])
+
+        if pred==1:
+            chan=channels[X[:17]][0]
+            # Saves the start time and end time of an electrode artifact in a dictionary for each raw signal
+            # within the dictionary 'bads'.
+            bads[windowInfo[0]][i]=(chan,windowInfo[0],windowInfo[1])
+    return bads
+
 
 if __name__ == "__main__":
     X, y = make_classification(n_features=3, n_redundant=0, n_informative=2,

@@ -13,7 +13,7 @@ TUH=TUH_data(path=path)
 # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
 # Ywindows (labels as list of strings) to use for electrode artifact classifier:
 windowssz = 10
-elecX,elecY=TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
+elecX,elecY,windowInfo=TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
 # Find the best electrode artifact classifier:
 electrodeCLF(elecX, elecY, "all", False)
 
