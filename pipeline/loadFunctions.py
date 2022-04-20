@@ -120,7 +120,8 @@ class TUH_data:
             # Generate output windows for (X,y) as (array, label)
             proc_subject["preprocessing_output"] = slidingRawWindow(proc_subject,
                                                                     t_max=proc_subject["rawData"].times[-1],
-                                                                    tStep=proc_subject["tStep"])
+                                                                    tStep=proc_subject["tStep"],
+                                                                    electrodeCLF=True)
 
             for window in proc_subject["preprocessing_output"].values():
                 Xwindows.append(window[0])
@@ -227,26 +228,55 @@ def TUH_rename_ch(MNE_raw=False):
     print(MNE_raw.info["ch_names"])
     return MNE_raw
 
-def label_TUH(annoPath=False, window=[0, 0], header=None):  # saveDir=os.getcwd(),
+def label_TUH(annoPath=False, window=[0, 0], header=None,channel=None):  # saveDir=os.getcwd(),
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
     df.fillna('null', inplace=True)
     within_con0 = (df[2] <= window[0]) & (window[0] <= df[3])
     within_con1 = (df[2] <= window[1]) & (window[1] <= df[3])
-    label_TUH = df[df[2].between(window[0], window[1]) |
+    if channel:
+        chan_names = df[1].to_numpy().tolist()
+        low_char = {'FP1': 'Fp1', 'FP2': 'Fp2', 'FZ': 'Fz', 'CZ': 'Cz', 'PZ': 'Pz'}
+        for i in range(len(chan_names)):
+            # remove numbers behind channel names:
+            chan_names[i] = [chan_names[i][:-3], chan_names[i][-2:]]
+
+            # Loop through all channel names in reverse order, so if something is removed it does not affect other index.
+            # Change certain channels to have smaller letters:
+            for k in range(len(chan_names[i]) - 1, -1, -1):
+                if chan_names[i][k] in low_char:
+                    chan_names[i][k] = low_char[chan_names[i][k]]
+        label_TUH = df[(df[2].between(window[0], window[1]) |
+                       df[3].between(window[0], window[1]) |
+                       (within_con0 & within_con1))
+                       & (np.sum(np.asarray(chan_names)==np.asarray(channel),axis=1).tolist())
+                        & ((df[4].to_numpy()=='elec')|
+                           (df[4].to_numpy()=='musc_elec')|
+                           (df[4].to_numpy()=='eyem_elec')|
+                           (df[4].to_numpy()=='shiv_elec')|
+                           (df[4].to_numpy()=='chew_elec'))]
+    else:
+        label_TUH = df[df[2].between(window[0], window[1]) |
                    df[3].between(window[0], window[1]) |
                    (within_con0 & within_con1)]
     label_df = label_TUH.rename(columns={2: 't_start', 3: 't_end', 4: 'label', 5: 'confidence'})["label"]  # Renamer headers i pandas dataen
     return_list = label_df.to_numpy().tolist()  # Outputter kun listen af label navne i vinduet, fx ["eyem", "null"]
+    if return_list==[]:
+        return_list=['null']
+    elif channel:
+        return_list=['elec']
     return return_list
 
 
 def makeArrayWindow(MNE_raw=None, t0=0, tWindow=120):
     # take a raw signal and make a window given time specifications. Outputs an array, because of raw.get_data().
-    chWindows = MNE_raw.get_data(start=int(t0), stop=int(t0 + tWindow), reject_by_annotation="omit", picks=['eeg'])
+    chWindows = MNE_raw.get_data(start=int(t0), stop=int(t0 + tWindow), reject_by_annotation=None, picks=['eeg'])
     return chWindows
 
 
-def slidingRawWindow(EEG_series=None, t_max=0, tStep=1):
+def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
+    #If electrodeCLF is set to true, the function outputs a window per channel
+    # with labels assigned only for this channel.
+
     # catch correct sample frequency and end sample
     edf_fS = EEG_series["rawData"].info["sfreq"]
     t_N = int(t_max * edf_fS)
@@ -272,17 +302,29 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1):
         t_end = (i + window_width) / edf_fS
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
         window_data = makeArrayWindow(EEG_series["rawData"], t0=i, tWindow=window_width)  # , show_chan_num=0) #)
-        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
-        window_EEG[window_key] = (window_data, window_label)
+        if electrodeCLF:
+            for i in range(len(window_data)):
+                chan=EEG_series['rawData'].info['ch_names'][i]
+                channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
+                oneHotChan=oneHotEncoder([chan])
+                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label)
+        else:
+            window_label = label_TUH(annoPath=label_path, window=[t_start, t_end],channel=None)  # , saveDir=annoDir)
+            window_EEG[window_key] = (window_data, window_label)
     # window_N segments (by negative lookahead)
     if t_N % t_overlap != 0:
         t_start = (t_N - window_width) / edf_fS
         t_end = t_N / edf_fS
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
         window_data = makeArrayWindow(EEG_series["rawData"], t0=i, tWindow=window_width)
-        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
-        window_EEG[window_key] = (window_data, window_label)
-
+        if electrodeCLF:
+            for i in range(len(window_data)):
+                chan=EEG_series['rawData'].info['ch_names'][i]
+                channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
+                window_EEG[window_key+f"{i}"] = (window_data, channel_label)
+        else:
+            window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
+            window_EEG[window_key] = (window_data, window_label)
     return window_EEG
 
 def plotWindow(EEG_series,label="null", t_max=0, t_step=1):

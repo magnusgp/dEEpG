@@ -96,7 +96,7 @@ def oneHotEncoder(labels, enumerate_labels=False, clfbin = False, type = 'labels
         all_labels = ['musc', 'eyem', 'elec', 'eyem_musc', 'musc_elec', 'chew', 'eyem_elev',
                       'eyem_chew', 'shiv', 'chew_musc', 'elpp', 'chew_elec', 'eyem_shiv', 'shiv_elec']
     elif type == 'channel':
-        all_labels = np.arange(0, 16)
+        all_labels = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2', 'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']
 
     n_classes = len(all_labels)
     #labels = [item for sublist in labels for item in sublist]
