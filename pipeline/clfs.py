@@ -16,6 +16,7 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.multioutput import MultiOutputClassifier
 from tabulate import tabulate
 import pandas as pd
+from operator import itemgetter
 import pickle
 
 from tqdm import *
@@ -50,6 +51,10 @@ def electrodeCLF(X, y, name = "all", multidim = True):
         #QuadraticDiscriminantAnalysis(),
     ]
 
+    #Create dict for classification
+    models = zip(names, classifiers)
+
+
     # Error handling for when all labels are the same (due to window size), must be deleted later!
     if len(np.unique(y)) == 1 and y[0][0] == 1:
         y[0] = [0]
@@ -77,6 +82,7 @@ def electrodeCLF(X, y, name = "all", multidim = True):
             stop = time.time()
             tabdata.append([name, str(round(score[name] * 100, 3)) + " %", str(round(stop - start, 2)) + " s"])
         # Print a formatted table of model performances
+        tabdata = sorted(tabdata, key=itemgetter(1), reverse=False)
         print("\n\nModel Performance Summary:")
         print(tabulate(tabdata, headers=['Model name', 'Model score', 'Time'], numalign='left', floatfmt=".3f"))
 
