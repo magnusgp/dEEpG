@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="MontageTest">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="electrode prep, sliding window changed">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/raw_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/raw_utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -311,7 +310,14 @@
       <option name="project" value="LOCAL" />
       <updated>1650014226240</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="electrode prep, sliding window changed">
+      <created>1650460611799</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1650460611799</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -336,7 +342,8 @@
     <MESSAGE value="Preprocess modified" />
     <MESSAGE value="Spectrogram maker works" />
     <MESSAGE value="montageTest" />
-    <option name="LAST_COMMIT_MESSAGE" value="montageTest" />
+    <MESSAGE value="electrode prep, sliding window changed" />
+    <option name="LAST_COMMIT_MESSAGE" value="electrode prep, sliding window changed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
