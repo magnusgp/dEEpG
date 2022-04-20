@@ -75,7 +75,7 @@ def electrodeCLF(X, y, name = "all", multidim = True):
             score[name] = clf.score(Xtest, ytest)
             # Append data to table
             stop = time.time()
-            tabdata.append([name, str(round(score[name] * 100, 3)) + " %", str(round(stop - start, 3)) + " s"])
+            tabdata.append([name, str(round(score[name] * 100, 3)) + " %", str(round(stop - start, 2)) + " s"])
         # Print a formatted table of model performances
         print("\n\nModel Performance Summary:")
         print(tabulate(tabdata, headers=['Model name', 'Model score', 'Time'], numalign='left', floatfmt=".3f"))
