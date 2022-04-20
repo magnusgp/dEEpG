@@ -50,6 +50,10 @@ def electrodeCLF(X, y, name = "all", multidim = True):
         #QuadraticDiscriminantAnalysis(),
     ]
 
+    #Create dict for classification
+    models = zip(names, classifiers)
+
+
     # Error handling for when all labels are the same (due to window size), must be deleted later!
     if len(np.unique(y)) == 1 and y[0][0] == 1:
         y[0] = [0]
