@@ -37,4 +37,8 @@ def CrossValidtion_simpel(model, X, Y, n_splits_outer=10, n_splits_inner=5, rand
     print('Accuracy: %.3f (%.3f)' % (mean(outer_results), std(outer_results)))
 
 def Crossvalidation_models(models, X, Y, n_splits_outer=10, n_splits_inner=5, random_state=None):
+    pass
+
+if __name__ == 'main':
+    pass
 
