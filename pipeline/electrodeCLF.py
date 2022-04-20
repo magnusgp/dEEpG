@@ -38,3 +38,6 @@ for i in range(len(X)):
 
 #score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=False))
 score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=True), name = "all")
+
+# load the model from disk
+loaded_model = pickle.load(open(filename, 'rb'))

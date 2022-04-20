@@ -15,6 +15,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.multioutput import MultiOutputClassifier
 from tabulate import tabulate
+import pandas as pd
+import pickle
 
 def electrodeCLF(X, y, name = "all"):
     h = 0.02  # step size in the mesh
@@ -71,6 +73,21 @@ def electrodeCLF(X, y, name = "all"):
     else:
         print("Error! Please select a classifier from the list: {}".format(names))
         score = 0.0
+
+    #Find index of best classifier
+    best_model = max(score, key=score.get)
+
+    #Match index to classifier name
+    for ind, name in enumerate(names):
+        if name == best_model:
+            best_model_index = ind
+
+    # Save and fit classifier
+    new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
+
+    #Use pickle to save classifier
+    filename = 'finalized_model.sav'
+    pickle.dump(new_model, open(filename, 'wb'))
 
     return score
 
