@@ -15,6 +15,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.multioutput import MultiOutputClassifier
 from tabulate import tabulate
+import pandas as pd
+import pickle
 
 from tqdm import *
 import time
@@ -73,7 +75,7 @@ def electrodeCLF(X, y, name = "all", multidim = True):
             score[name] = clf.score(Xtest, ytest)
             # Append data to table
             stop = time.time()
-            tabdata.append([name, str(round(score[name] * 100, 3)) + " %", str(round(stop - start, 3)) + " s"])
+            tabdata.append([name, str(round(score[name] * 100, 3)) + " %", str(round(stop - start, 2)) + " s"])
         # Print a formatted table of model performances
         print("\n\nModel Performance Summary:")
         print(tabulate(tabdata, headers=['Model name', 'Model score', 'Time'], numalign='left', floatfmt=".3f"))
@@ -86,6 +88,21 @@ def electrodeCLF(X, y, name = "all", multidim = True):
     else:
         print("Error! Please select a classifier from the list: {}".format(names))
         score = 0.0
+
+    #Find index of best classifier
+    best_model = max(score, key=score.get)
+
+    #Match index to classifier name
+    for ind, name in enumerate(names):
+        if name == best_model:
+            best_model_index = ind
+
+    # Save and fit classifier
+    new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
+
+    #Use pickle to save classifier
+    filename = 'finalized_model.sav'
+    pickle.dump(new_model, open(filename, 'wb'))
 
     return score
 
