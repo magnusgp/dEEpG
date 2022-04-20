@@ -9,6 +9,7 @@ from preprocessFunctions import simplePreprocess, rereference, preprocessRaw
 import matplotlib.pyplot as plt
 from scipy import signal, stats
 from raw_utils import oneHotEncoder
+from tqdm import *
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -79,7 +80,7 @@ class TUH_data:
         subjects_TUAR19 = defaultdict(dict)
         Xwindows = []
         Ywindows = []
-        for k in range(len(self.EEG_dict)):
+        for k in tqdm(range(len(self.EEG_dict))):
             subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
 
             proc_subject = subjects_TUAR19[k]
