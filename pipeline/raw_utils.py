@@ -87,13 +87,17 @@ def raw2array(raw, preproc_params, win_params, window_size_samples=10 ,window_st
 
     return windows
 
-def oneHotEncoder(labels, enumerate_labels=False):
+def oneHotEncoder(labels, enumerate_labels=False, clfbin = False, type = 'labels'):
     """
     Encode labels to one-hot encoding.
     """
     one_hot_labels = []
-    all_labels = ['musc', 'eyem', 'elec', 'eyem_musc', 'musc_elec', 'chew', 'eyem_elev',
-                  'eyem_chew', 'shiv', 'chew_musc', 'elpp', 'chew_elec', 'eyem_shiv', 'shiv_elec']
+    if type == 'labels':
+        all_labels = ['musc', 'eyem', 'elec', 'eyem_musc', 'musc_elec', 'chew', 'eyem_elev',
+                      'eyem_chew', 'shiv', 'chew_musc', 'elpp', 'chew_elec', 'eyem_shiv', 'shiv_elec']
+    elif type == 'channel':
+        all_labels = np.arange(0, 16)
+
     n_classes = len(all_labels)
     #labels = [item for sublist in labels for item in sublist]
     for i in range(len(labels)):
@@ -112,6 +116,13 @@ def oneHotEncoder(labels, enumerate_labels=False):
             for m in range(len(one_hot_labels[l])):
                 lab2.append(np.where(one_hot_labels[l][m] == 1)[0].item())
             lab.append(lab2)
+
+        if clfbin:
+            labbin = np.zeros(np.shape(lab))
+            for n in range(len(lab)):
+                labbin[n] = 1 if np.isin(lab[n], [2]).astype(int).any() == 1 else 0
+            return labbin
+
         return lab
 
     return one_hot_labels

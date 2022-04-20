@@ -639,7 +639,7 @@ def main(argv):
 if __name__ == "__main__":
     #main(sys.argv)
 
-    mon_path = "D:/fagprojekt/DOCS/03_tcp_ar_a_montage.txt"
+    mon_path = "D:/fagprojekt/DOCS/03_tcp_ar_a_montage_new.txt"
     edf_path = "TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.edf"
     params=nedc_load_parameters(mon_path)
 

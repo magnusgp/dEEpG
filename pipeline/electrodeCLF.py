@@ -9,12 +9,13 @@ from braindecode.datasets import create_from_X_y
 path = "../TUH_data_sample"
 TUH = TUH_data(path)
 #Xwindows, Ywindows = TUH.electrodeClassifierPrep(tWindow=100, tStep=100 * .25, plot=False)
-TUH.prep(tWindow=100, tStep=100 * .25, plot=False)
+X, y = TUH.electrodeCLFPrep(tWindow=100, tStep=100 * .25, plot=False)
 
+"""
 windows_dataset = create_from_X_y(
-    TUH.Xwindows, TUH.Ywindows, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
-    window_stride_samples=len(TUH.Xwindows[0][0]),
-    window_size_samples=len(TUH.Xwindows[0][0]),)
+    X, y, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
+    window_stride_samples=len(X[0][0]),
+    window_size_samples=len(X[0][0]),)
 
 i = 0
 x_i, y_i, window_ind = windows_dataset[0]
@@ -24,11 +25,9 @@ print(f"n_channels={n_channels}  -- n_times={n_times} -- y_i={y_i}")
 print(f"start_ind={start_ind} -- stop_ind={stop_ind}")
 
 print(windows_dataset.description)
-
-y = TUH.Ywindows
-X = TUH.Xwindows
-
-y = len(X[0]) * y
+"""
+y = len(X[0]) * list(map(lambda el:[el.astype(int)], y))
+#y = len(X[0]) * y
 X2 = []
 Xnew = []
 for i in range(len(X)):
@@ -37,7 +36,4 @@ for i in range(len(X)):
     #X2.append(Xnew)
 
 #score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=False))
-score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=True), name = "all")
-
-# load the model from disk
-loaded_model = pickle.load(open(filename, 'rb'))
+score = electrodeCLF(Xnew, y, name = "all", multidim=False)
