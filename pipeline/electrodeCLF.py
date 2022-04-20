@@ -5,35 +5,18 @@ from loadFunctions import TUH_data
 from raw_utils import oneHotEncoder, labelInt
 from braindecode.datasets import create_from_X_y
 
-# Create EEG dataset
-path = "../TUH_data_sample"
-TUH = TUH_data(path)
-#Xwindows, Ywindows = TUH.electrodeClassifierPrep(tWindow=100, tStep=100 * .25, plot=False)
-X, y = TUH.electrodeCLFPrep(tWindow=100, tStep=100 * .25, plot=False)
+if __name__ == "__main__":
+    # Create EEG dataset
+    path = "../TUH_data_sample"
+    TUH = TUH_data(path)
 
-"""
-windows_dataset = create_from_X_y(
-    X, y, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,
-    window_stride_samples=len(X[0][0]),
-    window_size_samples=len(X[0][0]),)
+    X, y = TUH.electrodeCLFPrep(tWindow=100, tStep=100 * .25, plot=False)
 
-i = 0
-x_i, y_i, window_ind = windows_dataset[0]
-n_channels, n_times = x_i.shape  # the EEG data
-_, start_ind, stop_ind = window_ind
-print(f"n_channels={n_channels}  -- n_times={n_times} -- y_i={y_i}")
-print(f"start_ind={start_ind} -- stop_ind={stop_ind}")
+    y = len(X[0]) * list(map(lambda el:[el.astype(int)], y))
 
-print(windows_dataset.description)
-"""
-y = len(X[0]) * list(map(lambda el:[el.astype(int)], y))
-#y = len(X[0]) * y
-X2 = []
-Xnew = []
-for i in range(len(X)):
-    for j in range(len(X[0])):
-        Xnew.append(X[i][j])
-    #X2.append(Xnew)
+    Xnew = []
+    for i in range(len(X)):
+        for j in range(len(X[0])):
+            Xnew.append(X[i][j])
 
-#score = electrodeCLF(Xnew, oneHotEncoder(y, enumerate_labels=False))
-score = electrodeCLF(Xnew, y, name = "all", multidim=False)
+    score = electrodeCLF(Xnew, y, name = "all", multidim=False)

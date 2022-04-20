@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="minor version changes">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/CV.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/CV.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="electrode prep, sliding window changed">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,9 +30,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="25W0Gvvo5KunPrCnT8lbZPNy557" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -163,9 +160,9 @@
     </configuration>
     <list>
       <item itemvalue="Python.BC_TUH_script" />
-      <item itemvalue="Python.LoadWithBraindecode" />
       <item itemvalue="Python.inputScript" />
       <item itemvalue="Python.loadData" />
+      <item itemvalue="Python.LoadWithBraindecode" />
       <item itemvalue="Python.prepareData" />
     </list>
     <recent_temporary>
@@ -313,7 +310,14 @@
       <option name="project" value="LOCAL" />
       <updated>1650014226240</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="electrode prep, sliding window changed">
+      <created>1650460611799</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1650460611799</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -338,7 +342,8 @@
     <MESSAGE value="Preprocess modified" />
     <MESSAGE value="Spectrogram maker works" />
     <MESSAGE value="montageTest" />
-    <option name="LAST_COMMIT_MESSAGE" value="montageTest" />
+    <MESSAGE value="electrode prep, sliding window changed" />
+    <option name="LAST_COMMIT_MESSAGE" value="electrode prep, sliding window changed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -382,6 +387,16 @@
           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
           <line>22</line>
           <option name="timeStamp" value="72" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>33</line>
+          <option name="timeStamp" value="105" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>54</line>
+          <option name="timeStamp" value="106" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>

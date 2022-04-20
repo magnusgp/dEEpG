@@ -9,6 +9,7 @@ from preprocessFunctions import simplePreprocess, rereference, preprocessRaw
 import matplotlib.pyplot as plt
 from scipy import signal, stats
 from raw_utils import oneHotEncoder
+from tqdm import *
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -79,7 +80,7 @@ class TUH_data:
         subjects_TUAR19 = defaultdict(dict)
         Xwindows = []
         Ywindows = []
-        for k in range(len(self.EEG_dict)):
+        for k in tqdm(range(len(self.EEG_dict))):
             subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
 
             proc_subject = subjects_TUAR19[k]
@@ -306,7 +307,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
             for i in range(len(window_data)):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
-                oneHotChan=oneHotEncoder([chan])
+                oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
                 window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label)
         else:
             window_label = label_TUH(annoPath=label_path, window=[t_start, t_end],channel=None)  # , saveDir=annoDir)
@@ -321,7 +322,8 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
             for i in range(len(window_data)):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
-                window_EEG[window_key+f"{i}"] = (window_data, channel_label)
+                oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
+                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label)
         else:
             window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
