@@ -8,6 +8,7 @@ import torch
 from preprocessFunctions import simplePreprocess, rereference, preprocessRaw
 import matplotlib.pyplot as plt
 from scipy import signal, stats
+from raw_utils import oneHotEncoder
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -130,6 +131,8 @@ class TUH_data:
               "it took %imin:%is to run electrode classifier preprocess-pipeline for %i patients\n with window length [%.2fs] and t_step [%.2fs]"
               "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(subjects_TUAR19),
                                             tWindow, tStep))
+
+        Ywindows = oneHotEncoder(Ywindows, enumerate_labels=True, clfbin=True)
 
         return Xwindows, Ywindows
 
