@@ -113,7 +113,8 @@ def electrodeCLF(X, y, name = "all", multidim = True):
     return score
 
 def classifyElectrodeIntervals(X,windowInfo,bestmodel):
-
+    #Takes channel specific windows with a hotencoding maching channel list below on the first 17 spots
+    # in each array in X. Windowinfo contains the path to the rawfile in question, the starting time and ending time.
     channels=['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2', 'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']
 
     bads=defaultdict(dict)
