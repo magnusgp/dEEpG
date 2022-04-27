@@ -80,12 +80,20 @@ class TUH_data:
         subjects_TUAR19 = defaultdict(dict)
         Xwindows = []
         Ywindows = []
+        windowInfo = []
         for k in tqdm(range(len(self.EEG_dict))):
             subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
 
             proc_subject = subjects_TUAR19[k]
             proc_subject = self.readRawEdf(proc_subject, tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
+            if k == 0 and plot:
+                #Plot the energy voltage potential against frequency.
+                #proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+
+                raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
+                raw_anno.plot()
+                plt.show()
 
             proc_subject["rawData"] = TUH_rename_ch(proc_subject["rawData"])
             TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
@@ -127,6 +135,8 @@ class TUH_data:
             for window in proc_subject["preprocessing_output"].values():
                 Xwindows.append(window[0])
                 Ywindows.append(window[1])
+                #save info about which raw file and start time and end time this window is.
+                windowInfo.append(self.EEG_dict[k]['path'],window[2],window[3])
 
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
@@ -136,7 +146,7 @@ class TUH_data:
 
         Ywindows = oneHotEncoder(Ywindows, enumerate_labels=True, clfbin=True)
 
-        return Xwindows, Ywindows
+        return Xwindows, Ywindows,windowInfo
 
     def prep(self, tWindow=100, tStep=100 *.25,plot=False):
         self.tWindow=tWindow
@@ -151,6 +161,13 @@ class TUH_data:
             proc_subject = subjects_TUAR19[k]
             proc_subject = self.readRawEdf(proc_subject, tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
+            if k == 0 and plot:
+                #Plot the energy voltage potential against frequency.
+                #proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+
+                raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
+                raw_anno.plot()
+                plt.show()
 
             proc_subject["rawData"] = TUH_rename_ch(proc_subject["rawData"])
             TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
@@ -308,7 +325,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
-                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label)
+                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
             window_label = label_TUH(annoPath=label_path, window=[t_start, t_end],channel=None)  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
@@ -323,7 +340,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
-                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label)
+                window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
             window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
@@ -335,7 +352,7 @@ def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
     window_width = int(EEG_series["tWindow"] * edf_fS)
     label_path = EEG_series['path'].split(".edf")[0] + ".csv"
 
-    for i in range(0, t_N - window_width, t_overlap):
+    for i in range(0, t_N - window_width, t_step):
         t_start = i / edf_fS
         t_end = (i + window_width) / edf_fS
         window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])
@@ -428,3 +445,120 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
     plt.title("channel spectrogram: " + ch_names[chan])
 
     return plt
+
+def solveLabelChannelRelation(annoPath, header = None):
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+
+    # Split pairs into single channels
+    #channel_pairs=df[1].to_numpy().tolist()
+    #channel_pairs=[n.split('-') for n in channel_pairs]
+    #channel_unique=list(set([n for n in channel_pairs]))
+    #Creating data frame:
+    anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
+
+    #checking every entry in label data:
+    for i in tqdm(range(len(df))):
+        chan1, chan2=df[1][i].split('-')
+        # Only check row against rows further down:
+        temp = df[i+1:]
+        # Only rows with same label:
+        temp = temp[temp[4] == df[4][i]]
+
+        # Only overlap in time:
+        temp_time = temp[((df[2][i]<=temp[2]) & (temp[2]<=df[3][i])) |
+                         ((df[2][i]<=temp[3]) & (temp[3]<=df[3][i])) |
+                         ((temp[2]<df[2][i]) & (df[3][i]<temp[3]))]
+
+        for k in temp_time.index:
+            #check if first channel is a match with one in the new channel pair:
+            channel = None
+            if chan1 in temp_time[1][k].split('-'):
+                channel = chan1
+            elif chan2 in temp_time[1][k].split('-'):
+                channel = chan2
+            if channel in [chan1, chan2]:
+                t_start = max(df[2][i], temp_time[2][k])
+                t_end = min(df[3][i], temp_time[3][k])
+
+                anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
+                                         't_end': [t_end], 'label': [df[4][i]]})
+
+                #if ((anno_new['channel'] == anno_df['channel']) & (anno_new['t_start'] == anno_df['t_start'])
+                #    & (anno_new['t_end'] == anno_df['t_end']) & (anno_new['label'] == anno_df['label'])).any():
+                #    anno_df.append(anno_new)
+
+                duplicates=anno_df[ ([df[4][i]]==anno_df['label']) &
+                         (chan1==anno_df['channel'])  &
+                        (((t_start<=anno_df['t_start']) & (anno_df['t_start']<=t_end)) |
+                         ((t_start<=anno_df['t_end']) & (anno_df['t_end']<=t_end)) |
+                         ((anno_df['t_start']<t_start) & (t_end<anno_df['t_end'])))]
+
+                if duplicates:
+                    new_t_start = min(duplicates['t_start'],t_start)
+                    new_t_end = max(duplicates['t_end'], t_start)
+
+                    anno_new = pd.DataFrame({'channel': [chan1], 't_start': [new_t_start],
+                                             't_end': [new_t_end], 'label': [df[4][i]]})
+                    anno_df.append(anno_new)
+
+                    #delete overlapping rows from behind so the indexes are not confused:
+                    for n in len(duplicates):
+                        index=duplicates.index[-n]
+                        anno_df.drop(index=index)
+
+                # if no duplicates/overlaps found, then just save annotation for channel:
+                else:
+                    anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
+                                             't_end': [t_end], 'label': [df[4][i]]})
+                    anno_df.append(anno_new)
+
+            # check if second channel is a match with one in the new channel pair:
+            if chan2 in channel_pairs[k]:
+                pass
+                # Starts and ends at same time:
+                if df[2][i] == df[2][k] and df[3][i] == df[3][k]:
+                    pass
+                # elif
+            else:
+                pass
+                #print("No checks passed \n"
+                #      "Channel 1: {} ({}-{} s) \n"
+                #      "Channel 2: {} ({}-{} s)".format(chan1, df[2][i], df[3][i], chan2, df[2][k], df[3][k]))
+
+    return anno_df
+
+
+
+
+def labelChannels(annoPath, header = None):
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+
+    # Split pairs into single channels
+    channel_pairs = df[1].to_numpy().tolist()
+    channel_pairs = [n.split('-') for n in channel_pairs]
+
+    # Creating data frame:
+    anno_df = pd.DataFrame(columns=['channel', 't_start', 't_end', 'label'])
+
+    anno_dict = defaultdict(lambda: (0, 0))
+
+    # Checking every entry in label data:
+    for i in tqdm(range(len(channel_pairs))):
+        # Check if label is the same in the two rows, eg. 'elec'=='elec':
+        # Create two variables, one for each channel in the pair:
+        chan1, chan2 = channel_pairs[i]
+        for k in range(i+1,len(channel_pairs)):
+            #Check if label is the same in the two rows, eg. 'elec'=='elec':
+            if df[4][i] == df[4][k]:
+                #Add both time frames to anno_dict
+               anno_dict[chan1] = (df[2][i], df[3][i])
+               anno_dict[chan2] = (df[2][i], df[3][i])
+
+
+
+if __name__ == "__main__":
+    path = "../TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.csv"
+
+    solveLabelChannelRelation(annoPath=path)
+
+    #labelChannels(annoPath=path)

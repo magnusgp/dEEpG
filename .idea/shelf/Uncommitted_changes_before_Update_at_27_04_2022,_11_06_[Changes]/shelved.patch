@@ -1,0 +1,243 @@
+Index: pipeline/loadData.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from loadFunctions import TUH_data\nfrom braindecode.datasets import create_from_X_y\nfrom clfs import electrodeCLF\n\n# Define path of outer directory for samples:\npath=\"../TUH_data_sample\"\n# Define folder for potential saves:\nsave_dir=\"D:/fagprojekt\"\n\n# Create class for data and find all edf files in path, and save in EEG_dict:\nTUH=TUH_data(path=path)\n\n# Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and\n# Ywindows (labels as list of strings) to use for electrode artifact classifier:\nwindowssz = 10\nelecX,elecY=TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)\n# Find the best electrode artifact classifier:\nelectrodeCLF(elecX, elecY, \"all\", False)\n\n# Load edf to raw, full preprocess with electrode classifier, make Xwindows (all windows\n# as arrays) and Ywindows (labels as list of strings) to use for data augmentation.\nTUH.prep(tWindow=100, tStep=100 * .25,plot=True)\n\n# Make Braindecode windows dataset from Xwindows and Ywindows:\nwindows_dataset = create_from_X_y(\n    TUH.Xwindows, TUH.Ywindows, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,\n    window_stride_samples=len(TUH.Xwindows[0][0]),\n    window_size_samples=len(TUH.Xwindows[0][0]),\n)\n\nwindows_dataset.description\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pipeline/loadData.py b/pipeline/loadData.py
+--- a/pipeline/loadData.py	(revision 95abadeaf3cafcc68b73385f059f426d09393853)
++++ b/pipeline/loadData.py	(date 1650530900206)
+@@ -12,14 +12,15 @@
+ 
+ # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
+ # Ywindows (labels as list of strings) to use for electrode artifact classifier:
+-windowssz = 10
+-elecX,elecY=TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
++windowssz = 100
++stride = 0.25
++elecX,elecY=TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * stride, plot=False)
+ # Find the best electrode artifact classifier:
+ electrodeCLF(elecX, elecY, "all", False)
+ 
+ # Load edf to raw, full preprocess with electrode classifier, make Xwindows (all windows
+ # as arrays) and Ywindows (labels as list of strings) to use for data augmentation.
+-TUH.prep(tWindow=100, tStep=100 * .25,plot=True)
++TUH.prep(tWindow=windowssz, tStep=windowssz * stride,plot=True)
+ 
+ # Make Braindecode windows dataset from Xwindows and Ywindows:
+ windows_dataset = create_from_X_y(
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"681eb482-4823-466c-900b-a027fa28e27f\" name=\"Changes\" comment=\"electrode prep, sliding window changed\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/pipeline/loadFunctions.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/pipeline/loadFunctions.py\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Python Script\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Merge.Settings\">\n    <option name=\"BRANCH\" value=\"origin/main\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"MarkdownSettingsMigration\">\n    <option name=\"stateVersion\" value=\"1\" />\n  </component>\n  <component name=\"ProjectId\" id=\"25W0Gvvo5KunPrCnT8lbZPNy557\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">\n    <property name=\"RunOnceActivity.OpenProjectViewOnStart\" value=\"true\" />\n    <property name=\"RunOnceActivity.ShowReadmeOnStart\" value=\"true\" />\n    <property name=\"ToolWindowPython Packages.ShowToolbar\" value=\"false\" />\n    <property name=\"last_opened_file_path\" value=\"$PROJECT_DIR$/David\" />\n    <property name=\"settings.editor.selected.configurable\" value=\"com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable\" />\n  </component>\n  <component name=\"RecentsManager\">\n    <key name=\"CopyFile.RECENT_KEYS\">\n      <recent name=\"C:\\Users\\marie\\PycharmProjects\\dEEpG\\David\" />\n      <recent name=\"C:\\Users\\marie\\PycharmProjects\\dEEpG\\Load\" />\n      <recent name=\"C:\\Users\\marie\\PycharmProjects\\dEEpG\" />\n    </key>\n    <key name=\"MoveFile.RECENT_KEYS\">\n      <recent name=\"C:\\Users\\marie\\PycharmProjects\\dEEpG\" />\n    </key>\n  </component>\n  <component name=\"RunManager\" selected=\"Python.loadData\">\n    <configuration name=\"BC_TUH_script\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"dEEpG\" />\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\n      <option name=\"PARENT_ENVS\" value=\"true\" />\n      <envs>\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\n      </envs>\n      <option name=\"SDK_HOME\" value=\"\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/David\" />\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/David/BC_TUH_script.py\" />\n      <option name=\"PARAMETERS\" value=\"\" />\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\n      <option name=\"MODULE_MODE\" value=\"false\" />\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\n      <option name=\"INPUT_FILE\" value=\"\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"LoadWithBraindecode\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"dEEpG\" />\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\n      <option name=\"PARENT_ENVS\" value=\"true\" />\n      <envs>\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\n      </envs>\n      <option name=\"SDK_HOME\" value=\"\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/LoadWithBraindecode.py\" />\n      <option name=\"PARAMETERS\" value=\"\" />\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\n      <option name=\"MODULE_MODE\" value=\"false\" />\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\n      <option name=\"INPUT_FILE\" value=\"\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"inputScript\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"dEEpG\" />\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\n      <option name=\"PARENT_ENVS\" value=\"true\" />\n      <envs>\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\n      </envs>\n      <option name=\"SDK_HOME\" value=\"\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/David\" />\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/David/inputScript.py\" />\n      <option name=\"PARAMETERS\" value=\"\" />\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\n      <option name=\"MODULE_MODE\" value=\"false\" />\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\n      <option name=\"INPUT_FILE\" value=\"\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"loadData\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"dEEpG\" />\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\n      <option name=\"PARENT_ENVS\" value=\"true\" />\n      <envs>\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\n      </envs>\n      <option name=\"SDK_HOME\" value=\"C:\\Users\\marie\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/pipeline\" />\n      <option name=\"IS_MODULE_SDK\" value=\"false\" />\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/pipeline/loadData.py\" />\n      <option name=\"PARAMETERS\" value=\"\" />\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\n      <option name=\"MODULE_MODE\" value=\"false\" />\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\n      <option name=\"INPUT_FILE\" value=\"\" />\n      <method v=\"2\" />\n    </configuration>\n    <configuration name=\"prepareData\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\n      <module name=\"Fagprojekt\" />\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\n      <option name=\"PARENT_ENVS\" value=\"true\" />\n      <envs>\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\n      </envs>\n      <option name=\"SDK_HOME\" value=\"C:\\Users\\marie\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" />\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\n      <option name=\"IS_MODULE_SDK\" value=\"false\" />\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/prepareData.py\" />\n      <option name=\"PARAMETERS\" value=\"\" />\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\n      <option name=\"MODULE_MODE\" value=\"false\" />\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\n      <option name=\"INPUT_FILE\" value=\"\" />\n      <method v=\"2\" />\n    </configuration>\n    <list>\n      <item itemvalue=\"Python.BC_TUH_script\" />\n      <item itemvalue=\"Python.inputScript\" />\n      <item itemvalue=\"Python.loadData\" />\n      <item itemvalue=\"Python.LoadWithBraindecode\" />\n      <item itemvalue=\"Python.prepareData\" />\n    </list>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Python.loadData\" />\n        <item itemvalue=\"Python.prepareData\" />\n        <item itemvalue=\"Python.LoadWithBraindecode\" />\n        <item itemvalue=\"Python.inputScript\" />\n        <item itemvalue=\"Python.BC_TUH_script\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"681eb482-4823-466c-900b-a027fa28e27f\" name=\"Changes\" comment=\"\" />\n      <created>1645627443933</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1645627443933</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData\">\n      <created>1646210526672</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1646210526672</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData\">\n      <created>1646210602178</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1646210602178</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData\">\n      <created>1647437747048</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1647437747048</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData\">\n      <created>1647437877128</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1647437877128</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData\">\n      <created>1647438156890</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1647438156890</updated>\n    </task>\n    <task id=\"LOCAL-00006\" summary=\"loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData\">\n      <created>1647438377335</created>\n      <option name=\"number\" value=\"00006\" />\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1647438377335</updated>\n    </task>\n    <task id=\"LOCAL-00007\" summary=\"Two temple data samples\">\n      <created>1647439137416</created>\n      <option name=\"number\" value=\"00007\" />\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1647439137416</updated>\n    </task>\n    <task id=\"LOCAL-00008\" summary=\"David EEG loader and prep implement\">\n      <created>1648046740264</created>\n      <option name=\"number\" value=\"00008\" />\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1648046740264</updated>\n    </task>\n    <task id=\"LOCAL-00009\" summary=\"David EEG loader and prep implement\">\n      <created>1648046786090</created>\n      <option name=\"number\" value=\"00009\" />\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1648046786090</updated>\n    </task>\n    <task id=\"LOCAL-00010\" summary=\"Changing Davids preprocess code to make X and y arrays\">\n      <created>1648644139919</created>\n      <option name=\"number\" value=\"00010\" />\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1648644139919</updated>\n    </task>\n    <task id=\"LOCAL-00011\" summary=\"Changing Davids preprocess code to make X and y arrays\">\n      <created>1648644460238</created>\n      <option name=\"number\" value=\"00011\" />\n      <option name=\"presentableId\" value=\"LOCAL-00011\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1648644460238</updated>\n    </task>\n    <task id=\"LOCAL-00012\" summary=\"Label_TUH fixed\">\n      <created>1648645553495</created>\n      <option name=\"number\" value=\"00012\" />\n      <option name=\"presentableId\" value=\"LOCAL-00012\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1648645553495</updated>\n    </task>\n    <task id=\"LOCAL-00013\" summary=\"Dataset of windows with labels\">\n      <created>1648648022245</created>\n      <option name=\"number\" value=\"00013\" />\n      <option name=\"presentableId\" value=\"LOCAL-00013\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1648648022245</updated>\n    </task>\n    <task id=\"LOCAL-00014\" summary=\"Code to load dataset as windows with labels\">\n      <created>1648727132055</created>\n      <option name=\"number\" value=\"00014\" />\n      <option name=\"presentableId\" value=\"LOCAL-00014\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1648727132056</updated>\n    </task>\n    <task id=\"LOCAL-00015\" summary=\"Preprocess modified\">\n      <created>1649241087409</created>\n      <option name=\"number\" value=\"00015\" />\n      <option name=\"presentableId\" value=\"LOCAL-00015\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1649241087410</updated>\n    </task>\n    <task id=\"LOCAL-00016\" summary=\"Preprocess modified\">\n      <created>1649246342681</created>\n      <option name=\"number\" value=\"00016\" />\n      <option name=\"presentableId\" value=\"LOCAL-00016\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1649246342681</updated>\n    </task>\n    <task id=\"LOCAL-00017\" summary=\"Spectrogram maker works\">\n      <created>1649248703473</created>\n      <option name=\"number\" value=\"00017\" />\n      <option name=\"presentableId\" value=\"LOCAL-00017\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1649248703473</updated>\n    </task>\n    <task id=\"LOCAL-00018\" summary=\"montageTest\">\n      <created>1650014226240</created>\n      <option name=\"number\" value=\"00018\" />\n      <option name=\"presentableId\" value=\"LOCAL-00018\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1650014226240</updated>\n    </task>\n    <task id=\"LOCAL-00019\" summary=\"electrode prep, sliding window changed\">\n      <created>1650460611799</created>\n      <option name=\"number\" value=\"00019\" />\n      <option name=\"presentableId\" value=\"LOCAL-00019\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1650460611799</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"20\" />\n    <servers />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData\" />\n    <MESSAGE value=\"Two temple data samples\" />\n    <MESSAGE value=\"David EEG loader and prep implement\" />\n    <MESSAGE value=\"Changing Davids preprocess code to make X and y arrays\" />\n    <MESSAGE value=\"Label_TUH fixed\" />\n    <MESSAGE value=\"Dataset of windows with labels\" />\n    <MESSAGE value=\"Code to load dataset as windows with labels\" />\n    <MESSAGE value=\"Preprocess modified\" />\n    <MESSAGE value=\"Spectrogram maker works\" />\n    <MESSAGE value=\"montageTest\" />\n    <MESSAGE value=\"electrode prep, sliding window changed\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"electrode prep, sliding window changed\" />\n  </component>\n  <component name=\"XDebuggerManager\">\n    <breakpoint-manager>\n      <breakpoints>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/prepareData.py</url>\n          <line>243</line>\n          <option name=\"timeStamp\" value=\"28\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/pipeline/preprocessing.py</url>\n          <line>2</line>\n          <option name=\"timeStamp\" value=\"50\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/prepareData.py</url>\n          <line>235</line>\n          <option name=\"timeStamp\" value=\"53\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/prepareData.py</url>\n          <line>242</line>\n          <option name=\"timeStamp\" value=\"59\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/prepareData.py</url>\n          <line>241</line>\n          <option name=\"timeStamp\" value=\"60\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/prepareData.py</url>\n          <line>209</line>\n          <option name=\"timeStamp\" value=\"67\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>\n          <line>28</line>\n          <option name=\"timeStamp\" value=\"71\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>\n          <line>22</line>\n          <option name=\"timeStamp\" value=\"72\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>\n          <line>33</line>\n          <option name=\"timeStamp\" value=\"105\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>\n          <line>54</line>\n          <option name=\"timeStamp\" value=\"106\" />\n        </line-breakpoint>\n        <line-breakpoint enabled=\"true\" suspend=\"THREAD\" type=\"python-line\">\n          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>\n          <line>308</line>\n          <option name=\"timeStamp\" value=\"111\" />\n        </line-breakpoint>\n      </breakpoints>\n      <default-breakpoints>\n        <breakpoint type=\"python-exception\">\n          <properties notifyOnTerminate=\"true\" exception=\"BaseException\">\n            <option name=\"notifyOnTerminate\" value=\"true\" />\n          </properties>\n        </breakpoint>\n      </default-breakpoints>\n    </breakpoint-manager>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 95abadeaf3cafcc68b73385f059f426d09393853)
++++ b/.idea/workspace.xml	(date 1651050366859)
+@@ -4,9 +4,9 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="electrode prep, sliding window changed">
+-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__13_21__Changes_.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
++    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="added progress bars for data loading">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/pipeline/loadData.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadData.py" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -30,12 +30,15 @@
+     <option name="stateVersion" value="1" />
+   </component>
+   <component name="ProjectId" id="25W0Gvvo5KunPrCnT8lbZPNy557" />
+-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
++  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
++    <ConfirmationsSetting value="2" id="Add" />
++  </component>
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+   <component name="PropertiesComponent">
++    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+     <property name="ToolWindowPython Packages.ShowToolbar" value="false" />
+@@ -53,7 +56,7 @@
+     </key>
+   </component>
+   <component name="RunManager" selected="Python.loadData">
+-    <configuration name="BC_TUH_script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
++    <configuration name="LoadWithBraindecode" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="dEEpG" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
+@@ -61,11 +64,11 @@
+         <env name="PYTHONUNBUFFERED" value="1" />
+       </envs>
+       <option name="SDK_HOME" value="" />
+-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/David" />
++      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+       <option name="IS_MODULE_SDK" value="true" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+       <option name="ADD_SOURCE_ROOTS" value="true" />
+-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/David/BC_TUH_script.py" />
++      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LoadWithBraindecode.py" />
+       <option name="PARAMETERS" value="" />
+       <option name="SHOW_COMMAND_LINE" value="false" />
+       <option name="EMULATE_TERMINAL" value="false" />
+@@ -74,19 +77,19 @@
+       <option name="INPUT_FILE" value="" />
+       <method v="2" />
+     </configuration>
+-    <configuration name="LoadWithBraindecode" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
++    <configuration name="electrodeCLF" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+       <module name="dEEpG" />
+       <option name="INTERPRETER_OPTIONS" value="" />
+       <option name="PARENT_ENVS" value="true" />
+       <envs>
+         <env name="PYTHONUNBUFFERED" value="1" />
+       </envs>
+-      <option name="SDK_HOME" value="" />
+-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+-      <option name="IS_MODULE_SDK" value="true" />
++      <option name="SDK_HOME" value="$USER_HOME$/opt/anaconda3/bin/python" />
++      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline" />
++      <option name="IS_MODULE_SDK" value="false" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+       <option name="ADD_SOURCE_ROOTS" value="true" />
+-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LoadWithBraindecode.py" />
++      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/electrodeCLF.py" />
+       <option name="PARAMETERS" value="" />
+       <option name="SHOW_COMMAND_LINE" value="false" />
+       <option name="EMULATE_TERMINAL" value="false" />
+@@ -123,7 +126,7 @@
+       <envs>
+         <env name="PYTHONUNBUFFERED" value="1" />
+       </envs>
+-      <option name="SDK_HOME" value="C:\Users\marie\AppData\Local\Programs\Python\Python310\python.exe" />
++      <option name="SDK_HOME" value="$USER_HOME$/opt/anaconda3/bin/python" />
+       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline" />
+       <option name="IS_MODULE_SDK" value="false" />
+       <option name="ADD_CONTENT_ROOTS" value="true" />
+@@ -159,19 +162,19 @@
+       <method v="2" />
+     </configuration>
+     <list>
+-      <item itemvalue="Python.BC_TUH_script" />
++      <item itemvalue="Python.LoadWithBraindecode" />
++      <item itemvalue="Python.electrodeCLF" />
+       <item itemvalue="Python.inputScript" />
+       <item itemvalue="Python.loadData" />
+-      <item itemvalue="Python.LoadWithBraindecode" />
+       <item itemvalue="Python.prepareData" />
+     </list>
+     <recent_temporary>
+       <list>
+         <item itemvalue="Python.loadData" />
++        <item itemvalue="Python.electrodeCLF" />
+         <item itemvalue="Python.prepareData" />
+         <item itemvalue="Python.LoadWithBraindecode" />
+         <item itemvalue="Python.inputScript" />
+-        <item itemvalue="Python.BC_TUH_script" />
+       </list>
+     </recent_temporary>
+   </component>
+@@ -317,7 +320,35 @@
+       <option name="project" value="LOCAL" />
+       <updated>1650460611799</updated>
+     </task>
+-    <option name="localTasksCounter" value="20" />
++    <task id="LOCAL-00020" summary="added window size variable for electrode classification">
++      <created>1650463344045</created>
++      <option name="number" value="00020" />
++      <option name="presentableId" value="LOCAL-00020" />
++      <option name="project" value="LOCAL" />
++      <updated>1650463344045</updated>
++    </task>
++    <task id="LOCAL-00021" summary="finalized model file added">
++      <created>1650463361699</created>
++      <option name="number" value="00021" />
++      <option name="presentableId" value="LOCAL-00021" />
++      <option name="project" value="LOCAL" />
++      <updated>1650463361699</updated>
++    </task>
++    <task id="LOCAL-00022" summary="sorted tabulate data">
++      <created>1650463773660</created>
++      <option name="number" value="00022" />
++      <option name="presentableId" value="LOCAL-00022" />
++      <option name="project" value="LOCAL" />
++      <updated>1650463773661</updated>
++    </task>
++    <task id="LOCAL-00023" summary="added progress bars for data loading">
++      <created>1650463805069</created>
++      <option name="number" value="00023" />
++      <option name="presentableId" value="LOCAL-00023" />
++      <option name="project" value="LOCAL" />
++      <updated>1650463805069</updated>
++    </task>
++    <option name="localTasksCounter" value="24" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -332,6 +363,7 @@
+     </option>
+   </component>
+   <component name="VcsManagerConfiguration">
++    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+     <MESSAGE value="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData" />
+     <MESSAGE value="Two temple data samples" />
+     <MESSAGE value="David EEG loader and prep implement" />
+@@ -343,7 +375,11 @@
+     <MESSAGE value="Spectrogram maker works" />
+     <MESSAGE value="montageTest" />
+     <MESSAGE value="electrode prep, sliding window changed" />
+-    <option name="LAST_COMMIT_MESSAGE" value="electrode prep, sliding window changed" />
++    <MESSAGE value="added window size variable for electrode classification" />
++    <MESSAGE value="finalized model file added" />
++    <MESSAGE value="sorted tabulate data" />
++    <MESSAGE value="added progress bars for data loading" />
++    <option name="LAST_COMMIT_MESSAGE" value="added progress bars for data loading" />
+   </component>
+   <component name="XDebuggerManager">
+     <breakpoint-manager>
+@@ -380,28 +416,28 @@
+         </line-breakpoint>
+         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
+-          <line>28</line>
++          <line>30</line>
+           <option name="timeStamp" value="71" />
+         </line-breakpoint>
+         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+           <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
+-          <line>22</line>
++          <line>24</line>
+           <option name="timeStamp" value="72" />
+         </line-breakpoint>
+         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+           <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+-          <line>33</line>
++          <line>34</line>
+           <option name="timeStamp" value="105" />
+         </line-breakpoint>
+         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+           <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+-          <line>54</line>
++          <line>55</line>
+           <option name="timeStamp" value="106" />
+         </line-breakpoint>
+         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+-          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+-          <line>308</line>
+-          <option name="timeStamp" value="111" />
++          <url>file://$PROJECT_DIR$/pipeline/raw_utils.py</url>
++          <line>116</line>
++          <option name="timeStamp" value="117" />
+         </line-breakpoint>
+       </breakpoints>
+       <default-breakpoints>
