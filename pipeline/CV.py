@@ -1,6 +1,6 @@
 #Make two level CV for model selection
-from numpy import mean
 from numpy import std
+import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
@@ -8,8 +8,21 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn import datasets
 from sklearn import svm
+from sklearn.metrics import f1_score
 
-def CrossValidtion_multi(model, X, Y, n_splits_outer=10, n_splits_inner=5, random_state=None):
+def CrossValidation_2(model, name, X, Y, n_splits_outer=10, n_splits_inner=5, random_state=None):
+    names = [
+        "Nearest Neighbors",
+        "Linear SVM",
+        "RBF SVM",
+        "Gaussian Process",
+        "Decision Tree",
+        "Random Forest",
+        "Neural Net",
+        #    "AdaBoost",
+        #    "Naive Bayes",
+        #    "QDA",
+    ]
     cv_outer = KFold(n_splits=n_splits_outer, shuffle=True, random_state=random_state)
     outer_results = list()
     for train_index, test_index in cv_outer.split(X):
@@ -20,8 +33,27 @@ def CrossValidtion_multi(model, X, Y, n_splits_outer=10, n_splits_inner=5, rando
         cv_inner = KFold(n_splits=n_splits_inner, shuffle=True, random_state=random_state)
         # define search space
         space = dict()
-        space['n_estimators'] = [10, 100, 500]
-        space['max_features'] = [2, 4, 6]
+
+
+        if name == "Nearest Neighbors":
+            space['n_neighbors'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        if name == "Linear SVM":
+            space['C'] = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+        if name == "RBF SVM":
+            space['gamma'] = [1, 2, 5, 10, 20]
+        if name == "Gaussian Process":
+            space['kernel'] = ['rbf', 'sigmoid', 'poly']
+            space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+        if name == "Decision Tree":
+            space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        if name == "Random Forest":
+            space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            space['n_estimators'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            space['max_features'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        if name == "Neural Net":
+            space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+            space['max_itter'] = [1, 10, 100, 1000, 10000]
+
         # define search
         search = GridSearchCV(model, space, scoring='accuracy', cv=cv_inner, refit=True)
         # execute search
@@ -37,12 +69,19 @@ def CrossValidtion_multi(model, X, Y, n_splits_outer=10, n_splits_inner=5, rando
         # report progress
         print('>acc=%.3f, est=%.3f, cfg=%s' % (acc, result.best_score_, result.best_params_))
     # summarize the estimated performance of the model
-    print('Accuracy: %.3f (%.3f)' % (mean(outer_results), std(outer_results)))
-    return mean(outer_results), std(outer_results)
+    print('Accuracy: %.3f (%.3f)' % (np.mean(outer_results), std(outer_results)))
+    return np.mean(outer_results), std(outer_results)
 
-def Crossvalidation_simple(models, X, Y, n_splits=10, random_state=None):
+def CrossValidation_1(models, X, Y, n_splits=10, random_state=None):
     cv = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-    results = list()
+    results_acc = list()
+    results_f1 = list()
+    dict = {}
+    dict_f1 = {}
+    best_model = [[0, 0, 0]]
+    for name, model in models.items():
+        dict[name] = list()
+        dict_f1[name] = list()
     for train_index, test_index in cv.split(X):
         # Split the data
         X_train, X_test = X[train_index], X[test_index]
@@ -53,10 +92,16 @@ def Crossvalidation_simple(models, X, Y, n_splits=10, random_state=None):
             model.fit(X_train, Y_train)
             yhat = model.predict(X_test)
             acc = accuracy_score(Y_test, yhat)
-            results.append(acc)
+            dict[name].append(acc)
+            f1 = f1_score(Y_test, yhat)
+            dict_f1[name].append(f1)
             # summarize the results
             print('>%s: %.3f' % (name, acc))
     # summarize the average accuracy
     for name, model in models.items():
-        print('%s: %.3f' % (name, mean(results)))
-    return name, mean(results)
+        print('%s: %.3f' % (name, np.mean(dict[name])))
+        print('%s: %.3f' % (name, np.mean(dict_f1[name])))
+        if np.mean(dict[name]) > best_model[0][1]:
+            best_model = []
+            best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name])])
+    return best_model

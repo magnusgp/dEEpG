@@ -18,11 +18,12 @@ from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
 import pickle
+from CV import CrossValidation_1, CrossValidation_2
 
 from tqdm import *
 import time
 
-def electrodeCLF(X, y, name = "all", multidim = True):
+def electrodeCLF(X, y, name = "all", multidim = True, Cross_validation = False):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -95,8 +96,14 @@ def electrodeCLF(X, y, name = "all", multidim = True):
         print("Error! Please select a classifier from the list: {}".format(names))
         score = 0.0
 
-    #Find index of best classifier
-    best_model = max(score, key=score.get)
+    if Cross_validation:
+        C_model_data = CrossValidation_1(models, X, Y)
+        C_model = C_model_data[0][0]
+        NB_model = models[C_model]
+        best_model = CrossValidation_2(NB_model, C_model, X, Y)
+    else:
+        #Find index of best classifier
+        best_model = max(score, key=score.get)
 
     #Match index to classifier name
     for ind, name in enumerate(names):
