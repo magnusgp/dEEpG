@@ -498,8 +498,8 @@ def solveLabelChannelRelation(annoPath, header = None):
                     anno_df.append(anno_new)
 
                 # check if second channel is a match with one in the new channel pair:
-                elif chan2 in channel_pairs[k]:
-
+                if chan2 in channel_pairs[k]:
+                    pass
                     # Starts and ends at same time:
                     if df[2][i] == df[2][k] and df[3][i] == df[3][k]:
                         pass
