@@ -479,9 +479,9 @@ def solveLabelChannelRelation(annoPath, header = None):
                 anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
                                          't_end': [t_end], 'label': [df[4][i]]})
 
-                if ((anno_new['channel'] == anno_df['channel']) & (anno_new['t_start'] == anno_df['t_start'])
-                    & (anno_new['t_end'] == anno_df['t_end']) & (anno_new['label'] == anno_df['label'])).any():
-                    anno_df.append(anno_new)
+                #if ((anno_new['channel'] == anno_df['channel']) & (anno_new['t_start'] == anno_df['t_start'])
+                #    & (anno_new['t_end'] == anno_df['t_end']) & (anno_new['label'] == anno_df['label'])).any():
+                #    anno_df.append(anno_new)
 
                 duplicates=anno_df[ ([df[4][i]]==anno_df['label']) &
                          (chan1==anno_df['channel'])  &
@@ -490,18 +490,12 @@ def solveLabelChannelRelation(annoPath, header = None):
                          ((temp[2]<anno_df['t_start']) & (t_end<anno_df['t_end'])))]
 
                 if duplicates:
-
+    
                     pass
                 else:
                     anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
                                              't_end': [t_end], 'label': [df[4][i]]})
-                # Check if channel 1 and channel 2 are overlapping in time frame
-                #elif (df[2][i]<=df[2][k] and df[2][k]<=df[3][i]) or (df[2][i]<=df[3][k] and df[3][k]<=df[3][i]):
-                    #write data to anno_df with overlapping label
-
-
-                #elif df[2][k]<df[2][i] and df[3][i]<df[3][k]:
-                #    pass
+                    anno_df.append(anno_new)
 
                 # check if second channel is a match with one in the new channel pair:
                 elif chan2 in channel_pairs[k]:
