@@ -512,18 +512,22 @@ def solveLabelChannelRelation(annoPath, header = None):
                                              't_end': [t_end], 'label': [df[4][i]]})
                     anno_df.append(anno_new)
 
-            # check if second channel is a match with one in the new channel pair:
-            if chan2 in channel_pairs[k]:
-                pass
-                # Starts and ends at same time:
-                if df[2][i] == df[2][k] and df[3][i] == df[3][k]:
-                    pass
-                # elif
             else:
                 pass
                 #print("No checks passed \n"
                 #      "Channel 1: {} ({}-{} s) \n"
                 #      "Channel 2: {} ({}-{} s)".format(chan1, df[2][i], df[3][i], chan2, df[2][k], df[3][k]))
+
+        #check that annotation is covered in the dataframe on either one of the channels or both
+        if not anno_df.empty:
+            #check if annotation is covered in the dataframe
+            if not (anno_df['t_start'].min() >= df[2][i] and anno_df['t_end'].max() <= df[3][i]):
+                print("Annotation not covered in dataframe \n"
+                      "Channel 1: {} ({}-{} s) \n"
+                      "Channel 2: {} ({}-{} s)".format(chan1, df[2][i], df[3][i], chan2, df[2][k], df[3][k]))
+                anno_df = pd.DataFrame()
+            else:
+                pass
 
     return anno_df
 
