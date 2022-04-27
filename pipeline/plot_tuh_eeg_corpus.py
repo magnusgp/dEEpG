@@ -52,7 +52,8 @@ mne.set_log_level('ERROR')  # avoid messages everytime a window is extracted
 # a `BaseConcatDataset` of `BaseDatasets` each holding a single
 # `nme.io.Raw` which is fully compatible with other braindecode functionalities.
 
-TUH_PATH = 'D:/fagprojekt/fagprojekt_data'
+#TUH_PATH = 'D:/fagprojekt/fagprojekt_data'
+TUH_PATH = '../TUH_data_sample'
 N_JOBS = 1  # specify the number of jobs for loading and windowing
 tuh = TUH(
     path=TUH_PATH,
