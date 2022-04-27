@@ -450,15 +450,15 @@ def solveLabelChannelRelation(annoPath, header = None):
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
 
     # Split pairs into single channels
-    channel_pairs=df[1].to_numpy().tolist()
-    channel_pairs=[n.split('-') for n in channel_pairs]
+    #channel_pairs=df[1].to_numpy().tolist()
+    #channel_pairs=[n.split('-') for n in channel_pairs]
     #channel_unique=list(set([n for n in channel_pairs]))
     #Creating data frame:
     anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
 
     #checking every entry in label data:
-    for i in tqdm(range(len(channel_pairs))):
-        chan1, chan2=channel_pairs[i]
+    for i in tqdm(range(len(df))):
+        chan1, chan2=df[1][i].split('-')
         # Only check row against rows further down:
         temp = df[i+1:]
         # Only rows with same label:
@@ -469,14 +469,18 @@ def solveLabelChannelRelation(annoPath, header = None):
                          ((df[2][i]<=temp[3]) & (temp[3]<=df[3][i])) |
                          ((temp[2]<df[2][i]) & (df[3][i]<temp[3]))]
 
-        for k in range(len(temp_time)):
-
+        for k in temp_time.index:
             #check if first channel is a match with one in the new channel pair:
-            if chan1 in channel_pairs[k]:
-                t_start = max(df[2][i], temp[2][k])
-                t_end = min(df[3][i], temp[3][k])
+            channel = None
+            if chan1 in temp_time[1][k].split('-'):
+                channel = chan1
+            elif chan2 in temp_time[1][k].split('-'):
+                channel = chan2
+            if channel in [chan1, chan2]:
+                t_start = max(df[2][i], temp_time[2][k])
+                t_end = min(df[3][i], temp_time[3][k])
 
-                anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
+                anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
                                          't_end': [t_end], 'label': [df[4][i]]})
 
                 #if ((anno_new['channel'] == anno_df['channel']) & (anno_new['t_start'] == anno_df['t_start'])
@@ -487,23 +491,34 @@ def solveLabelChannelRelation(annoPath, header = None):
                          (chan1==anno_df['channel'])  &
                         (((t_start<=anno_df['t_start']) & (anno_df['t_start']<=t_end)) |
                          ((t_start<=anno_df['t_end']) & (anno_df['t_end']<=t_end)) |
-                         ((temp[2]<anno_df['t_start']) & (t_end<anno_df['t_end'])))]
+                         ((anno_df['t_start']<t_start) & (t_end<anno_df['t_end'])))]
 
                 if duplicates:
-                    newt_start=min(duplicates['t_start'],t_start)
-                    pass
+                    new_t_start = min(duplicates['t_start'],t_start)
+                    new_t_end = max(duplicates['t_end'], t_start)
+
+                    anno_new = pd.DataFrame({'channel': [chan1], 't_start': [new_t_start],
+                                             't_end': [new_t_end], 'label': [df[4][i]]})
+                    anno_df.append(anno_new)
+
+                    #delete overlapping rows from behind so the indexes are not confused:
+                    for n in len(duplicates):
+                        index=duplicates.index[-n]
+                        anno_df.drop(index=index)
+
+                # if no duplicates/overlaps found, then just save annotation for channel:
                 else:
                     anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
                                              't_end': [t_end], 'label': [df[4][i]]})
                     anno_df.append(anno_new)
 
-                # check if second channel is a match with one in the new channel pair:
-                if chan2 in channel_pairs[k]:
+            # check if second channel is a match with one in the new channel pair:
+            if chan2 in channel_pairs[k]:
+                pass
+                # Starts and ends at same time:
+                if df[2][i] == df[2][k] and df[3][i] == df[3][k]:
                     pass
-                    # Starts and ends at same time:
-                    if df[2][i] == df[2][k] and df[3][i] == df[3][k]:
-                        pass
-                    # elif
+                # elif
             else:
                 pass
                 #print("No checks passed \n"
