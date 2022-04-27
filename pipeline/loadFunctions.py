@@ -448,6 +448,8 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
 
 def solveLabelChannelRelation(annoPath):
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+
+    # Split pairs into single channels
     channel_pairs=df[1].to_numpy().tolist()
     channel_pairs=[n.split('-') for n in channel_pairs]
 
@@ -463,12 +465,37 @@ def solveLabelChannelRelation(annoPath):
             #Check if label is the same in the two rows, eg. 'elec'=='elec':
             if df[4][i]==df[4][k]:
 
-                #check if first channel is a match with one in the new channel pair:
-                if chan1 in channel_pairs[k]:
+            #check if first channel is a match with one in the new channel pair:
+            if chan1 in channel_pairs[k]:
+                t_start = max(df[2][i], temp[2][k])
+                t_end = min(df[3][i], temp[3][k])
 
-                    #Starts and ends at same time:
-                    if df[2][i]==df[2][k] and df[3][i]==df[3][k]:
-                        pass
+                anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
+                                         't_end': [t_end], 'label': [df[4][i]]})
+
+                if ((anno_new['channel'] == anno_df['channel']) & (anno_new['t_start'] == anno_df['t_start'])
+                    & (anno_new['t_end'] == anno_df['t_end']) & (anno_new['label'] == anno_df['label'])).any():
+                    anno_df.append(anno_new)
+
+                duplicates=anno_df[ ([df[4][i]]==anno_df['label']) &
+                         (chan1==anno_df['channel'])  &
+                        (((t_start<=anno_df['t_start']) & (anno_df['t_start']<=t_end)) |
+                         ((t_start<=anno_df['t_end']) & (anno_df['t_end']<=t_end)) |
+                         ((temp[2]<anno_df['t_start']) & (t_end<anno_df['t_end'])))]
+
+                if duplicates:
+
+                    pass
+                else:
+                    anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
+                                             't_end': [t_end], 'label': [df[4][i]]})
+                # Check if channel 1 and channel 2 are overlapping in time frame
+                #elif (df[2][i]<=df[2][k] and df[2][k]<=df[3][i]) or (df[2][i]<=df[3][k] and df[3][k]<=df[3][i]):
+                    #write data to anno_df with overlapping label
+
+
+                #elif df[2][k]<df[2][i] and df[3][i]<df[3][k]:
+                #    pass
 
                 # check if second channel is a match with one in the new channel pair:
                 elif chan2 in channel_pairs[k]:
