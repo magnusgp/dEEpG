@@ -490,7 +490,7 @@ def solveLabelChannelRelation(annoPath, header = None):
                          ((temp[2]<anno_df['t_start']) & (t_end<anno_df['t_end'])))]
 
                 if duplicates:
-    
+                    newt_start=min(duplicates['t_start'],t_start)
                     pass
                 else:
                     anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
