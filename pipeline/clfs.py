@@ -97,10 +97,10 @@ def electrodeCLF(X, y, name = "all", multidim = True, Cross_validation = False):
         score = 0.0
 
     if Cross_validation:
-        C_model_data = CrossValidation_1(models, X, Y)
+        C_model_data = CrossValidation_1(models, X, y)
         C_model = C_model_data[0][0]
         NB_model = models[C_model]
-        best_model = CrossValidation_2(NB_model, C_model, X, Y)
+        best_model = CrossValidation_2(NB_model, C_model, X, y)
     else:
         #Find index of best classifier
         best_model = max(score, key=score.get)
