@@ -352,7 +352,7 @@ def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
     window_width = int(EEG_series["tWindow"] * edf_fS)
     label_path = EEG_series['path'].split(".edf")[0] + ".csv"
 
-    for i in range(0, t_N - window_width, t_overlap):
+    for i in range(0, t_N - window_width, t_step):
         t_start = i / edf_fS
         t_end = (i + window_width) / edf_fS
         window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])
@@ -446,24 +446,30 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
 
     return plt
 
-def solveLabelChannelRelation(annoPath):
+def solveLabelChannelRelation(annoPath, header = None):
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
 
     # Split pairs into single channels
     channel_pairs=df[1].to_numpy().tolist()
     channel_pairs=[n.split('-') for n in channel_pairs]
-
+    #channel_unique=list(set([n for n in channel_pairs]))
     #Creating data frame:
     anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
 
     #checking every entry in label data:
-    for i in range(len(channel_pairs)):
-        chan1,chan2=channel_pairs[i]
+    for i in tqdm(range(len(channel_pairs))):
+        chan1, chan2=channel_pairs[i]
+        # Only check row against rows further down:
+        temp = df[i+1:]
+        # Only rows with same label:
+        temp = temp[temp[4] == df[4][i]]
 
-        #Only check row against rows further down:
-        for k in range(i+1,len(channel_pairs)):
-            #Check if label is the same in the two rows, eg. 'elec'=='elec':
-            if df[4][i]==df[4][k]:
+        # Only overlap in time:
+        temp_time = temp[((df[2][i]<=temp[2]) & (temp[2]<=df[3][i])) |
+                         ((df[2][i]<=temp[3]) & (temp[3]<=df[3][i])) |
+                         ((temp[2]<df[2][i]) & (df[3][i]<temp[3]))]
+
+        for k in range(len(temp_time)):
 
             #check if first channel is a match with one in the new channel pair:
             if chan1 in channel_pairs[k]:
@@ -503,14 +509,47 @@ def solveLabelChannelRelation(annoPath):
                     # Starts and ends at same time:
                     if df[2][i] == df[2][k] and df[3][i] == df[3][k]:
                         pass
+                    # elif
+            else:
+                pass
+                #print("No checks passed \n"
+                #      "Channel 1: {} ({}-{} s) \n"
+                #      "Channel 2: {} ({}-{} s)".format(chan1, df[2][i], df[3][i], chan2, df[2][k], df[3][k]))
 
-                    elif
+    return anno_df
 
 
 
-    pass
+
+def labelChannels(annoPath, header = None):
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+
+    # Split pairs into single channels
+    channel_pairs = df[1].to_numpy().tolist()
+    channel_pairs = [n.split('-') for n in channel_pairs]
+
+    # Creating data frame:
+    anno_df = pd.DataFrame(columns=['channel', 't_start', 't_end', 'label'])
+
+    anno_dict = defaultdict(lambda: (0, 0))
+
+    # Checking every entry in label data:
+    for i in tqdm(range(len(channel_pairs))):
+        # Check if label is the same in the two rows, eg. 'elec'=='elec':
+        # Create two variables, one for each channel in the pair:
+        chan1, chan2 = channel_pairs[i]
+        for k in range(i+1,len(channel_pairs)):
+            #Check if label is the same in the two rows, eg. 'elec'=='elec':
+            if df[4][i] == df[4][k]:
+                #Add both time frames to anno_dict
+               anno_dict[chan1] = (df[2][i], df[3][i])
+               anno_dict[chan2] = (df[2][i], df[3][i])
+
+
 
 if __name__ == "__main__":
     path = "../TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.csv"
 
     solveLabelChannelRelation(annoPath=path)
+
+    #labelChannels(annoPath=path)
