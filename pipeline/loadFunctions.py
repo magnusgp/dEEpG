@@ -457,21 +457,27 @@ def solveLabelChannelRelation(annoPath):
     #checking every entry in label data:
     for i in range(len(channel_pairs)):
         chan1,chan2=channel_pairs[i]
-        for k in range(len(channel_pairs)):
-            #Do not check row against itself:
-            if k!=i:
-                #Check if label is the same in the two rows, eg. 'elec'=='elec':
-                if df[4][i]==df[4][k]:
+
+        #Only check row against rows further down:
+        for k in range(i+1,len(channel_pairs)):
+            #Check if label is the same in the two rows, eg. 'elec'=='elec':
+            if df[4][i]==df[4][k]:
+
+                #check if first channel is a match with one in the new channel pair:
+                if chan1 in channel_pairs[k]:
 
                     #Starts and ends at same time:
                     if df[2][i]==df[2][k] and df[3][i]==df[3][k]:
-                        #check if same channels in annotation indicating this channel has the label
-                        if chan1 in channel_pairs[k]:
+                        pass
 
-                            pass
+                # check if second channel is a match with one in the new channel pair:
+                elif chan2 in channel_pairs[k]:
 
-                        if chan2 in channel_pairs[k]:
-                            pass
+                    # Starts and ends at same time:
+                    if df[2][i] == df[2][k] and df[3][i] == df[3][k]:
+                        pass
+
+                    elif
 
 
 
