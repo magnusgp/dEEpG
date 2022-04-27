@@ -87,6 +87,13 @@ class TUH_data:
             proc_subject = subjects_TUAR19[k]
             proc_subject = self.readRawEdf(proc_subject, tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
+            if k == 0 and plot:
+                #Plot the energy voltage potential against frequency.
+                #proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+
+                raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
+                raw_anno.plot()
+                plt.show()
 
             proc_subject["rawData"] = TUH_rename_ch(proc_subject["rawData"])
             TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
@@ -154,6 +161,13 @@ class TUH_data:
             proc_subject = subjects_TUAR19[k]
             proc_subject = self.readRawEdf(proc_subject, tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
+            if k == 0 and plot:
+                #Plot the energy voltage potential against frequency.
+                #proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+
+                raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
+                raw_anno.plot()
+                plt.show()
 
             proc_subject["rawData"] = TUH_rename_ch(proc_subject["rawData"])
             TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
@@ -431,3 +445,39 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
     plt.title("channel spectrogram: " + ch_names[chan])
 
     return plt
+
+def solveLabelChannelRelation(annoPath):
+    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+    channel_pairs=df[1].to_numpy().tolist()
+    channel_pairs=[n.split('-') for n in channel_pairs]
+
+    #Creating data frame:
+    anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
+
+    #checking every entry in label data:
+    for i in range(len(channel_pairs)):
+        chan1,chan2=channel_pairs[i]
+        for k in range(len(channel_pairs)):
+            #Do not check row against itself:
+            if k!=i:
+                #Check if label is the same in the two rows, eg. 'elec'=='elec':
+                if df[4][i]==df[4][k]:
+
+                    #Starts and ends at same time:
+                    if df[2][i]==df[2][k] and df[3][i]==df[3][k]:
+                        #check if same channels in annotation indicating this channel has the label
+                        if chan1 in channel_pairs[k]:
+
+                            pass
+
+                        if chan2 in channel_pairs[k]:
+                            pass
+
+
+
+    pass
+
+if __name__ == "__main__":
+    path = "../TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.csv"
+
+    solveLabelChannelRelation(annoPath=path)
