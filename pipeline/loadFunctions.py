@@ -123,13 +123,14 @@ class TUH_data:
                                             tWindow, tStep))
 
     def collectWindows(self,id=None):
+        # Helper funtion to makeDatasetFromIds
         Xwindows = []
         Ywindows = []
         windowInfo = []
         for window in self.EEG_dict[id]["labeled_windows"].values():
-            Xwindows.append(window[0])
+            Xwindows=Xwindows+window[0]
 
-            Ywindows.append(1 if window[1]=='elec' else 0)
+            Ywindows.append(1 if window[1]==['elec'] else 0)
             # save info about which raw file and start time and end time this window is.
             windowInfo.append([{'patient_id':self.EEG_dict[id]['patient_id'], 't_start':window[2], 't_end':window[3]}])
 
@@ -137,6 +138,7 @@ class TUH_data:
 
 
     def makeDatasetFromIds(self,ids=None):
+        # Needs list of Ids/indexes in EEG_dict. Function electrodeCLFPrep should be called beforehand.
         Xwindows = []
         Ywindows = []
         windowInfo = []
@@ -145,8 +147,6 @@ class TUH_data:
             Xwindows.append(Xwind)
             Ywindows.append(Ywind)
             windowInfo.append(windowIn)
-
-        #Ywindows = oneHotEncoder(Ywindows, enumerate_labels=True, clfbin=True)
 
         return Xwindows,Ywindows,windowInfo
 

@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="change structure to have raw and windows in EEG_dict and two functions for handling of this">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_04_05_2022__12_02__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_04_05_2022__12_02__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="pandas df patient id index overview">
       <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -420,7 +418,14 @@
       <option name="project" value="LOCAL" />
       <updated>1651676545606</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="pandas df patient id index overview">
+      <created>1651679080652</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1651679080652</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -469,7 +474,8 @@
     <MESSAGE value="Changes to solveLabelChannelRelation, splitting of double labels etc." />
     <MESSAGE value="split functions between loadFunction.py and new labelFunctions.py" />
     <MESSAGE value="change structure to have raw and windows in EEG_dict and two functions for handling of this" />
-    <option name="LAST_COMMIT_MESSAGE" value="change structure to have raw and windows in EEG_dict and two functions for handling of this" />
+    <MESSAGE value="pandas df patient id index overview" />
+    <option name="LAST_COMMIT_MESSAGE" value="pandas df patient id index overview" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
