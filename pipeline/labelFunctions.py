@@ -173,6 +173,7 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
                     anno_new = pd.DataFrame({'channel': [channel], 't_start': [new_t_start],
                                              't_end': [new_t_end], 'label': [df[4][i]]})
                     if plot:
+                        # Heatmap matrix
                         plotmat[i, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
                         plotmat[k, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
                     anno_df = pd.concat([anno_df, anno_new], ignore_index=True)
