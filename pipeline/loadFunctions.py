@@ -565,4 +565,13 @@ if __name__ == "__main__":
 
     solveLabelChannelRelation(annoPath=path)
 
+    s1 = pd.read_csv(path, sep=",", skiprows=6, header=None)
+
+    s2 = pd.read_csv(path, sep=",", skiprows=6, header=None)
+
+    df = pd.concat([s1, s2], axis=1).ffill().dropna()
+    overlap = df.index.to_series().diff().shift(-1) \
+        .fillna(0).groupby(df.s1.eq(df.s2)).sum()
+    overlap.div(overlap.sum())
+
     #labelChannels(annoPath=path)
