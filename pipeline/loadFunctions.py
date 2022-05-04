@@ -23,7 +23,7 @@ class TUH_data:
         ### Makes dictionary of all edf files
         EEG_count = 0
         EEG_dict = {}
-
+        index_patient_df = pd.DataFrame(columns=['index', 'patient_id'])
         for dirpath, dirnames, filenames in os.walk(path):
             for filename in [f for f in filenames if f.endswith(".edf")]:
                 """For every edf file found somewhere in the directory, it is assumed the folders hold the structure: 
@@ -38,20 +38,12 @@ class TUH_data:
                                              "session": session_path_split[1],
                                              "path": os.path.join(dirpath, filename),
                                              "csvpath": os.path.join(dirpath, os.path.splitext(filename)[0]+'.csv')}})
+                new_index_patient = pd.DataFrame({'index': EEG_count,'patient_id': EEG_dict[EEG_count]["patient_id"]}, index = [EEG_count])
+                index_patient_df=pd.concat([index_patient_df, new_index_patient])
                 EEG_count += 1
+        self.index_patient_df = index_patient_df
         self.EEG_dict = EEG_dict
         self.EEG_count = EEG_count
-
-    """ These functions could probably be deleted, but are nice in case we want a quick plot of a raw file.
-    def loadOneRaw(self, id):
-        return mne.io.read_raw_edf(self.EEG_dict[id]["path"], preload=True)
-
-    def loadAllRaw(self):
-        EEG_raw_dict = {}
-        for id in range(self.EEG_count):
-            EEG_raw_dict[id] = self.loadOneRaw(id)
-        self.EEG_raw_dict = EEG_raw_dict
-        """
 
     def readRawEdf(self, edfDict=None, tWindow=120, tStep=30,
                    read_raw_edf_param={'preload': True, "stim_channel": "auto"}):
