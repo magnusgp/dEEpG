@@ -1,6 +1,6 @@
 from loadFunctions import TUH_data
 from braindecode.datasets import create_from_X_y
-from clfs import electrodeCLF,classifyElectrodeIntervals
+from clfs import electrodeCLF
 
 # Define path of outer directory for samples:
 path="../TUH_data_sample"
@@ -13,11 +13,12 @@ TUH=TUH_data(path=path)
 # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
 # Ywindows (labels as list of strings) to use for electrode artifact classifier:
 windowssz = 10
-elecX,elecY,windowInfo=TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=True)
+TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
+elecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])
 # Find the best electrode artifact classifier:
 bestmodel=electrodeCLF(elecX, elecY, "all", False)
 
-bads=classifyElectrodeIntervals(elecX,windowInfo,bestmodel)
+#bads=classifyElectrodeIntervals(elecX,windowInfo,bestmodel)
 
 
 # Load edf to raw, full preprocess with electrode classifier, make Xwindows (all windows

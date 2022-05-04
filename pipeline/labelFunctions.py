@@ -2,13 +2,12 @@ import pandas as pd
 import numpy as np
 from tqdm import *
 
-def label_TUH(annoPath=False, window=[0, 0], header=None,channel=None):  # saveDir=os.getcwd(),
-    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
-    df.fillna('null', inplace=True)
-    within_con0 = (df[2] <= window[0]) & (window[0] <= df[3])
-    within_con1 = (df[2] <= window[1]) & (window[1] <= df[3])
+def label_TUH(dataFrame=False, window=[0, 0], header=None,channel=None):  # saveDir=os.getcwd(),
+    df=dataFrame
+    within_con0 = (df['t_start'] <= window[0]) & (window[0] <= df['t_end'])
+    within_con1 = (df['t_start'] <= window[1]) & (window[1] <= df['t_end'])
     if channel:
-        chan_names = df[1].to_numpy().tolist()
+        chan_names = df['channel'].to_numpy().tolist()
         low_char = {'FP1': 'Fp1', 'FP2': 'Fp2', 'FZ': 'Fz', 'CZ': 'Cz', 'PZ': 'Pz'}
         for i in range(len(chan_names)):
             # remove numbers behind channel names:
@@ -19,21 +18,20 @@ def label_TUH(annoPath=False, window=[0, 0], header=None,channel=None):  # saveD
             for k in range(len(chan_names[i]) - 1, -1, -1):
                 if chan_names[i][k] in low_char:
                     chan_names[i][k] = low_char[chan_names[i][k]]
-        label_TUH = df[(df[2].between(window[0], window[1]) |
-                       df[3].between(window[0], window[1]) |
+        label_TUH = df[(df['t_start'].between(window[0], window[1]) |
+                       df['t_end'].between(window[0], window[1]) |
                        (within_con0 & within_con1))
                        & (np.sum(np.asarray(chan_names)==np.asarray(channel),axis=1).tolist())
-                        & ((df[4].to_numpy()=='elec')|
-                           (df[4].to_numpy()=='musc_elec')|
-                           (df[4].to_numpy()=='eyem_elec')|
-                           (df[4].to_numpy()=='shiv_elec')|
-                           (df[4].to_numpy()=='chew_elec'))]
+                        & ((df['label'].to_numpy()=='elec')|
+                           (df['label'].to_numpy()=='musc_elec')|
+                           (df['label'].to_numpy()=='eyem_elec')|
+                           (df['label'].to_numpy()=='shiv_elec')|
+                           (df['label'].to_numpy()=='chew_elec'))]
     else:
-        label_TUH = df[df[2].between(window[0], window[1]) |
-                   df[3].between(window[0], window[1]) |
+        label_TUH = df[df['t_start'].between(window[0], window[1]) |
+                   df['t_end'].between(window[0], window[1]) |
                    (within_con0 & within_con1)]
-    label_df = label_TUH.rename(columns={2: 't_start', 3: 't_end', 4: 'label', 5: 'confidence'})["label"]  # Renamer headers i pandas dataen
-    return_list = label_df.to_numpy().tolist()  # Outputter kun listen af label navne i vinduet, fx ["eyem", "null"]
+    return_list = label_TUH.to_numpy().tolist()  # Outputter kun listen af label navne i vinduet, fx ["eyem", "null"]
     if return_list==[]:
         return_list=['null']
     elif channel:
@@ -44,34 +42,24 @@ def label_TUH(annoPath=False, window=[0, 0], header=None,channel=None):  # saveD
 # The function "annotate_TUH()" takes a raw signal and a path for a csv file with annotations/labels in it.
 # The annotations are read and added to the raw signal. The function is mainly made for the purpose of making
 # plots with the artifacts showing.
-def annotate_TUH(raw,annoPath=False, header=None):
-    df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
-    t_start=df[2].to_numpy()
-    dura=df[3].to_numpy()-t_start
-    labels=df[4].to_numpy().tolist()
-    chan_names=df[1].to_numpy().tolist()
+def annotate_TUH(raw,df=None):
+    t_start=df['t_start'].to_numpy()
+    dura=df['t_end'].to_numpy()-t_start
+    labels=df['label'].to_numpy().tolist()
+    chan_names=df['channel'].to_numpy().tolist()
     t_start=t_start.tolist()
     dura=dura.tolist()
 
     delete=[]
     low_char={'FP1':'Fp1', 'FP2':'Fp2', 'FZ':'Fz', 'CZ':'Cz', 'PZ':'Pz'}
     for i in range(len(chan_names)):
-        #remove numbers behind channel names:
-        chan_names[i]=[chan_names[i][:-3],chan_names[i][-2:]]
-
         # Loop through all channel names in reverse order, so if something is removed it does not affect other index.
         # Change certain channels to have smaller letters:
-        for k in range(len(chan_names[i])-1,-1,-1):
-            if chan_names[i][k] in low_char:
-                chan_names[i][k]=low_char[chan_names[i][k]]
+        if chan_names[i] in low_char:
+            chan_names[i]=low_char[chan_names[i]]
 
-            # If channel names are not in the raw info their are removed from an annotation:
-            if chan_names[i][k] not in raw.ch_names:
-                chan_names[i].remove(chan_names[i][k])
-
-        # If no channel names are left for an annotation its index is saved for later removal entirely:
-        # (It could potentially just be annotated for the whole signal)
-        if not chan_names[i]:
+        # If channel names are not in the raw info their are removed from an annotation:
+        if chan_names[i] not in raw.ch_names:
             delete.append(i)
 
 
@@ -134,9 +122,6 @@ def solveLabelChannelRelation(annoPath, header = None):
             if channel in [chan1, chan2]:
                 t_start = max(df[2][i], temp_time[2][k])
                 t_end = min(df[3][i], temp_time[3][k])
-
-                anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
-                                         't_end': [t_end], 'label': [df[4][i]]})
 
                 #Find all entries in the new annotation dataframe where there is a match of label and found channel (two
                 # first checks). Then check that there is an overlap in time (three checks of overlap: start time within
@@ -223,5 +208,3 @@ if __name__ == "__main__":
     path = "../TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.csv"
 
     solveLabelChannelRelation(annoPath=path)
-
-    #labelChannels(annoPath=path)

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from scipy import signal, stats
 from raw_utils import oneHotEncoder
 from tqdm import *
-from labelFunctions import label_TUH,annotate_TUH
+from labelFunctions import label_TUH, annotate_TUH, solveLabelChannelRelation
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -79,75 +79,84 @@ class TUH_data:
     def electrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
         subjects_TUAR19 = defaultdict(dict)
-        Xwindows = []
-        Ywindows = []
-        windowInfo = []
         for k in tqdm(range(len(self.EEG_dict))):
-            subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
 
-            proc_subject = subjects_TUAR19[k]
-            proc_subject = self.readRawEdf(proc_subject, tWindow=tWindow, tStep=tStep,
+            annotations=solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
+
+            #subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
+
+            #self.EEG_dict[k] = subjects_TUAR19[k]
+            self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
-            if k == 0 and plot:
-                #Plot the energy voltage potential against frequency.
-                #proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
 
-                raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
-                raw_anno.plot()
-                plt.show()
-
-            proc_subject["rawData"] = TUH_rename_ch(proc_subject["rawData"])
+            self.EEG_dict[k]["rawData"] = TUH_rename_ch(self.EEG_dict[k]["rawData"])
             TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
                         'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']  # A1, A2 removed
-            proc_subject["rawData"].pick_channels(ch_names=TUH_pick)
-            proc_subject["rawData"].reorder_channels(TUH_pick)
+            self.EEG_dict[k]["rawData"].pick_channels(ch_names=TUH_pick)
+            self.EEG_dict[k]["rawData"].reorder_channels(TUH_pick)
 
             if k == 0 and plot:
                 #Plot the energy voltage potential against frequency.
-                proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+                self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
 
-                raw_anno = annotate_TUH(proc_subject["rawData"],annoPath=self.EEG_dict[k]["csvpath"])
+                raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"],df=annotations)
                 raw_anno.plot()
                 plt.title("Untouched raw signal")
                 plt.show()
 
-            simplePreprocess(proc_subject["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=40, notchfq=60,
+            simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
                      downSam=250)
 
             if k == 0:
-
-                self.sfreq = proc_subject["rawData"].info["sfreq"]
-                self.ch_names = proc_subject["rawData"].info["ch_names"]
+                self.sfreq = self.EEG_dict[k]["rawData"].info["sfreq"]
+                self.ch_names = self.EEG_dict[k]["rawData"].info["ch_names"]
                 if plot:
-                    proc_subject["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
+                    self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
 
-                    raw_anno = annotate_TUH(proc_subject["rawData"], annoPath=self.EEG_dict[k]["csvpath"])
+                    raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"], df=annotations)
                     raw_anno.plot()
                     plt.title("Raw signal after simple preprocessing")
                     plt.show()
 
 
             # Generate output windows for (X,y) as (array, label)
-            proc_subject["preprocessing_output"] = slidingRawWindow(proc_subject,
-                                                                    t_max=proc_subject["rawData"].times[-1],
-                                                                    tStep=proc_subject["tStep"],
-                                                                    electrodeCLF=True)
-
-            for window in proc_subject["preprocessing_output"].values():
-                Xwindows.append(window[0])
-                Ywindows.append(window[1])
-                #save info about which raw file and start time and end time this window is.
-                windowInfo.append(self.EEG_dict[k]['path'],window[2],window[3])
-
+            self.EEG_dict[k]["labeled_windows"] = slidingRawWindow(self.EEG_dict[k],
+                                                                    t_max=self.EEG_dict[k]["rawData"].times[-1],
+                                                                    tStep=self.EEG_dict[k]["tStep"],
+                                                                    electrodeCLF=True,df=annotations)
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
               "it took %imin:%is to run electrode classifier preprocess-pipeline for %i patients\n with window length [%.2fs] and t_step [%.2fs]"
               "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(subjects_TUAR19),
                                             tWindow, tStep))
 
-        Ywindows = oneHotEncoder(Ywindows, enumerate_labels=True, clfbin=True)
+    def collectWindows(self,id=None):
+        Xwindows = []
+        Ywindows = []
+        windowInfo = []
+        for window in self.EEG_dict[id]["labeled_windows"].values():
+            Xwindows.append(window[0])
 
-        return Xwindows, Ywindows,windowInfo
+            Ywindows.append(1 if window[1]=='elec' else 0)
+            # save info about which raw file and start time and end time this window is.
+            windowInfo.append([{'patient_id':self.EEG_dict[id]['patient_id'], 't_start':window[2], 't_end':window[3]}])
+
+        return Xwindows,Ywindows,windowInfo
+
+
+    def makeDatasetFromIds(self,ids=None):
+        Xwindows = []
+        Ywindows = []
+        windowInfo = []
+        for id in ids:
+            Xwind,Ywind,windowIn=self.collectWindows(id=id)
+            Xwindows.append(Xwind)
+            Ywindows.append(Ywind)
+            windowInfo.append(windowIn)
+
+        #Ywindows = oneHotEncoder(Ywindows, enumerate_labels=True, clfbin=True)
+
+        return Xwindows,Ywindows,windowInfo
 
     def prep(self, tWindow=100, tStep=100 *.25,plot=False):
         self.tWindow=tWindow
@@ -254,7 +263,7 @@ def makeArrayWindow(MNE_raw=None, t0=0, tWindow=120):
     return chWindows
 
 
-def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
+def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=False):
     #If electrodeCLF is set to true, the function outputs a window per channel
     # with labels assigned only for this channel.
 
@@ -286,11 +295,11 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
         if electrodeCLF:
             for i in range(len(window_data)):
                 chan=EEG_series['rawData'].info['ch_names'][i]
-                channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
+                channel_label=label_TUH(dataFrame=df, window=[t_start, t_end],channel=chan)
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
                 window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
-            window_label = label_TUH(annoPath=label_path, window=[t_start, t_end],channel=None)  # , saveDir=annoDir)
+            window_label = label_TUH(dataFrame=df, window=[t_start, t_end],channel=None)  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
     # window_N segments (by negative lookahead)
     if t_N % t_overlap != 0:
@@ -301,11 +310,11 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False):
         if electrodeCLF:
             for i in range(len(window_data)):
                 chan=EEG_series['rawData'].info['ch_names'][i]
-                channel_label=label_TUH(annoPath=label_path, window=[t_start, t_end],channel=chan)
+                channel_label=label_TUH(dataFrame=df, window=[t_start, t_end],channel=chan)
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
                 window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
-            window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])  # , saveDir=annoDir)
+            window_label = label_TUH(dataFrame=df, window=[t_start, t_end])  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
     return window_EEG
 
@@ -318,7 +327,7 @@ def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
     for i in range(0, t_N - window_width, t_step):
         t_start = i / edf_fS
         t_end = (i + window_width) / edf_fS
-        window_label = label_TUH(annoPath=label_path, window=[t_start, t_end])
+        window_label = label_TUH(dataFrame=df, window=[t_start, t_end])
         if len(window_label)==1 & window_label[0]==label:
             return EEG_series["rawData"].plot(t_start=t_start, t_end=t_end)
     return None

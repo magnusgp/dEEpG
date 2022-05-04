@@ -98,6 +98,8 @@ def oneHotEncoder(labels, enumerate_labels=False, clfbin = False, type = 'labels
     elif type == 'channel':
         all_labels = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2', 'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']
 
+
+
     n_classes = len(all_labels)
     #labels = [item for sublist in labels for item in sublist]
     for i in range(len(labels)):
@@ -114,7 +116,8 @@ def oneHotEncoder(labels, enumerate_labels=False, clfbin = False, type = 'labels
         for l in range(len(one_hot_labels)):
             lab2 = []
             for m in range(len(one_hot_labels[l])):
-                lab2.append(np.where(one_hot_labels[l][m] == 1)[0].item())
+                lab2.append(np.where(one_hot_labels[l][m] == 1)[0].tolist())
+                #lab2.append(np.where(one_hot_labels[l][m] == 1)[0])
             lab.append(lab2)
 
         if clfbin:
