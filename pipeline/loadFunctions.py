@@ -449,10 +449,22 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
 def solveLabelChannelRelation(annoPath, header = None):
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
 
-    # Split pairs into single channels
-    #channel_pairs=df[1].to_numpy().tolist()
-    #channel_pairs=[n.split('-') for n in channel_pairs]
-    #channel_unique=list(set([n for n in channel_pairs]))
+    # Find all double labels eg. "eyem_elec" and split them to two seperate annotations:
+    double_label_temp_df=pd.DataFrame(columns=[1,2,3,4])
+    double_labels=df[df[4].str.len()==9]
+    for i in double_labels.index:
+        label1,label2=df[4][i].split('_')
+
+        rows_two_labels = pd.DataFrame({1: [df[1][i],df[1][i]], 2: [df[2][i],df[2][i]],
+                                         3: [df[3][i],df[3][i]], 4: [label1, label2]})
+
+
+        double_label_temp_df = pd.concat([double_label_temp_df, rows_two_labels], ignore_index=True)
+
+        df = df.drop(index=i)
+    #Join the df with removed doublelabels with the dataframe with the separated single annotations:
+    df=pd.concat([df, rows_two_labels], ignore_index=True)
+
     #Creating data frame:
     anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
 
@@ -483,52 +495,57 @@ def solveLabelChannelRelation(annoPath, header = None):
                 anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
                                          't_end': [t_end], 'label': [df[4][i]]})
 
-                #if ((anno_new['channel'] == anno_df['channel']) & (anno_new['t_start'] == anno_df['t_start'])
-                #    & (anno_new['t_end'] == anno_df['t_end']) & (anno_new['label'] == anno_df['label'])).any():
-                #    anno_df.append(anno_new)
-
-                duplicates=anno_df[ ([df[4][i]]==anno_df['label']) &
-                         (chan1==anno_df['channel'])  &
+                #Find all entries in the new annotation dataframe where there is a match of label and found channel (two
+                # first checks). Then check that there is an overlap in time (three checks of overlap: start time within
+                # interval, end time within interval or comparison signal k is larger and lies around the signal i.)
+                duplicates=anno_df[ ((df[4][i]==anno_df['label']) &
+                         (channel==anno_df['channel'])  &
                         (((t_start<=anno_df['t_start']) & (anno_df['t_start']<=t_end)) |
                          ((t_start<=anno_df['t_end']) & (anno_df['t_end']<=t_end)) |
-                         ((anno_df['t_start']<t_start) & (t_end<anno_df['t_end'])))]
+                         ((anno_df['t_start']<t_start) & (t_end<anno_df['t_end']))))]
 
-                if duplicates:
-                    new_t_start = min(duplicates['t_start'],t_start)
-                    new_t_end = max(duplicates['t_end'], t_start)
-
-                    anno_new = pd.DataFrame({'channel': [chan1], 't_start': [new_t_start],
-                                             't_end': [new_t_end], 'label': [df[4][i]]})
-                    anno_df.append(anno_new)
+                if not duplicates.empty:
+                    new_t_start = min(duplicates['t_start'].to_numpy().tolist()+[t_start])
+                    new_t_end = max(duplicates['t_end'].to_numpy().tolist()+[t_start])
 
                     #delete overlapping rows from behind so the indexes are not confused:
-                    for n in len(duplicates):
+                    for n in range(len(duplicates)):
                         index=duplicates.index[-n]
-                        anno_df.drop(index=index)
+                        anno_df=anno_df.drop(index=index)
+                        print('yes')
 
+                    #Wait to concatenate new row to dataframe, since the indexes are ignored, meaning the duplicates
+                    # get different indexes and cannot be removed unless this order is used.
+                    anno_new = pd.DataFrame({'channel': [channel], 't_start': [new_t_start],
+                                             't_end': [new_t_end], 'label': [df[4][i]]})
+
+                    anno_df = pd.concat([anno_df, anno_new], ignore_index=True)
                 # if no duplicates/overlaps found, then just save annotation for channel:
                 else:
-                    anno_new = pd.DataFrame({'channel': [chan1], 't_start': [t_start],
+                    anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
                                              't_end': [t_end], 'label': [df[4][i]]})
-                    anno_df.append(anno_new)
+                    anno_df=pd.concat([anno_df,anno_new],ignore_index=True)
 
             else:
+                #print("Annotation was not appended since channel was not a match")
                 pass
-                #print("No checks passed \n"
-                #      "Channel 1: {} ({}-{} s) \n"
-                #      "Channel 2: {} ({}-{} s)".format(chan1, df[2][i], df[3][i], chan2, df[2][k], df[3][k]))
 
         #check that annotation is covered in the dataframe on either one of the channels or both
         if not anno_df.empty:
-            #check if annotation is covered in the dataframe
-            if not (anno_df['t_start'].min() >= df[2][i] and anno_df['t_end'].max() <= df[3][i]):
-                print("Annotation not covered in dataframe \n"
-                      "Channel 1: {} ({}-{} s) \n"
-                      "Channel 2: {} ({}-{} s)".format(chan1, df[2][i], df[3][i], chan2, df[2][k], df[3][k]))
-                anno_df = pd.DataFrame()
-            else:
-                pass
+            pass
+            # Find all entries in the new annotation dataframe where there is a match of label and one of the channels
+            # (two first checks). Then check that there is an overlap in time (three checks of overlap: start time within
+            # interval, end time within interval or comparison signal k is larger and lies around the signal i.)
+            """
+            time_check=anno_df[((df[4][i] == anno_df['label']) &
+                    (anno_df['channel'] == chan1 | anno_df['channel'] == chan2) &
+                     (((t_start <= anno_df['t_start']) & (anno_df['t_start'] <= t_end)) |
+                      ((t_start <= anno_df['t_end']) & (anno_df['t_end'] <= t_end)) |
+                      ((anno_df['t_start'] < t_start) & (t_end < anno_df['t_end'])))),2:4]
+            """
 
+
+    print(anno_df)
     return anno_df
 
 

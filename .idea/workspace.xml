@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="shelves patches">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__15_39__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20_04_2022__15_39__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__11_06__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__11_06__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__13_53__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__13_53__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__17_32__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__17_32__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__17_32__Changes_by_marie_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__17_32__Changes_by_marie_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,9 +94,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\marie\AppData\Local\Programs\Python\Python310\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pipeline" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/loadFunctions.py" />
@@ -395,7 +393,14 @@
       <option name="project" value="LOCAL" />
       <updated>1651071407671</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="shelves patches">
+      <created>1651517674886</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1651517674887</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -439,9 +444,9 @@
     <MESSAGE value="classify electrode intervals created" />
     <MESSAGE value="label magi" />
     <MESSAGE value="label magi updates" />
-    <MESSAGE value="shelves patches" />
     <MESSAGE value="Changes by marie" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changes by marie" />
+    <MESSAGE value="shelves patches" />
+    <option name="LAST_COMMIT_MESSAGE" value="shelves patches" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -460,6 +465,26 @@
           <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
           <line>342</line>
           <option name="timeStamp" value="111" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>534</line>
+          <option name="timeStamp" value="112" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>499</line>
+          <option name="timeStamp" value="125" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>500</line>
+          <option name="timeStamp" value="126" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>451</line>
+          <option name="timeStamp" value="127" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
