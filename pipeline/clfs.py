@@ -100,18 +100,22 @@ def electrodeCLF(X, y, name = "all", multidim = True, Cross_validation = False):
         C_model_data = CrossValidation_1(models, X, y)
         C_model = C_model_data[0][0]
         NB_model = models[C_model]
-        best_model = CrossValidation_2(NB_model, C_model, X, y)
+        best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
+
+        new_model = best_model.fit(Xtrain, ytrain)
+
     else:
         #Find index of best classifier
         best_model = max(score, key=score.get)
 
-    #Match index to classifier name
-    for ind, name in enumerate(names):
-        if name == best_model:
-            best_model_index = ind
+        #Match index to classifier name
+        for ind, name in enumerate(names):
+            if name == best_model:
+                best_model_index = ind
 
-    # Save and fit classifier
-    new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
+        # Save and fit classifier
+        new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
+
 
     #Use pickle to save classifier
     filename = 'finalized_model.sav'
@@ -122,4 +126,4 @@ def electrodeCLF(X, y, name = "all", multidim = True, Cross_validation = False):
 if __name__ == "__main__":
     X, y = make_classification(n_features=3, n_redundant=0, n_informative=2,
                                random_state=1, n_clusters_per_class=1)
-    score = electrodeCLF(X, y, name = "all", multidim=False)
+    score = electrodeCLF(X, y, name = "all", multidim=False, Cross_validation=True)

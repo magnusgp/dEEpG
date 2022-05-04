@@ -25,6 +25,7 @@ def CrossValidation_2(model, name, X, Y, n_splits_outer=10, n_splits_inner=5, ra
     ]
     cv_outer = KFold(n_splits=n_splits_outer, shuffle=True, random_state=random_state)
     outer_results = list()
+    best_modeL_score = 0
     for train_index, test_index in cv_outer.split(X):
         #Split the data
         X_train, X_test = X[train_index], X[test_index]
@@ -68,9 +69,17 @@ def CrossValidation_2(model, name, X, Y, n_splits_outer=10, n_splits_inner=5, ra
         outer_results.append(acc)
         # report progress
         print('>acc=%.3f, est=%.3f, cfg=%s' % (acc, result.best_score_, result.best_params_))
+        # store the best performing model
+        if acc > best_modeL_score:
+            best_modeL_score = acc
+            best_model_ = best_model
+            best_model_params = result.best_params_
     # summarize the estimated performance of the model
     print('Accuracy: %.3f (%.3f)' % (np.mean(outer_results), std(outer_results)))
-    return np.mean(outer_results), std(outer_results)
+    # report the best configuration
+    print('Best Config: %s for model %s' % (best_model_params, best_model_))
+
+    return [np.mean(outer_results), std(outer_results), best_model_]
 
 def CrossValidation_1(models, X, Y, n_splits=10, random_state=None):
     cv = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)

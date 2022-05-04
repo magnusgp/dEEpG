@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 from tqdm import *
+from collections import defaultdict
+import mne
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def label_TUH(dataFrame=False, window=[0, 0], header=None,channel=None):  # saveDir=os.getcwd(),
     df=dataFrame
@@ -77,7 +81,7 @@ def annotate_TUH(raw,df=None):
     return raw_anno
 
 
-def solveLabelChannelRelation(annoPath, header = None):
+def solveLabelChannelRelation(annoPath, header = None, plot=False):
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
 
     # Find all double labels eg. "eyem_elec" and split them to two seperate annotations:
@@ -99,6 +103,13 @@ def solveLabelChannelRelation(annoPath, header = None):
     #Creating data frame:
     anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
 
+    if plot:
+        # Should we drop the NaN values?
+        plotmat = np.zeros((len(df), int(round(df[3].max()*256,0))))
+
+        for i in range(len(df)):
+            plotmat[i, int(round(df[2][i] * 256, 0)):int(round(df[3][i] * 256, 0))] = 1
+
     #checking every entry in label data:
     for i in tqdm(range(len(df))):
         chan1, chan2=df[1][i].split('-')
@@ -114,6 +125,7 @@ def solveLabelChannelRelation(annoPath, header = None):
 
         for k in temp_time.index:
             #check if first channel is a match with one in the new channel pair:
+
             channel = None
             if chan1 in temp_time[1][k].split('-'):
                 channel = chan1
@@ -145,13 +157,19 @@ def solveLabelChannelRelation(annoPath, header = None):
                     # get different indexes and cannot be removed unless this order is used.
                     anno_new = pd.DataFrame({'channel': [channel], 't_start': [new_t_start],
                                              't_end': [new_t_end], 'label': [df[4][i]]})
-
+                    if plot:
+                        # Heatmap matrix
+                        plotmat[i, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
+                        plotmat[k, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
                     anno_df = pd.concat([anno_df, anno_new], ignore_index=True)
                 # if no duplicates/overlaps found, then just save annotation for channel:
                 else:
                     anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
                                              't_end': [t_end], 'label': [df[4][i]]})
-                    anno_df=pd.concat([anno_df,anno_new],ignore_index=True)
+                    if plot:
+                        plotmat[i, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
+                        plotmat[k, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
+                    anno_df = pd.concat([anno_df,anno_new],ignore_index=True)
 
             else:
                 #print("Annotation was not appended since channel was not a match")
@@ -171,12 +189,12 @@ def solveLabelChannelRelation(annoPath, header = None):
                       ((anno_df['t_start'] < t_start) & (t_end < anno_df['t_end'])))),2:4]
             """
 
+    if plot:
+        sns.heatmap(plotmat)
+        plt.show()
 
     print(anno_df)
     return anno_df
-
-
-
 
 def labelChannels(annoPath, header = None):
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
@@ -207,4 +225,6 @@ def labelChannels(annoPath, header = None):
 if __name__ == "__main__":
     path = "../TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.csv"
 
-    solveLabelChannelRelation(annoPath=path)
+    solveLabelChannelRelation(annoPath=path, header=None, plot=True)
+
+    #labelChannels(annoPath=path)
