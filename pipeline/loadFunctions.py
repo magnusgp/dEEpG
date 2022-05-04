@@ -136,7 +136,7 @@ class TUH_data:
                 Xwindows.append(window[0])
                 Ywindows.append(window[1])
                 #save info about which raw file and start time and end time this window is.
-                windowInfo.append(self.EEG_dict[k]['path'],window[2],window[3])
+                windowInfo.append([self.EEG_dict[k]['path'],window[2],window[3]])
 
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
