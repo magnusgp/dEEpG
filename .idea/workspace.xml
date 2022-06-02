@@ -168,11 +168,11 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.pipelineMain" />
       <item itemvalue="Python.pipeline_main" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
       <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.clfs" />
-      <item itemvalue="Python.pipelineMain" />
     </list>
     <recent_temporary>
       <list>
