@@ -22,8 +22,9 @@ from CV import CrossValidation_1, CrossValidation_2
 from collections import defaultdict
 from tqdm import *
 import time
+from loadFunctions import TUH_data
 
-def electrodeCLF(X, y, name = "all", multidim = True, Cross_validation = False):
+def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = False):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -55,13 +56,21 @@ def electrodeCLF(X, y, name = "all", multidim = True, Cross_validation = False):
     #Create dict for classification
     models = zip(names, classifiers)
 
+    TUH = TUH_data(path=dictpath)
+    windowssz = 100
+    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)  # Problems with the plots
+    all_ids = TUH.index_patient_df.patient_id.unique()
+    all_idx = TUH.index_patient_df.index.unique()
+    x, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
 
     # Error handling for when all labels are the same (due to window size), must be deleted later!
+    """
     if len(np.unique(y)) == 1 and y[0][0] == 1:
         y[0] = [0]
 
     y = np.concatenate([np.array(i) for i in y])
-
+    """
+    # Remove first dimension of y
     Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
     score = {}
     if name == "all":
@@ -126,4 +135,5 @@ def electrodeCLF(X, y, name = "all", multidim = True, Cross_validation = False):
 if __name__ == "__main__":
     X, y = make_classification(n_features=3, n_redundant=0, n_informative=2,
                                random_state=1, n_clusters_per_class=1)
-    score = electrodeCLF(X, y, name = "all", multidim=False, Cross_validation=True)
+    path = "../TUH_data_sample"
+    score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=True)

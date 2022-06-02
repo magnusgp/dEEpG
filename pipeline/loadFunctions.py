@@ -129,8 +129,11 @@ class TUH_data:
         windowInfo = []
         for window in self.EEG_dict[id]["labeled_windows"].values():
             Xwindows=Xwindows+window[0]
-
-            Ywindows.append(1 if window[1]==['elec'] else 0)
+            if window[1] == ['elec']:
+                Ywindows.append([1])
+            else:
+                Ywindows.append([0])
+            #Ywindows.append(1 if window[1]==['elec'] else 0)
             # save info about which raw file and start time and end time this window is.
             windowInfo.append([{'patient_id':self.EEG_dict[id]['patient_id'], 't_start':window[2], 't_end':window[3]}])
 
