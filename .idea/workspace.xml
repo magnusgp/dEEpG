@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="spring cleaning">
-      <change beforePath="$PROJECT_DIR$/pipeline/tuegLoading.py" beforeDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="spring cleaning 2.0">
+      <change beforePath="$PROJECT_DIR$/pipeline/loadData.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/pipelineMain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/pipeline_main.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +104,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="loadData" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="pipelineMain" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dEEpG" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -115,7 +116,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/loadData.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/pipelineMain.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -168,17 +169,17 @@
     </configuration>
     <list>
       <item itemvalue="Python.pipeline_main" />
-      <item itemvalue="Python.loadData" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
       <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.clfs" />
+      <item itemvalue="Python.pipelineMain" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.pipeline_main" />
         <item itemvalue="Python.plot_tuh_eeg_corpus" />
         <item itemvalue="Python.clfs" />
-        <item itemvalue="Python.loadData" />
+        <item itemvalue="Python.pipelineMain" />
         <item itemvalue="Python.labelFunctions" />
       </list>
     </recent_temporary>
@@ -430,7 +431,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654170241105</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="spring cleaning 2.0">
+      <created>1654170749780</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1654170749780</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -481,18 +489,19 @@
     <MESSAGE value="change structure to have raw and windows in EEG_dict and two functions for handling of this" />
     <MESSAGE value="pandas df patient id index overview" />
     <MESSAGE value="spring cleaning" />
-    <option name="LAST_COMMIT_MESSAGE" value="spring cleaning" />
+    <MESSAGE value="spring cleaning 2.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="spring cleaning 2.0" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
+          <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
           <line>35</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
+          <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
           <line>29</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
@@ -502,7 +511,7 @@
           <option name="timeStamp" value="135" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/loadData.py</url>
+          <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
           <line>18</line>
           <option name="timeStamp" value="138" />
         </line-breakpoint>
