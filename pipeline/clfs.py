@@ -18,7 +18,7 @@ from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
 import pickle
-from CV import CrossValidation_1, CrossValidation_2
+from cvFunctions import CrossValidation_1, CrossValidation_2
 from collections import defaultdict
 from tqdm import *
 import time
