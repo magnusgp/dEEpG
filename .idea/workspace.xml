@@ -4,37 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="pandas df patient id index overview">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_04_05_2022,_12_02_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_04_05_2022__12_02__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022,_11_06_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022,_13_53_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022,_17_32_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022,_17_32_[Changes_by_marie]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__11_06__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__13_53__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__17_32__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27_04_2022__17_32__Changes_by_marie_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spectorgram_DA.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Spectorgram_DA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/augtest.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dn3test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eegLoader.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eegProcess.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/flipTimeAxis_Test.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/flipTimeAxis_Test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/montageTest.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/autoReject.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/customDataImport.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/dataAugFunctions.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/electrodeCLF.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/finalized_model.sav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/loadTUHData.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/plot_tuh_eeg_corpus.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/preprocessing.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/prepareData.py" beforeDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="spring cleaning">
+      <change beforePath="$PROJECT_DIR$/pipeline/tuegLoading.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -452,7 +423,14 @@
       <option name="project" value="LOCAL" />
       <updated>1651679080652</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="spring cleaning">
+      <created>1654170241105</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1654170241105</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -502,7 +480,8 @@
     <MESSAGE value="split functions between loadFunction.py and new labelFunctions.py" />
     <MESSAGE value="change structure to have raw and windows in EEG_dict and two functions for handling of this" />
     <MESSAGE value="pandas df patient id index overview" />
-    <option name="LAST_COMMIT_MESSAGE" value="pandas df patient id index overview" />
+    <MESSAGE value="spring cleaning" />
+    <option name="LAST_COMMIT_MESSAGE" value="spring cleaning" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
