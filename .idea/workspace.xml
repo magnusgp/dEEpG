@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment=".xml updates">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="evaluation.py was created">
+      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
     </list>
@@ -471,7 +473,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654253981937</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="evaluation.py was created">
+      <created>1654262724021</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1654262724022</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -506,7 +515,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="David EEG loader and prep implement" />
     <MESSAGE value="Changing Davids preprocess code to make X and y arrays" />
     <MESSAGE value="Label_TUH fixed" />
     <MESSAGE value="Dataset of windows with labels" />
@@ -531,7 +539,8 @@
     <MESSAGE value="check for saved TUH instance added" />
     <MESSAGE value="save class instance" />
     <MESSAGE value=".xml updates" />
-    <option name="LAST_COMMIT_MESSAGE" value=".xml updates" />
+    <MESSAGE value="evaluation.py was created" />
+    <option name="LAST_COMMIT_MESSAGE" value="evaluation.py was created" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -590,21 +599,6 @@
           <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
           <line>43</line>
           <option name="timeStamp" value="145" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
-          <line>140</line>
-          <option name="timeStamp" value="146" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/cvFunctions.py</url>
-          <line>123</line>
-          <option name="timeStamp" value="147" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
-          <line>76</line>
-          <option name="timeStamp" value="148" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
