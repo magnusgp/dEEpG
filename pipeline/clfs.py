@@ -18,11 +18,12 @@ from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
 import pickle
-from cvFunctions import CrossValidation_1, CrossValidation_2
+from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset
 from collections import defaultdict
 from tqdm import *
 import time
 from loadFunctions import TUH_data
+import os
 
 def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = False):
     h = 0.02  # step size in the mesh
@@ -56,9 +57,19 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     #Create dict for classification
     models = zip(names, classifiers)
 
-    TUH = TUH_data(path=dictpath)
-    windowssz = 100
-    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)  # Problems with the plots
+    # Check if a saved dataset exists, if not, create it:
+    filename = 'TUH.sav'
+    # Check if the savedModels folder contains a saved dataset:
+
+    if not os.path.isfile(filename):
+        TUH = TUH_data(path=dictpath)
+        windowssz = 100
+        TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
+        pickle.dump(TUH, open(filename, 'wb'))# Problems with the plots
+    else:
+        TUH = pickle.load(open(filename, 'rb'))
+
+
     all_ids = TUH.index_patient_df.patient_id.unique()
     all_idx = TUH.index_patient_df.index.unique()
     x, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
@@ -71,7 +82,9 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     y = np.concatenate([np.array(i) for i in y])
     """
     # Remove first dimension of y
-    Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
+    # Use custom splitting function
+    splitDataset(x, y, ratio=0.2, shuffle=True)
+    #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
     score = {}
     if name == "all":
         # Iterate over all classifiers
