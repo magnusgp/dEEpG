@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="spring cleaning 2.0">
-      <change beforePath="$PROJECT_DIR$/pipeline/loadData.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/pipelineMain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/pipeline_main.py" beforeDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="rename of Cv.py">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_30_03_2022__15_54__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_30_03_2022__15_54__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2022__09_41__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2022__09_41__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2022__09_41__Changes_by_benj3542_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2022__09_41__Changes_by_benj3542_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2022__09_41__Changes_by_marie_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2022__09_41__Changes_by_marie_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20-04-2022_16_59__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_20-04-2022_16_59__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,11 +172,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.clfs" />
-      <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.pipelineMain" />
       <item itemvalue="Python.pipeline_main" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
+      <item itemvalue="Python.labelFunctions" />
+      <item itemvalue="Python.clfs" />
     </list>
     <recent_temporary>
       <list>
@@ -438,13 +442,25 @@
       <option name="project" value="LOCAL" />
       <updated>1654170749780</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="rename of Cv.py">
+      <created>1654248246566</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1654248246566</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+        <entry key="bc83aafe-54b4-44c4-943b-ca299a6a98fe">
           <value>
             <State />
           </value>
@@ -490,7 +506,8 @@
     <MESSAGE value="pandas df patient id index overview" />
     <MESSAGE value="spring cleaning" />
     <MESSAGE value="spring cleaning 2.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="spring cleaning 2.0" />
+    <MESSAGE value="rename of Cv.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="rename of Cv.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
