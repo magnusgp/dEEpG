@@ -10,8 +10,9 @@ from sklearn import datasets
 from sklearn import svm
 from sklearn.metrics import f1_score
 import random
+import pandas as pd
 
-def CrossValidation_2(model, name, X, Y, n_splits_outer=10, n_splits_inner=5, random_state=None):
+def CrossValidation_2(model, name, X, Y, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
         "Nearest Neighbors",
         "Linear SVM",
@@ -27,6 +28,10 @@ def CrossValidation_2(model, name, X, Y, n_splits_outer=10, n_splits_inner=5, ra
     cv_outer = KFold(n_splits=n_splits_outer, shuffle=True, random_state=random_state)
     outer_results = list()
     best_modeL_score = 0
+
+    X = np.squeeze(X)
+    Y = np.squeeze(Y)
+
     for train_index, test_index in cv_outer.split(X):
         #Split the data
         X_train, X_test = X[train_index], X[test_index]
@@ -82,7 +87,7 @@ def CrossValidation_2(model, name, X, Y, n_splits_outer=10, n_splits_inner=5, ra
 
     return [np.mean(outer_results), std(outer_results), best_model_]
 
-def CrossValidation_1(models, X, Y, n_splits=10, random_state=None):
+def CrossValidation_1(models, X, Y, n_splits=3, random_state=None):
     cv = KFold(n_splits=n_splits, shuffle=True, random_state=random_state)
     results_acc = list()
     results_f1 = list()
@@ -92,6 +97,10 @@ def CrossValidation_1(models, X, Y, n_splits=10, random_state=None):
     for name, model in models.items():
         dict[name] = list()
         dict_f1[name] = list()
+
+    X = np.squeeze(X)
+    Y = np.squeeze(Y)
+
     for train_index, test_index in cv.split(X):
         # Split the data
         X_train, X_test = X[train_index], X[test_index]
@@ -116,12 +125,11 @@ def CrossValidation_1(models, X, Y, n_splits=10, random_state=None):
             best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name])])
     return best_model
 
-def splitDataset(X, y, ratio, shuffle=False):
+def splitDataset(data, ratio, shuffle=False):
     # Function that splits the dataset into test and training based on patient IDs
     # The function should make sure that the patient does not show up in both test and training
     # The function should return the test and training datasets
-    # First combine X and y to a single dataset
-    data = np.concatenate((X, y), axis=1)
+
     # Get patient IDs and shuffle them random
     patients = data.loc[:, 'patient_id'].unique()
     if shuffle:
@@ -142,4 +150,4 @@ def splitDataset(X, y, ratio, shuffle=False):
     return X_train, X_test, Y_train, Y_test
 
 if __name__ == "__main__":
-    pass
+    Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
