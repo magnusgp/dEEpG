@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import datasets
 from sklearn import svm
 from sklearn.metrics import f1_score
+import random
 
 def CrossValidation_2(model, name, X, Y, n_splits_outer=10, n_splits_inner=5, random_state=None):
     names = [
@@ -114,3 +115,31 @@ def CrossValidation_1(models, X, Y, n_splits=10, random_state=None):
             best_model = []
             best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name])])
     return best_model
+
+def splitDataset(X, y, ratio, shuffle=False):
+    # Function that splits the dataset into test and training based on patient IDs
+    # The function should make sure that the patient does not show up in both test and training
+    # The function should return the test and training datasets
+    # First combine X and y to a single dataset
+    data = np.concatenate((X, y), axis=1)
+    # Get patient IDs and shuffle them random
+    patients = data.loc[:, 'patient_id'].unique()
+    if shuffle:
+        random.shuffle(patients)
+
+    # Make test and training datasets
+    test = patients[:int(len(patients) * ratio)]
+    train = patients[int(len(patients) * ratio):]
+
+    test_data = data[data['patient_id'].isin(test)]
+    train_data = data[data['patient_id'].isin(train)]
+
+    # Split test and training data into X and Y
+    X_test = test_data.drop(['patient_id', 'label'], axis=1)
+    Y_test = test_data.loc[:, 'label']
+    X_train = train_data.drop(['patient_id', 'label'], axis=1)
+    Y_train = train_data.loc[:, 'label']
+    return X_train, X_test, Y_train, Y_test
+
+if __name__ == "__main__":
+    pass
