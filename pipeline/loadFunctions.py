@@ -118,8 +118,8 @@ class TUH_data:
                                                                     electrodeCLF=True,df=annotations)
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
-              "it took %imin:%is to run electrode classifier preprocess-pipeline for %i patients\n with window length [%.2fs] and t_step [%.2fs]"
-              "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(subjects_TUAR19),
+              "it took %imin:%is to run electrode classifier preprocess-pipeline for %i file(s)\nwith window length [%.2fs] and t_step [%.2fs]"
+              "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
                                             tWindow, tStep))
 
     def collectWindows(self,id=None):
@@ -128,7 +128,7 @@ class TUH_data:
         Ywindows = []
         windowInfo = []
         for window in self.EEG_dict[id]["labeled_windows"].values():
-            Xwindows=Xwindows+window[0]
+            Xwindows=Xwindows+[window[0]]
             if window[1] == ['elec']:
                 Ywindows.append([1])
             else:
