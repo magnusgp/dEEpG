@@ -25,7 +25,7 @@ import time
 from loadFunctions import TUH_data
 import os
 
-def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = False):
+def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -55,7 +55,7 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     ]
 
     #Create dict for classification
-    models = zip(names, classifiers)
+    models = dict(zip(names, classifiers))
 
     # Check if a saved dataset exists, if not, create it:
     filename = 'TUH.sav'
@@ -74,7 +74,7 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
     all_ids = TUH.index_patient_df.patient_id.unique()
     all_idx = TUH.index_patient_df.index.unique()
-    x, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
+    X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
 
     # Error handling for when all labels are the same (due to window size), must be deleted later!
     """
@@ -82,10 +82,10 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         y[0] = [0]
 
     y = np.concatenate([np.array(i) for i in y])
-    """
+    
     # Remove first dimension of y
     # Use custom splitting function
-    splitDataset(x, y, ratio=0.2, shuffle=True)
+    splitDataset(X, y, ratio=0.2, shuffle=True)
     #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
     score = {}
     if name == "all":
@@ -119,16 +119,18 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     else:
         print("Error! Please select a classifier from the list: {}".format(names))
         score = 0.0
-
-    if Cross_validation:
+    """
+    if Cross_validation == True:
         C_model_data = CrossValidation_1(models, X, y)
         C_model = C_model_data[0][0]
         NB_model = models[C_model]
         best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
 
+        Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
         new_model = best_model.fit(Xtrain, ytrain)
 
     else:
+        """
         #Find index of best classifier
         best_model = max(score, key=score.get)
 
@@ -139,13 +141,18 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
 
         # Save and fit classifier
         new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
-
+        """
+        pass
+        return print("No validation or evalution has been done, due to lack of choise")
 
     #Use pickle to save classifier
     filename = 'finalized_model.sav'
     pickle.dump(new_model, open(filename, 'wb'))
 
-    return score
+    if Evaluation == True:
+        pass
+
+    return print("Model has been evaluated and stored")
 
 if __name__ == "__main__":
     path = "../TUH_data_sample"
