@@ -126,7 +126,8 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         NB_model = models[C_model]
         best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
 
-        Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
+        #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
+        Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
         new_model = best_model.fit(Xtrain, ytrain)
 
     else:
