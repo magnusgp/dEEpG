@@ -2,6 +2,7 @@ from loadFunctions import TUH_data
 from braindecode.datasets import create_from_X_y
 from clfs import electrodeCLF
 import pickle
+from cvFunctions import splitDataset
 
 # Define path of outer directory for samples:
 path="../TUH_data_sample"
@@ -18,7 +19,9 @@ TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Prob
 elecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])
 
 # Save class instance to pickle for later loading
-pickle.dump(TUH)
+#pickle.dump(TUH)
+
+Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
 
 # Find the best electrode artifact classifier:
 bestmodel=electrodeCLF(elecX, elecY, "all", False)
