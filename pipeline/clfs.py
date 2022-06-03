@@ -60,7 +60,7 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     # Check if a saved dataset exists, if not, create it:
     filename = 'TUH.sav'
     # Check if the savedModels folder contains a saved dataset:
-
+    """
     if not os.path.isfile(filename):
         TUH = TUH_data(path=dictpath)
         windowssz = 100
@@ -68,8 +68,10 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         pickle.dump(TUH, open(filename, 'wb'))# Problems with the plots
     else:
         TUH = pickle.load(open(filename, 'rb'))
-
-
+    """
+    TUH = TUH_data(path=dictpath)
+    windowssz = 100
+    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
     all_ids = TUH.index_patient_df.patient_id.unique()
     all_idx = TUH.index_patient_df.index.unique()
     x, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
@@ -146,7 +148,5 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     return score
 
 if __name__ == "__main__":
-    X, y = make_classification(n_features=3, n_redundant=0, n_informative=2,
-                               random_state=1, n_clusters_per_class=1)
     path = "../TUH_data_sample"
     score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=True)

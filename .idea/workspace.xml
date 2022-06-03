@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="spring cleaning 2.1.0">
-      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment=".xml updates">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.edf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/cvFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/cvFunctions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/pipelineMain.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/pipelineMain.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +59,7 @@
       <recent name="C:\Users\marie\PycharmProjects\dEEpG" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.pipeline_main">
+  <component name="RunManager" selected="Python.clfs">
     <configuration name="clfs" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dEEpG" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -179,9 +174,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.clfs" />
         <item itemvalue="Python.pipeline_main" />
         <item itemvalue="Python.plot_tuh_eeg_corpus" />
-        <item itemvalue="Python.clfs" />
         <item itemvalue="Python.pipelineMain" />
         <item itemvalue="Python.labelFunctions" />
       </list>
@@ -448,7 +443,35 @@
       <option name="project" value="LOCAL" />
       <updated>1654248246566</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="custom splitDataset function added">
+      <created>1654253923094</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1654253923095</updated>
+    </task>
+    <task id="LOCAL-00038" summary="check for saved TUH instance added">
+      <created>1654253946314</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1654253946314</updated>
+    </task>
+    <task id="LOCAL-00039" summary="save class instance">
+      <created>1654253962410</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1654253962410</updated>
+    </task>
+    <task id="LOCAL-00040" summary=".xml updates">
+      <created>1654253981937</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1654253981937</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -483,8 +506,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData" />
-    <MESSAGE value="Two temple data samples" />
     <MESSAGE value="David EEG loader and prep implement" />
     <MESSAGE value="Changing Davids preprocess code to make X and y arrays" />
     <MESSAGE value="Label_TUH fixed" />
@@ -506,7 +527,11 @@
     <MESSAGE value="spring cleaning" />
     <MESSAGE value="spring cleaning 2.0" />
     <MESSAGE value="rename of Cv.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="rename of Cv.py" />
+    <MESSAGE value="custom splitDataset function added" />
+    <MESSAGE value="check for saved TUH instance added" />
+    <MESSAGE value="save class instance" />
+    <MESSAGE value=".xml updates" />
+    <option name="LAST_COMMIT_MESSAGE" value=".xml updates" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -565,6 +590,21 @@
           <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
           <line>43</line>
           <option name="timeStamp" value="145" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>140</line>
+          <option name="timeStamp" value="146" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/cvFunctions.py</url>
+          <line>123</line>
+          <option name="timeStamp" value="147" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>76</line>
+          <option name="timeStamp" value="148" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
