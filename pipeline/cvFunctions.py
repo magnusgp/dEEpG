@@ -11,6 +11,7 @@ from sklearn import svm
 from sklearn.metrics import f1_score
 import random
 import pandas as pd
+from loadFunctions import TUH_data
 
 def CrossValidation_2(model, name, X, Y, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
@@ -131,7 +132,12 @@ def splitDataset(data, ratio, shuffle=False):
     # The function should return the test and training datasets
 
     # Get patient IDs and shuffle them random
-    patients = data.loc[:, 'patient_id'].unique()
+    ids = []
+    for i in range(len(data)):
+        ids.append(data[i]['patient_id'])
+
+    #patients = ids.loc[:, 'patient_id'].unique()
+    patients = list(set(ids))
     if shuffle:
         random.shuffle(patients)
 
@@ -139,15 +145,43 @@ def splitDataset(data, ratio, shuffle=False):
     test = patients[:int(len(patients) * ratio)]
     train = patients[int(len(patients) * ratio):]
 
-    test_data = data[data['patient_id'].isin(test)]
-    train_data = data[data['patient_id'].isin(train)]
+    # If test is empty (we only have 1 data file), copy train to test
+    # TODO: This is very bad practice and should be fixed immediately
+    if len(test) == 0:
+        test = train
+
+    # Make test and training datasets
+    test_data = []
+    train_data = []
+    for i in range(len(data)):
+        if data[i]['patient_id'] in test:
+            test_data.append(data[i])
+        if data[i]['patient_id'] in train:
+        # TODO: should be elif so we can save checks
+        # elif data[i]['patient_id'] in train:
+            train_data.append(data[i])
+
+    #test_data = [v for k, v in data[i].key() if k == 'patient_id' and v in test for i in range(len(data))]
+    #train_data = [v for k, v in data[i].key() if k == 'patient_id' and v in train for i in range(len(data))]
+
+    #test_data = data[data['patient_id'].isin(test)]
+    #train_data = data[data['patient_id'].isin(train)]
+
+    X_test, Y_test, X_train, Y_train = [], [], [], []
 
     # Split test and training data into X and Y
-    X_test = test_data.drop(['patient_id', 'label'], axis=1)
-    Y_test = test_data.loc[:, 'label']
-    X_train = train_data.drop(['patient_id', 'label'], axis=1)
-    Y_train = train_data.loc[:, 'label']
+    for i in range(len(test_data)):
+        for j in range(len(test_data[i]['labeled_windows'])):
+            X_test.append([test_data[0]['labeled_windows'][k] for k in test_data[0]['labeled_windows'].keys()][j][0])
+            Y_test.append([test_data[0]['labeled_windows'][k] for k in test_data[0]['labeled_windows'].keys()][j][1])
+
+    for i in range(len(train_data)):
+        for j in range(len(train_data[i]['labeled_windows'])):
+            X_train.append([train_data[0]['labeled_windows'][k] for k in train_data[0]['labeled_windows'].keys()][j][0])
+            Y_train.append([train_data[0]['labeled_windows'][k] for k in train_data[0]['labeled_windows'].keys()][j][1])
+
     return X_train, X_test, Y_train, Y_test
 
 if __name__ == "__main__":
+
     Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
