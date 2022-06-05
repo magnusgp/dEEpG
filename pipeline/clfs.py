@@ -121,10 +121,10 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         score = 0.0
     """
     if Cross_validation == True:
-        #C_model_data = CrossValidation_1(models, X, y)
-        #C_model = C_model_data[0][0]
-        #NB_model = models[C_model]
-        #best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
+        C_model_data = CrossValidation_1(models, X, y)
+        C_model = C_model_data[0][0]
+        NB_model = models[C_model]
+        best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
 
         #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
         Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.2, shuffle=True)
