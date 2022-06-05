@@ -121,14 +121,17 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         score = 0.0
     """
     if Cross_validation == True:
-        C_model_data = CrossValidation_1(models, X, y)
-        C_model = C_model_data[0][0]
-        NB_model = models[C_model]
-        best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
+        #C_model_data = CrossValidation_1(models, X, y)
+        #C_model = C_model_data[0][0]
+        #NB_model = models[C_model]
+        #best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
 
         #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
-        Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
-        new_model = best_model.fit(Xtrain, ytrain)
+        Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.2, shuffle=True)
+        # Print lengths of test and train datasetes in a table
+        print("\n\nTrain and Test dataset sizes:")
+        print(tabulate([["Train", len(Xtrain)], ["Test", len(Xtest)]], headers=['Dataset', 'Size'], numalign='left'))
+        #new_model = best_model.fit(Xtrain, ytrain)
 
     else:
         """
@@ -157,4 +160,5 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
 
 if __name__ == "__main__":
     path = "../TUH_data_sample"
+    TUH = TUH_data(path=path)
     score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=True)
