@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 
 def label_TUH(dataFrame=False, window=[0, 0], header=None,channel=None):  # saveDir=os.getcwd(),
     df=dataFrame
-    within_con0 = (df['t_start'] <= window[0]) & (window[0] <= df['t_end'])
-    within_con1 = (df['t_start'] <= window[1]) & (window[1] <= df['t_end'])
+    within_con0 = (pd.to_numeric(df['t_start']) <= window[0]) & (window[0] <= pd.to_numeric(df['t_end']))
+    within_con1 = (pd.to_numeric(df['t_start']) <= window[1]) & (window[1] <= pd.to_numeric(df['t_end']))
+
     if channel:
         chan_names = df['channel'].to_numpy().tolist()
         low_char = {'FP1': 'Fp1', 'FP2': 'Fp2', 'FZ': 'Fz', 'CZ': 'Cz', 'PZ': 'Pz'}
@@ -22,15 +23,16 @@ def label_TUH(dataFrame=False, window=[0, 0], header=None,channel=None):  # save
             for k in range(len(chan_names[i]) - 1, -1, -1):
                 if chan_names[i][k] in low_char:
                     chan_names[i][k] = low_char[chan_names[i][k]]
-        label_TUH = df[(df['t_start'].between(window[0], window[1]) |
-                       df['t_end'].between(window[0], window[1]) |
+
+        label_TUH = df[(pd.to_numeric(df['t_start']).between(window[0], window[1]) |
+                       pd.to_numeric(df['t_end']).between(window[0], window[1]) |
                        (within_con0 & within_con1))
                        & (np.sum(np.asarray(chan_names)==np.asarray(channel),axis=1).tolist())
-                        & ((df['label'].to_numpy()=='elec')|
-                           (df['label'].to_numpy()=='musc_elec')|
-                           (df['label'].to_numpy()=='eyem_elec')|
-                           (df['label'].to_numpy()=='shiv_elec')|
-                           (df['label'].to_numpy()=='chew_elec'))]
+                        & (df['label'].to_numpy()=='elec')]
+                        #Handle double labels in the solveLabelChannelRelations function, so only keeping
+                        # these in case we would like other checks.
+                        # |(df['label'].to_numpy()=='musc_elec')|(df['label'].to_numpy()=='eyem_elec')|
+                          # (df['label'].to_numpy()=='shiv_elec')|(df['label'].to_numpy()=='chew_elec'))]
     else:
         label_TUH = df[df['t_start'].between(window[0], window[1]) |
                    df['t_end'].between(window[0], window[1]) |
@@ -82,63 +84,72 @@ def annotate_TUH(raw,df=None):
 
 
 def solveLabelChannelRelation(annoPath, header = None, plot=False):
+    print(f"Annotation: {annoPath}")
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
+    if len(df.columns)==5:
+        # first row in this setup is just the column names so, first column is removed:
+        df = df.drop(index=0)
+    else:
+        #if this setup (6 columns), the first column contains file names, that we don't care about
+        df = df.drop(0,axis=1)
+    df.columns = ['channel', 'start_time', 'stop_time', 'label', 'confidence']
 
     # Find all double labels eg. "eyem_elec" and split them to two seperate annotations:
-    double_label_temp_df=pd.DataFrame(columns=[1,2,3,4])
-    double_labels=df[df[4].str.len()==9]
-    for i in double_labels.index:
-        label1,label2=df[4][i].split('_')
+    double_label_temp_df=pd.DataFrame(columns=['channel', 'start_time', 'stop_time', 'label'])
+    double_labels=df[df['label'].str.len()==9]
+    if not double_labels.empty:
+        for i in double_labels.index:
+            label1,label2=df['label'][i].split('_')
 
-        rows_two_labels = pd.DataFrame({1: [df[1][i],df[1][i]], 2: [df[2][i],df[2][i]],
-                                         3: [df[3][i],df[3][i]], 4: [label1, label2]})
+            rows_two_labels = pd.DataFrame({'channel': [df['channel'][i],df['channel'][i]], 'start_time': [df['start_time'][i],df['start_time'][i]],
+                                             'stop_time': [df['stop_time'][i],df['stop_time'][i]], 'label': [label1, label2]})
 
 
-        double_label_temp_df = pd.concat([double_label_temp_df, rows_two_labels], ignore_index=True)
+            double_label_temp_df = pd.concat([double_label_temp_df, rows_two_labels], ignore_index=True)
 
-        df = df.drop(index=i)
-    #Join the df with removed doublelabels with the dataframe with the separated single annotations:
-    df=pd.concat([df, rows_two_labels], ignore_index=True)
+            df = df.drop(index=i)
+        #Join the df with removed doublelabels with the dataframe with the separated single annotations:
+        df=pd.concat([df, rows_two_labels], ignore_index=True)
 
     #Creating data frame:
     anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
 
     if plot:
         # Should we drop the NaN values?
-        plotmat = np.zeros((len(df), int(round(df[3].max()*256,0))))
+        plotmat = np.zeros((len(df), int(round(df['stop_time'].max()*256,0))))
 
         for i in range(len(df)):
-            plotmat[i, int(round(df[2][i] * 256, 0)):int(round(df[3][i] * 256, 0))] = 1
+            plotmat[i, int(round(df['start_time'][i] * 256, 0)):int(round(df['stop_time'][i] * 256, 0))] = 1
 
     #checking every entry in label data:
-    for i in tqdm(range(len(df))):
-        chan1, chan2=df[1][i].split('-')
+    for i in tqdm(df.index):
+        chan1, chan2=df['channel'][i].split('-')
         # Only check row against rows further down:
         temp = df[i+1:]
         # Only rows with same label:
-        temp = temp[temp[4] == df[4][i]]
+        temp = temp[temp['label'] == df['label'][i]]
 
         # Only overlap in time:
-        temp_time = temp[((df[2][i]<=temp[2]) & (temp[2]<=df[3][i])) |
-                         ((df[2][i]<=temp[3]) & (temp[3]<=df[3][i])) |
-                         ((temp[2]<df[2][i]) & (df[3][i]<temp[3]))]
+        temp_time = temp[((df['start_time'][i]<=temp['start_time']) & (temp['start_time']<=df['stop_time'][i])) |
+                         ((df['start_time'][i]<=temp['stop_time']) & (temp['stop_time']<=df['stop_time'][i])) |
+                         ((temp['start_time']<df['start_time'][i]) & (df['stop_time'][i]<temp['stop_time']))]
 
         for k in temp_time.index:
             #check if first channel is a match with one in the new channel pair:
 
             channel = None
-            if chan1 in temp_time[1][k].split('-'):
+            if chan1 in temp_time['channel'][k].split('-'):
                 channel = chan1
-            elif chan2 in temp_time[1][k].split('-'):
+            elif chan2 in temp_time['channel'][k].split('-'):
                 channel = chan2
             if channel in [chan1, chan2]:
-                t_start = max(df[2][i], temp_time[2][k])
-                t_end = min(df[3][i], temp_time[3][k])
+                t_start = max(df['start_time'][i], temp_time['start_time'][k])
+                t_end = min(df['stop_time'][i], temp_time['stop_time'][k])
 
                 #Find all entries in the new annotation dataframe where there is a match of label and found channel (two
                 # first checks). Then check that there is an overlap in time (three checks of overlap: start time within
                 # interval, end time within interval or comparison signal k is larger and lies around the signal i.)
-                duplicates=anno_df[ ((df[4][i]==anno_df['label']) &
+                duplicates=anno_df[ ((df['label'][i]==anno_df['label']) &
                          (channel==anno_df['channel'])  &
                         (((t_start<=anno_df['t_start']) & (anno_df['t_start']<=t_end)) |
                          ((t_start<=anno_df['t_end']) & (anno_df['t_end']<=t_end)) |
@@ -156,7 +167,7 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
                     #Wait to concatenate new row to dataframe, since the indexes are ignored, meaning the duplicates
                     # get different indexes and cannot be removed unless this order is used.
                     anno_new = pd.DataFrame({'channel': [channel], 't_start': [new_t_start],
-                                             't_end': [new_t_end], 'label': [df[4][i]]})
+                                             't_end': [new_t_end], 'label': [df['label'][i]]})
                     if plot:
                         # Heatmap matrix
                         plotmat[i, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
@@ -165,7 +176,7 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
                 # if no duplicates/overlaps found, then just save annotation for channel:
                 else:
                     anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
-                                             't_end': [t_end], 'label': [df[4][i]]})
+                                             't_end': [t_end], 'label': [df['label'][i]]})
                     if plot:
                         plotmat[i, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
                         plotmat[k, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
@@ -174,20 +185,6 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
             else:
                 #print("Annotation was not appended since channel was not a match")
                 pass
-
-        #check that annotation is covered in the dataframe on either one of the channels or both
-        if not anno_df.empty:
-            pass
-            # Find all entries in the new annotation dataframe where there is a match of label and one of the channels
-            # (two first checks). Then check that there is an overlap in time (three checks of overlap: start time within
-            # interval, end time within interval or comparison signal k is larger and lies around the signal i.)
-            """
-            time_check=anno_df[((df[4][i] == anno_df['label']) &
-                    (anno_df['channel'] == chan1 | anno_df['channel'] == chan2) &
-                     (((t_start <= anno_df['t_start']) & (anno_df['t_start'] <= t_end)) |
-                      ((t_start <= anno_df['t_end']) & (anno_df['t_end'] <= t_end)) |
-                      ((anno_df['t_start'] < t_start) & (t_end < anno_df['t_end'])))),2:4]
-            """
 
     if plot:
         sns.heatmap(plotmat)

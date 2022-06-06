@@ -18,7 +18,7 @@ from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
 import pickle
-from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset
+from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2
 from collections import defaultdict
 from tqdm import *
 import time
@@ -76,55 +76,12 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     all_idx = TUH.index_patient_df.index.unique()
     X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
 
-    # Error handling for when all labels are the same (due to window size), must be deleted later!
-    """
-    if len(np.unique(y)) == 1 and y[0][0] == 1:
-        y[0] = [0]
-
-    y = np.concatenate([np.array(i) for i in y])
-    
-    # Remove first dimension of y
-    # Use custom splitting function
-    splitDataset(X, y, ratio=0.2, shuffle=True)
-    #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
-    score = {}
-    if name == "all":
-        # Iterate over all classifiers
-        score = {}
-        tabdata = []
-        start = time.time()
-        for name, clf in zip(names, classifiers):
-            print("\nNow training: " + name + "\n")
-            # Fit classifier
-            if not multidim:
-                clf.fit(Xtrain, ytrain)
-            else:
-                clf = MultiOutputClassifier(clf, n_jobs=-1)
-                clf.fit(Xtrain, ytrain)
-            # Update scoring dictionary
-            score[name] = clf.score(Xtest, ytest)
-            # Append data to table
-            stop = time.time()
-            tabdata.append([name, str(round(score[name] * 100, 3)) + " %", str(round(stop - start, 2)) + " s"])
-        # Print a formatted table of model performances
-        tabdata = sorted(tabdata, key=itemgetter(1), reverse=False)
-        print("\n\nModel Performance Summary:")
-        print(tabulate(tabdata, headers=['Model name', 'Model score', 'Time'], numalign='left', floatfmt=".3f"))
-
-    elif name in names:
-        classifiers[names.index(name)].fit(Xtrain, ytrain)
-        score[name] = classifiers[names.index(name)].score(Xtest, ytest)
-        print("{} score: {} %".format(name, str(score[name]) * 100))
-
-    else:
-        print("Error! Please select a classifier from the list: {}".format(names))
-        score = 0.0
-    """
     if Cross_validation == True:
-        C_model_data = CrossValidation_1(models, X, y)
+        #C_model_data = CrossValidation_1(models, X, y)
+        C_model_data = GroupKFoldCV(ids = TUH.index_patient_df, X=X, Y=y, models=models, n_splits=5, random_state=42)
         C_model = C_model_data[0][0]
         NB_model = models[C_model]
-        best_model = CrossValidation_2(NB_model, C_model, X, y)[2]
+        best_model = GroupKFold_2(NB_model, C_model, X, y, TUH.index_patient_df)[2]
 
         #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
         Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.2, shuffle=True)
@@ -139,18 +96,6 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         print("\n\nBest model score: {} %".format(str(score * 100)))
 
     else:
-        """
-        #Find index of best classifier
-        best_model = max(score, key=score.get)
-
-        #Match index to classifier name
-        for ind, name in enumerate(names):
-            if name == best_model:
-                best_model_index = ind
-
-        # Save and fit classifier
-        new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
-        """
         pass
         return print("No validation or evalution has been done, due to lack of choice")
 
