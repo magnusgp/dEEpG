@@ -1,0 +1,16 @@
+Index: pipeline/loadData.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from loadFunctions import TUH_data\r\nfrom braindecode.datasets import create_from_X_y\r\nfrom clfs import electrodeCLF\r\n\r\n# Define path of outer directory for samples:\r\npath=\"../TUH_data_sample\"\r\n# Define folder for potential saves:\r\nsave_dir=\"D:/fagprojekt\"\r\n\r\n# Create class for data and find all edf files in path, and save in EEG_dict:\r\nTUH=TUH_data(path=path)\r\n\r\n# Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and\r\n# Ywindows (labels as list of strings) to use for electrode artifact classifier:\r\nwindowssz = 10\r\nTUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots\r\nelecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])\r\n# Find the best electrode artifact classifier:\r\nbestmodel=electrodeCLF(elecX, elecY, \"all\", False)\r\n\r\n#bads=classifyElectrodeIntervals(elecX,windowInfo,bestmodel)\r\n\r\n\r\n# Load edf to raw, full preprocess with electrode classifier, make Xwindows (all windows\r\n# as arrays) and Ywindows (labels as list of strings) to use for data augmentation.\r\nTUH.prep(tWindow=100, tStep=100 * .25,plot=True)\r\n\r\n# Make Braindecode windows dataset from Xwindows and Ywindows:\r\nwindows_dataset = create_from_X_y(\r\n    TUH.Xwindows, TUH.Ywindows, drop_last_window=False, sfreq=TUH.sfreq, ch_names=TUH.ch_names,\r\n    window_stride_samples=len(TUH.Xwindows[0][0]),\r\n    window_size_samples=len(TUH.Xwindows[0][0]),\r\n)\r\n\r\nwindows_dataset.description\r\n
+===================================================================
+diff --git a/pipeline/loadData.py b/pipeline/loadData.py
+--- a/pipeline/loadData.py	
++++ b/pipeline/loadData.py	
+@@ -14,6 +14,7 @@
+ # Ywindows (labels as list of strings) to use for electrode artifact classifier:
+ windowssz = 10
+ TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
++
+ elecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])
+ # Find the best electrode artifact classifier:
+ bestmodel=electrodeCLF(elecX, elecY, "all", False)

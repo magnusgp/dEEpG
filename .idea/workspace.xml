@@ -4,13 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="unversioned files">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="extra data files">
       <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022,_15_25_[Changes]/00013103_s001_t000.edf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022__11_58__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022__11_58__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022__15_25__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022__15_25__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022__16_12__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022__16_12__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/cvFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/cvFunctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TUH_data_sample/002/00000254/s007_2013_03_25/00000254_s007.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TUH_data_sample/002/00000254/s007_2013_03_25/00000254_s007_t000.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TUH_data_sample/002/00000254/s007_2013_03_25/00000254_s007_t000.edf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/labelFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/labelFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,18 +174,18 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.clfs" />
+      <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.pipelineMain" />
       <item itemvalue="Python.pipeline_main" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
-      <item itemvalue="Python.labelFunctions" />
-      <item itemvalue="Python.clfs" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.clfs" />
+        <item itemvalue="Python.pipelineMain" />
         <item itemvalue="Python.pipeline_main" />
         <item itemvalue="Python.plot_tuh_eeg_corpus" />
-        <item itemvalue="Python.pipelineMain" />
         <item itemvalue="Python.labelFunctions" />
       </list>
     </recent_temporary>
@@ -503,7 +507,42 @@
       <option name="project" value="LOCAL" />
       <updated>1654265663487</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="Comments and small fix to annotation algorithm">
+      <created>1654506329822</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1654506329822</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Comments and small fix to annotation algorithm">
+      <created>1654506359782</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1654506359782</updated>
+    </task>
+    <task id="LOCAL-00047" summary="requirements file made">
+      <created>1654509313537</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1654509313537</updated>
+    </task>
+    <task id="LOCAL-00048" summary="requirements file made">
+      <created>1654510463961</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1654510463961</updated>
+    </task>
+    <task id="LOCAL-00049" summary="extra data files">
+      <created>1654510715716</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1654510715716</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -538,9 +577,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Code to load dataset as windows with labels" />
-    <MESSAGE value="Preprocess modified" />
-    <MESSAGE value="Spectrogram maker works" />
     <MESSAGE value="montageTest" />
     <MESSAGE value="electrode prep, sliding window changed" />
     <MESSAGE value="classify electrode intervals created" />
@@ -563,7 +599,10 @@
     <MESSAGE value="added data split by patient id to main" />
     <MESSAGE value="bug fixes" />
     <MESSAGE value="unversioned files" />
-    <option name="LAST_COMMIT_MESSAGE" value="unversioned files" />
+    <MESSAGE value="Comments and small fix to annotation algorithm" />
+    <MESSAGE value="requirements file made" />
+    <MESSAGE value="extra data files" />
+    <option name="LAST_COMMIT_MESSAGE" value="extra data files" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -615,8 +654,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
-          <line>152</line>
+          <line>157</line>
           <option name="timeStamp" value="157" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/labelFunctions.py</url>
+          <line>176</line>
+          <option name="timeStamp" value="165" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
