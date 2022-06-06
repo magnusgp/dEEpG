@@ -131,7 +131,12 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         # Print lengths of test and train datasetes in a table
         print("\n\nTrain and Test dataset sizes:")
         print(tabulate([["Train", len(Xtrain)], ["Test", len(Xtest)]], headers=['Dataset', 'Size'], numalign='left'))
-        #new_model = best_model.fit(Xtrain, ytrain)
+
+        # Fit new best model and summarize findings
+        new_model = best_model.fit(Xtrain, ytrain)
+        score = new_model.score(Xtest, ytest)
+        print("\n\nBest model: {}".format(best_model))
+        print("\n\nBest model score: {} %".format(str(score * 100)))
 
     else:
         """
@@ -147,7 +152,7 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
         """
         pass
-        return print("No validation or evalution has been done, due to lack of choise")
+        return print("No validation or evalution has been done, due to lack of choice")
 
     #Use pickle to save classifier
     filename = 'finalized_model.sav'

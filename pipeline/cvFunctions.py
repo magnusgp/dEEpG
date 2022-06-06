@@ -174,5 +174,5 @@ def splitDataset(data, ratio, shuffle=False):
     return X_train, X_test, Y_train, Y_test
 
 if __name__ == "__main__":
-
-    Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
+    pass
+    #Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
