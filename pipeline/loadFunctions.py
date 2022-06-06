@@ -171,6 +171,7 @@ def TUH_rename_ch(MNE_raw=False):
     # mne.channels.rename_channels(MNE_raw.info, {"PHOTIC-REF": "PROTIC"})
     for i in MNE_raw.info["ch_names"]:
         reSTR = r"(?<=EEG )(\S*)(?=-REF)"  # working reSTR = r"(?<=EEG )(.*)(?=-REF)"
+        reSTR2 = r"(?<=EEG )(\S*)(?=-LE)"  # working reSTR = r"(?<=EEG )(.*)(?=-LE)"
         reLowC = ['FP1', 'FP2', 'FZ', 'CZ', 'PZ']
 
         if re.search(reSTR, i) and re.search(reSTR, i).group() in reLowC:
@@ -180,7 +181,18 @@ def TUH_rename_ch(MNE_raw=False):
             mne.channels.rename_channels(MNE_raw.info, {i: "PHOTIC"})
         elif re.search(reSTR, i):
             mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR, i)[0]})
+
+        elif re.search(reSTR2, i) and re.search(reSTR2, i).group() in reLowC:
+            lowC = i[0:5]+i[5].lower()+i[6:]
+            mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR2, lowC)[0]})
+        elif i == "PHOTIC-LE":
+            mne.channels.rename_channels(MNE_raw.info, {i: "PHOTIC"})
+        elif re.search(reSTR2, i):
+                mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR2, i)[0]})
+        elif re.search("PHOTIC", i):
+            mne.channels.rename_channels(MNE_raw.info, {i: "PHOTIC"})
         else:
+            print("No match for %s" % i)
             continue
             # print(i)
     print(MNE_raw.info["ch_names"])
