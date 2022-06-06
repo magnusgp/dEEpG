@@ -128,15 +128,12 @@ def CrossValidation_1(models, X, Y, n_splits=3, random_state=None):
 
 def splitDataset(data, ratio, shuffle=False):
     # Function that splits the dataset into test and training based on patient IDs
-    # The function should make sure that the patient does not show up in both test and training
-    # The function should return the test and training datasets
 
     # Get patient IDs and shuffle them random
     ids = []
     for i in range(len(data)):
         ids.append(data[i]['patient_id'])
 
-    #patients = ids.loc[:, 'patient_id'].unique()
     patients = list(set(ids))
     if shuffle:
         random.shuffle(patients)
@@ -145,7 +142,7 @@ def splitDataset(data, ratio, shuffle=False):
     test = patients[:int(len(patients) * ratio)]
     train = patients[int(len(patients) * ratio):]
 
-    # If test is empty (we only have 1 data file), copy train to test
+    # If test is empty (we only have 1 data file currently), copy train to test
     # TODO: This is very bad practice and should be fixed immediately
     if len(test) == 0:
         test = train
@@ -160,12 +157,6 @@ def splitDataset(data, ratio, shuffle=False):
         # TODO: should be elif so we can save checks
         # elif data[i]['patient_id'] in train:
             train_data.append(data[i])
-
-    #test_data = [v for k, v in data[i].key() if k == 'patient_id' and v in test for i in range(len(data))]
-    #train_data = [v for k, v in data[i].key() if k == 'patient_id' and v in train for i in range(len(data))]
-
-    #test_data = data[data['patient_id'].isin(test)]
-    #train_data = data[data['patient_id'].isin(train)]
 
     X_test, Y_test, X_train, Y_train = [], [], [], []
 
