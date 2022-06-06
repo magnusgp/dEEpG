@@ -23,7 +23,7 @@ class TUH_data:
         ### Makes dictionary of all edf files
         EEG_count = 0
         EEG_dict = {}
-        index_patient_df = pd.DataFrame(columns=['index', 'patient_id'])
+        index_patient_df = pd.DataFrame(columns=['index', 'patient_id', 'window_count', 'elec_count'])
         for dirpath, dirnames, filenames in os.walk(path):
             for filename in [f for f in filenames if f.endswith(".edf")]:
                 """For every edf file found somewhere in the directory, it is assumed the folders hold the structure: 
@@ -38,7 +38,7 @@ class TUH_data:
                                              "session": session_path_split[1],
                                              "path": os.path.join(dirpath, filename),
                                              "csvpath": os.path.join(dirpath, os.path.splitext(filename)[0]+'.csv')}})
-                new_index_patient = pd.DataFrame({'index': EEG_count,'patient_id': EEG_dict[EEG_count]["patient_id"]}, index = [EEG_count])
+                new_index_patient = pd.DataFrame({'index': EEG_count,'patient_id': EEG_dict[EEG_count]["patient_id"], 'window_count' : 0, 'elec_count' : 0}, index = [EEG_count])
                 index_patient_df=pd.concat([index_patient_df, new_index_patient])
                 EEG_count += 1
         self.index_patient_df = index_patient_df
@@ -112,15 +112,19 @@ class TUH_data:
 
 
             # Generate output windows for (X,y) as (array, label)
-            self.EEG_dict[k]["labeled_windows"] = slidingRawWindow(self.EEG_dict[k],
+            self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k], self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
                                                                     t_max=self.EEG_dict[k]["rawData"].times[-1],
                                                                     tStep=self.EEG_dict[k]["tStep"],
                                                                     electrodeCLF=True,df=annotations)
+
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
               "it took %imin:%is to run electrode classifier preprocess-pipeline for %i file(s)\nwith window length [%.2fs] and t_step [%.2fs]"
               "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
                                             tWindow, tStep))
+        print(self.index_patient_df)
+
+
 
     def collectWindows(self,id=None):
         # Helper funtion to makeDatasetFromIds
@@ -195,6 +199,8 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=Fa
     #If electrodeCLF is set to true, the function outputs a window per channel
     # with labels assigned only for this channel.
 
+    window_count = 0
+    elec_count = 0
     # catch correct sample frequency and end sample
     edf_fS = EEG_series["rawData"].info["sfreq"]
     t_N = int(t_max * edf_fS)
@@ -224,6 +230,11 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=Fa
             for i in range(len(window_data)):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(dataFrame=df, window=[t_start, t_end],channel=chan)
+                if 'elec' in channel_label:
+                    elec_count += 1
+                    window_count += 1
+                else:
+                    window_count += 1
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
                 window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
@@ -239,12 +250,17 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=Fa
             for i in range(len(window_data)):
                 chan=EEG_series['rawData'].info['ch_names'][i]
                 channel_label=label_TUH(dataFrame=df, window=[t_start, t_end],channel=chan)
+                if 'elec' in channel_label:
+                    elec_count += 1
+                    window_count += 1
+                else:
+                    window_count += 1
                 oneHotChan=(np.asarray(EEG_series['rawData'].info['ch_names'])==chan)*1
                 window_EEG[window_key+f"{i}"] = (np.concatenate((oneHotChan,window_data[i])), channel_label,t_start,t_end)
         else:
             window_label = label_TUH(dataFrame=df, window=[t_start, t_end])  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
-    return window_EEG
+    return window_EEG, window_count, elec_count
 
 def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
     edf_fS = EEG_series["rawData"].info["sfreq"]
