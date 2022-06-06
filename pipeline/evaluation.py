@@ -2,17 +2,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import cycle
 from sklearn.metrics import PrecisionRecallDisplay
-
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import roc_curve, auc
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize
 from sklearn.metrics import roc_auc_score
 
-def evaluation(model, X, y, ROC_curve = False, F1 = False):
+def evaluation(model, X, y, ROC_curve = False, F1 = False, Confusion_Matrix = False):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
     if ROC_curve == True:
         n_classes = 2
-        y_score = model.fit(X_train, y_train).decision_function(X_test)
+        y_score = model.decision_function(X_test)
 
         # Compute ROC curve and ROC area for each class
         fpr = dict()
@@ -43,12 +45,20 @@ def evaluation(model, X, y, ROC_curve = False, F1 = False):
         plt.title("Receiver operating characteristic example")
         plt.legend(loc="lower right")
         plt.show()
+        plt.savefig('ROC_curve.png')
 
     if F1 == True:
         display = PrecisionRecallDisplay.from_estimator(
             model, X_test, y_test, name="Best_model"
         )
         _ = display.ax_.set_title("2-class Precision-Recall curve")
+
+    if Confusion_Matrix == True:
+        cm = confusion_matrix(y_test, predictions, labels=clf.classes_)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels = clf.classes_)
+        disp.plot()
+        plt.show()
+        plt.savefig('Confusion_matrix.png')
 
     else:
         pass
