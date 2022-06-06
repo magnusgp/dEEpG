@@ -124,6 +124,7 @@ class TUH_data:
 
     def collectWindows(self,id=None):
         # Helper funtion to makeDatasetFromIds
+        # Collects all windows from one session into list
         Xwindows = []
         Ywindows = []
         windowInfo = []
@@ -142,6 +143,7 @@ class TUH_data:
 
     def makeDatasetFromIds(self,ids=None):
         # Needs list of Ids/indexes in EEG_dict. Function electrodeCLFPrep should be called beforehand.
+        # Collects all windows of all given ids into one list of X (window data) and Y corresponding labels
         Xwindows = []
         Ywindows = []
         windowInfo = []

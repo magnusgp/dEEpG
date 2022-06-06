@@ -82,23 +82,25 @@ def annotate_TUH(raw,df=None):
 
 
 def solveLabelChannelRelation(annoPath, header = None, plot=False):
+    print(f"Annotation: {annoPath}")
     df = pd.read_csv(annoPath, sep=",", skiprows=6, header=header)
 
     # Find all double labels eg. "eyem_elec" and split them to two seperate annotations:
     double_label_temp_df=pd.DataFrame(columns=[1,2,3,4])
     double_labels=df[df[4].str.len()==9]
-    for i in double_labels.index:
-        label1,label2=df[4][i].split('_')
+    if not double_labels.empty:
+        for i in double_labels.index:
+            label1,label2=df[4][i].split('_')
 
-        rows_two_labels = pd.DataFrame({1: [df[1][i],df[1][i]], 2: [df[2][i],df[2][i]],
-                                         3: [df[3][i],df[3][i]], 4: [label1, label2]})
+            rows_two_labels = pd.DataFrame({1: [df[1][i],df[1][i]], 2: [df[2][i],df[2][i]],
+                                             3: [df[3][i],df[3][i]], 4: [label1, label2]})
 
 
-        double_label_temp_df = pd.concat([double_label_temp_df, rows_two_labels], ignore_index=True)
+            double_label_temp_df = pd.concat([double_label_temp_df, rows_two_labels], ignore_index=True)
 
-        df = df.drop(index=i)
-    #Join the df with removed doublelabels with the dataframe with the separated single annotations:
-    df=pd.concat([df, rows_two_labels], ignore_index=True)
+            df = df.drop(index=i)
+        #Join the df with removed doublelabels with the dataframe with the separated single annotations:
+        df=pd.concat([df, rows_two_labels], ignore_index=True)
 
     #Creating data frame:
     anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
