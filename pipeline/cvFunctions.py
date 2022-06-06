@@ -5,6 +5,7 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import GroupKFold
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import train_test_split
@@ -209,11 +210,11 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
     Y = np.squeeze(Y)
 
     # TODO: Fix this when more groups has been added from the data
-    gidx = len(groups)//2
+    #gidx = len(groups)//2
 
-    groups[gidx:] = ['00013202'] * len(groups[gidx:])
+    #groups[gidx:] = ['00013202'] * len(groups[gidx:])
 
-    group_kfold = GroupKFold(n_splits=len(list(set(groups))))
+    group_kfold = GroupKFold(n_splits=len(groups))
     group_kfold.get_n_splits(X, Y, groups)
 
     results_acc = list()
@@ -234,11 +235,12 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
         # evaluate each model in turn
         for name, model in models.items():
             # evaluate the model and store results
-            model.fit(X_train, Y_train)
-            yhat = model.predict(X_test)
-            acc = accuracy_score(Y_test, yhat)
+            # TODO: Bug here, we should use the same model for all groups
+            model.fit(X_train[0], Y_train[0])
+            yhat = model.predict(X_test[0])
+            acc = accuracy_score(Y_test[0], yhat)
             dict[name].append(acc)
-            f1 = f1_score(Y_test, yhat)
+            f1 = f1_score(Y_test[0], yhat)
             dict_f1[name].append(f1)
             # summarize the results
             print('>%s: %.3f' % (name, acc))
@@ -287,7 +289,7 @@ def GroupKFold_2(model, name, X, Y, ids, n_splits_outer=3, n_splits_inner=2, ran
     group_kfold_outer = GroupKFold(n_splits=len(list(set(groups))))
     group_kfold_outer.get_n_splits(X, Y, groups)
 
-    #cv_outer = KFold(n_splits=n_splits_outer, shuffle=True, random_state=random_state)
+    # cv_outer = KFold(n_splits=n_splits_outer, shuffle=True, random_state=random_state)
     outer_results = list()
     best_modeL_score = 0
 
@@ -295,13 +297,13 @@ def GroupKFold_2(model, name, X, Y, ids, n_splits_outer=3, n_splits_inner=2, ran
     Y = np.squeeze(Y)
 
     for train_index, test_index in group_kfold_outer.split(X, Y, groups):
-        #Split the data
+        # Split the data
         X_train, X_test = X[train_index], X[test_index]
         Y_train, Y_test = Y[train_index], Y[test_index]
         g_train, g_test = groups[train_index], groups[test_index]
 
         # configure the cross-validation procedure
-        #cv_inner = KFold(n_splits=n_splits_inner, shuffle=True, random_state=random_state)
+        # cv_inner = KFold(n_splits=n_splits_inner, shuffle=True, random_state=random_state)
         group_kfold_inner = GroupKFold(n_splits=len(list(set(groups))))
         group_kfold_inner.get_n_splits(X, Y, groups)
         # define search space
