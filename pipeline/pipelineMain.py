@@ -16,6 +16,7 @@ TUH=TUH_data(path=path)
 # Ywindows (labels as list of strings) to use for electrode artifact classifier:
 windowssz = 10
 TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
+
 elecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])
 
 # Save class instance to pickle for later loading
