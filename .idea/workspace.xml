@@ -4,8 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="extra data files">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="unversioned files">
+      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022,_15_25_[Changes]/00013103_s001_t000.edf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/cvFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/cvFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +63,7 @@
       <recent name="C:\Users\marie\PycharmProjects\dEEpG" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.pipelineMain">
+  <component name="RunManager" selected="Python.clfs">
     <configuration name="clfs" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dEEpG" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -165,18 +170,18 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.clfs" />
+      <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.pipelineMain" />
       <item itemvalue="Python.pipeline_main" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
-      <item itemvalue="Python.labelFunctions" />
-      <item itemvalue="Python.clfs" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.pipelineMain" />
         <item itemvalue="Python.clfs" />
         <item itemvalue="Python.pipeline_main" />
         <item itemvalue="Python.plot_tuh_eeg_corpus" />
+        <item itemvalue="Python.pipelineMain" />
         <item itemvalue="Python.labelFunctions" />
       </list>
     </recent_temporary>
@@ -189,6 +194,34 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645627443933</updated>
+    </task>
+    <task id="LOCAL-00001" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
+      <created>1646210526672</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1646210526672</updated>
+    </task>
+    <task id="LOCAL-00002" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
+      <created>1646210602178</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1646210602178</updated>
+    </task>
+    <task id="LOCAL-00003" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
+      <created>1647437747048</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1647437747048</updated>
+    </task>
+    <task id="LOCAL-00004" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
+      <created>1647437877128</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1647437877128</updated>
     </task>
     <task id="LOCAL-00005" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
       <created>1647438156890</created>
@@ -470,70 +503,7 @@
       <option name="project" value="LOCAL" />
       <updated>1654265663487</updated>
     </task>
-    <task id="LOCAL-00045" summary="Comments and small fix to annotation algorithm">
-      <created>1654506329822</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1654506329822</updated>
-    </task>
-    <task id="LOCAL-00046" summary="Comments and small fix to annotation algorithm">
-      <created>1654506359782</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1654506359782</updated>
-    </task>
-    <task id="LOCAL-00047" summary="requirements file made">
-      <created>1654509313537</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1654509313537</updated>
-    </task>
-    <task id="LOCAL-00048" summary="requirements file made">
-      <created>1654510463961</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1654510463961</updated>
-    </task>
-    <task id="LOCAL-00049" summary="extra data files">
-      <created>1654510715716</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1654510715716</updated>
-    </task>
-    <task id="LOCAL-00050" summary="Fix of solveLabelChannelRelation() to  work for both types of csv setups">
-      <created>1654519520744</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1654519520744</updated>
-    </task>
-    <task id="LOCAL-00051" summary="extra data files">
-      <created>1654519705274</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1654519705274</updated>
-    </task>
-    <task id="LOCAL-00052" summary="extra data files">
-      <created>1654519726901</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1654519726901</updated>
-    </task>
-    <task id="LOCAL-00053" summary="extra data files">
-      <created>1654519771835</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1654519771835</updated>
-    </task>
-    <option name="localTasksCounter" value="54" />
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -568,6 +538,10 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="Code to load dataset as windows with labels" />
+    <MESSAGE value="Preprocess modified" />
+    <MESSAGE value="Spectrogram maker works" />
+    <MESSAGE value="montageTest" />
     <MESSAGE value="electrode prep, sliding window changed" />
     <MESSAGE value="classify electrode intervals created" />
     <MESSAGE value="label magi" />
@@ -589,11 +563,7 @@
     <MESSAGE value="added data split by patient id to main" />
     <MESSAGE value="bug fixes" />
     <MESSAGE value="unversioned files" />
-    <MESSAGE value="Comments and small fix to annotation algorithm" />
-    <MESSAGE value="requirements file made" />
-    <MESSAGE value="Fix of solveLabelChannelRelation() to  work for both types of csv setups" />
-    <MESSAGE value="extra data files" />
-    <option name="LAST_COMMIT_MESSAGE" value="extra data files" />
+    <option name="LAST_COMMIT_MESSAGE" value="unversioned files" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -644,9 +614,9 @@
           <option name="timeStamp" value="143" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/labelFunctions.py</url>
-          <line>176</line>
-          <option name="timeStamp" value="165" />
+          <url>file://$PROJECT_DIR$/pipeline/clfs.py</url>
+          <line>152</line>
+          <option name="timeStamp" value="157" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
