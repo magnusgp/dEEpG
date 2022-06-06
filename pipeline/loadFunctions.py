@@ -122,6 +122,7 @@ class TUH_data:
               "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
                                             tWindow, tStep))
 
+
     def collectWindows(self,id=None):
         # Helper funtion to makeDatasetFromIds
         # Collects all windows from one session into list
