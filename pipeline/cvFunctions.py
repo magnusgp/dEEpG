@@ -253,7 +253,7 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
             best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name])])
     return best_model
 
-def GroupKFold_2(model, name, X, Y, ids, n_splits_outer=3, n_splits_inner=2, random_state=None):
+def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
         "Nearest Neighbors",
         "Linear SVM",
@@ -278,15 +278,19 @@ def GroupKFold_2(model, name, X, Y, ids, n_splits_outer=3, n_splits_inner=2, ran
     # Each group should consist of all session from one patient
     groups = np.squeeze(groups)
 
+    ids = [TUH.EEG_dict[id]['id'] for id in range(len(TUH.EEG_dict))]
+
     X = np.squeeze(X)
     Y = np.squeeze(Y)
 
+    #X, Y, _ = TUH.makeDatasetFromIds(ids=ids)
+
     # TODO: Fix this when more groups has been added from the data
-    gidx = len(groups)//2
+    #gidx = len(groups)//2
 
-    groups[gidx:] = ['00013202'] * len(groups[gidx:])
+    #groups[gidx:] = ['00013202'] * len(groups[gidx:])
 
-    group_kfold_outer = GroupKFold(n_splits=len(list(set(groups))))
+    group_kfold_outer = GroupKFold(n_splits=len(groups))
     group_kfold_outer.get_n_splits(X, Y, groups)
 
     # cv_outer = KFold(n_splits=n_splits_outer, shuffle=True, random_state=random_state)
@@ -304,7 +308,7 @@ def GroupKFold_2(model, name, X, Y, ids, n_splits_outer=3, n_splits_inner=2, ran
 
         # configure the cross-validation procedure
         # cv_inner = KFold(n_splits=n_splits_inner, shuffle=True, random_state=random_state)
-        group_kfold_inner = GroupKFold(n_splits=len(list(set(groups))))
+        group_kfold_inner = GroupKFold(n_splits=len(groups))
         group_kfold_inner.get_n_splits(X, Y, groups)
         # define search space
         space = dict()
@@ -334,15 +338,17 @@ def GroupKFold_2(model, name, X, Y, ids, n_splits_outer=3, n_splits_inner=2, ran
         # execute search
         # TODO: Endnu en røver pga datamangel
         #result = search.fit(X_train, Y_train, groups=g_train)
-        g_train1 = g_train[:len(g_train)//2]
-        g_train2 = g_train[len(g_train)//2:]
-        result = search.fit(X_train, Y_train, groups=g_train)
+        #g_train1 = g_train[:len(g_train)//2]
+        #g_train2 = g_train[len(g_train)//2:]
+        g_train = [x for xs in g_train for x in xs]
+        g_test = [x for xs in g_test for x in xs]
+        result = search.fit(X_train[0], Y_train[0], groups=g_train)
         # get the best performing model fit on the whole training set
         best_model = result.best_estimator_
         # evaluate model on the hold out dataset
-        yhat = best_model.predict(X_test)
+        yhat = best_model.predict(X_test[0], groups=g_test)
         # evaluate the model
-        acc = accuracy_score(Y_test, yhat)
+        acc = accuracy_score(Y_test[0], yhat)
         # store the result
         outer_results.append(acc)
         # report progress
