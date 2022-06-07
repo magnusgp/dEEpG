@@ -11,6 +11,7 @@ from scipy import signal, stats
 from raw_utils import oneHotEncoder
 from tqdm import *
 from labelFunctions import label_TUH, annotate_TUH, solveLabelChannelRelation
+import matplotlib.pyplot as plt
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -124,6 +125,25 @@ class TUH_data:
                                             tWindow, tStep))
         print(self.index_patient_df)
 
+        #Plot window and elec count
+
+        x = self.index_patient_df['patient_id'].tolist()
+        y1 = self.index_patient_df['elec_count'].tolist()
+        y2 = self.index_patient_df['window_count'].tolist()
+        try:
+            y2_m = list()
+            for item1, item2 in zip(y2, y1):
+                y2_m.append(item1 - item2)
+        except:
+            y2_m = [0]
+            print("Number of recorded counts for elec and windows dosen't match in dataframe")
+
+
+
+        plt.bar(x, y1, color='r')
+        plt.bar(x, y2_m, bottom=y1, color='b')
+        plt.show()
+        plt.savefig("window_and_elec_count.png")
 
 
 
