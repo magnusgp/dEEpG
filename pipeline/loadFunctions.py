@@ -78,9 +78,6 @@ class TUH_data:
 
             annotations=solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
 
-            #subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
-
-            #self.EEG_dict[k] = subjects_TUAR19[k]
             self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
 
@@ -146,6 +143,7 @@ class TUH_data:
         plt.bar(x, y2_m, bottom=y1, color='b')
         plt.show()
         plt.savefig("window_and_elec_count.png")
+
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
         pool_obj=multiprocessing.Pool()
