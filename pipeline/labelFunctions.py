@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tqdm import *
+#from tqdm import *
 from collections import defaultdict
 import mne
 import seaborn as sns
@@ -124,7 +124,7 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
             plotmat[i, int(round(df['start_time'][i] * 256, 0)):int(round(df['stop_time'][i] * 256, 0))] = 1
 
     #checking every entry in label data:
-    for i in tqdm(df.index):
+    for i in df.index:
         chan1, chan2=df['channel'][i].split('-')
         # Only check row against rows further down:
         temp = df[i+1:]
@@ -208,7 +208,7 @@ def labelChannels(annoPath, header = None):
     anno_dict = defaultdict(lambda: (0, 0))
 
     # Checking every entry in label data:
-    for i in tqdm(range(len(channel_pairs))):
+    for i in range(len(channel_pairs)):
         # Check if label is the same in the two rows, eg. 'elec'=='elec':
         # Create two variables, one for each channel in the pair:
         chan1, chan2 = channel_pairs[i]
