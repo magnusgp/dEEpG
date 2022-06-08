@@ -7,6 +7,8 @@ from datetime import datetime
 from os.path import exists
 import os
 import json
+import pandas as pd
+from multiprocessing import freeze_support
 
 
 # Define path of outer directory for samples:
@@ -16,7 +18,7 @@ path="../TUH_data_sample"
 TUH=TUH_data(path=path)
 
 deletePickle=False
-if deletePickle:
+if exists("TUH_EEG_dict.pkl") and deletePickle:
     os.remove("TUH_EEG_dict.pkl")
     os.remove("index_patient_df.pkl")
 
@@ -24,18 +26,21 @@ if exists("TUH_EEG_dict.pkl"):
     saved_dict=open("TUH_EEG_dict.pkl","rb")
     TUH.EEG_dict=pickle.load(saved_dict)
     TUH.index_patient_df=pd.read_pickle("index_patient_df.pkl")
+    print("Preprocessed data loaded succesfully")
 
 else:
     # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
     # Ywindows (labels as list of strings) to use for electrode artifact classifier:
     windowssz = 10
-    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
+    freeze_support()
+    TUH.parallelElectrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
 
     save_dict=open("TUH_EEG_dict.pkl","wb")
     pickle.dump(TUH.EEG_dict,save_dict)
     save_dict.close()
     TUH.index_patient_df.to_pickle("index_patient_df.pkl")
-
+    print("Preprocessed data savved succesfully")
+"""
 elecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])
 
 # Save class instance to pickle for later loading
@@ -61,3 +66,4 @@ windows_dataset = create_from_X_y(
 )
 
 windows_dataset.description
+"""
