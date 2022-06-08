@@ -11,6 +11,7 @@ from scipy import signal, stats
 from raw_utils import oneHotEncoder
 from tqdm import *
 from labelFunctions import label_TUH, annotate_TUH, solveLabelChannelRelation
+import matplotlib.pyplot as plt
 import multiprocessing
 from itertools import repeat
 
@@ -126,6 +127,25 @@ class TUH_data:
                                             tWindow, tStep))
         print(self.index_patient_df)
 
+        #Plot window and elec count
+
+        x = self.index_patient_df['patient_id'].tolist()
+        y1 = self.index_patient_df['elec_count'].tolist()
+        y2 = self.index_patient_df['window_count'].tolist()
+        try:
+            y2_m = list()
+            for item1, item2 in zip(y2, y1):
+                y2_m.append(item1 - item2)
+        except:
+            y2_m = [0]
+            print("Number of recorded counts for elec and windows dosen't match in dataframe")
+
+
+
+        plt.bar(x, y1, color='r')
+        plt.bar(x, y2_m, bottom=y1, color='b')
+        plt.show()
+        plt.savefig("window_and_elec_count.png")
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
         pool_obj=multiprocessing.Pool()
@@ -230,6 +250,7 @@ def TUH_rename_ch(MNE_raw=False):
     # mne.channels.rename_channels(MNE_raw.info, {"PHOTIC-REF": "PROTIC"})
     for i in MNE_raw.info["ch_names"]:
         reSTR = r"(?<=EEG )(\S*)(?=-REF)"  # working reSTR = r"(?<=EEG )(.*)(?=-REF)"
+        reSTR2 = r"(?<=EEG )(\S*)(?=-LE)"  # working reSTR = r"(?<=EEG )(.*)(?=-LE)"
         reLowC = ['FP1', 'FP2', 'FZ', 'CZ', 'PZ']
 
         if re.search(reSTR, i) and re.search(reSTR, i).group() in reLowC:
@@ -239,7 +260,18 @@ def TUH_rename_ch(MNE_raw=False):
             mne.channels.rename_channels(MNE_raw.info, {i: "PHOTIC"})
         elif re.search(reSTR, i):
             mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR, i)[0]})
+
+        elif re.search(reSTR2, i) and re.search(reSTR2, i).group() in reLowC:
+            lowC = i[0:5]+i[5].lower()+i[6:]
+            mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR2, lowC)[0]})
+        elif i == "PHOTIC-LE":
+            mne.channels.rename_channels(MNE_raw.info, {i: "PHOTIC"})
+        elif re.search(reSTR2, i):
+                mne.channels.rename_channels(MNE_raw.info, {i: re.findall(reSTR2, i)[0]})
+        elif re.search("PHOTIC", i):
+            mne.channels.rename_channels(MNE_raw.info, {i: "PHOTIC"})
         else:
+            print("No match for %s" % i)
             continue
             # print(i)
     print(MNE_raw.info["ch_names"])
