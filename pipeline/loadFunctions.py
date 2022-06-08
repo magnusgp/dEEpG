@@ -118,12 +118,13 @@ class TUH_data:
                 #Plot the energy voltage potential against frequency.
                 self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
 
+                """
                 raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"],df=annotations)
                 raw_anno.plot()
                 plt.title("Untouched raw signal")
                 plt.show()
                 plt.savefig('Untouched_raw_signal.png')
-
+                """
             simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
                      downSam=250)
 
@@ -133,12 +134,13 @@ class TUH_data:
                 if plot:
                     self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
 
+                    """
                     raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"], df=annotations)
                     raw_anno.plot()
                     plt.title("Raw signal after simple preprocessing")
                     plt.show()
                     plt.savefig('Raw_signal_post_processing.png')
-
+                    """
 
             # Generate output windows for (X,y) as (array, label)
             self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k], self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
@@ -169,19 +171,24 @@ class TUH_data:
 
             plt.bar(x, y1,0.6, color='r')
             plt.bar(x, y2_m,0.6, bottom=y1, color='b')
+            fig1 = plt.gcf()
             plt.show()
-            plt.savefig("window_and_elec_count.png")
+            fig1.savefig("window_and_elec_count.png")
 
             #Gaussian distribution of elec and window count
-            plot = Gaussian(np.mean(y1), np.std(y1))
-            plot = Gaussian(np.mean(y2), np.std(y2))
+            plot = Gaussian.plot(np.mean(y1), np.std(y1))
+            plot = Gaussian.plot(np.mean(y2), np.std(y2))
+            fig2 = plt.gcf()
             plt.show()
+            fig2.savefig("Gaussian_window_and_elec_count.png")
 
             #Plot histogram of window and elec count
             plt.bar(y2, y1, align='center')  # A bar chart
             plt.xlabel('window_count')
             plt.ylabel('elec_count')
+            fig3 = plt.gcf()
             plt.show()
+            fig3.savefig("Histogram_window_and_elec_count.png")
 
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()

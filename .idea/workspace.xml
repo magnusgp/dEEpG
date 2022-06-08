@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="Gaussian distribution of elec and window count">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="New plots for Gaussian distribution of elec and window count + histogram plot">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TUH_data_sample/002/00000254/s005_2010_11_15/00000254_s005.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TUH_data_sample/002/00000254/s005_2010_11_15/00000254_s005_t000.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TUH_data_sample/002/00000254/s005_2010_11_15/00000254_s005_t000.edf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -531,7 +529,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654679605408</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="New plots for Gaussian distribution of elec and window count + histogram plot">
+      <created>1654684444934</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1654684444934</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -566,7 +571,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="electrode prep, sliding window changed" />
     <MESSAGE value="classify electrode intervals created" />
     <MESSAGE value="label magi" />
     <MESSAGE value="label magi updates" />
@@ -591,7 +595,8 @@
     <MESSAGE value="plot for count fo windows and elec" />
     <MESSAGE value="update new CV-functions with new accuracy meassures" />
     <MESSAGE value="Gaussian distribution of elec and window count" />
-    <option name="LAST_COMMIT_MESSAGE" value="Gaussian distribution of elec and window count" />
+    <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot" />
+    <option name="LAST_COMMIT_MESSAGE" value="New plots for Gaussian distribution of elec and window count + histogram plot" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
