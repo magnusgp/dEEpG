@@ -78,9 +78,6 @@ class TUH_data:
 
             annotations=solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
 
-            #subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
-
-            #self.EEG_dict[k] = subjects_TUAR19[k]
             self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
 
@@ -98,6 +95,7 @@ class TUH_data:
                 raw_anno.plot()
                 plt.title("Untouched raw signal")
                 plt.show()
+                plt.savefig('Untouched_raw_signal.png')
 
             simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
                      downSam=250)
@@ -112,6 +110,7 @@ class TUH_data:
                     raw_anno.plot()
                     plt.title("Raw signal after simple preprocessing")
                     plt.show()
+                    plt.savefig('Raw_signal_post_processing.png')
 
 
             # Generate output windows for (X,y) as (array, label)
@@ -129,23 +128,23 @@ class TUH_data:
 
         #Plot window and elec count
 
-        x = self.index_patient_df['patient_id'].tolist()
-        y1 = self.index_patient_df['elec_count'].tolist()
-        y2 = self.index_patient_df['window_count'].tolist()
-        try:
-            y2_m = list()
-            for item1, item2 in zip(y2, y1):
-                y2_m.append(item1 - item2)
-        except:
-            y2_m = [0]
-            print("Number of recorded counts for elec and windows dosen't match in dataframe")
+        if plot:
+            x = self.index_patient_df['patient_id'].tolist()
+            y1 = self.index_patient_df['elec_count'].tolist()
+            y2 = self.index_patient_df['window_count'].tolist()
+            try:
+                y2_m = list()
+                for item1, item2 in zip(y2, y1):
+                    y2_m.append(item1 - item2)
+            except:
+                y2_m = [0]
+                print("Number of recorded counts for elec and windows dosen't match in dataframe")
 
+            plt.bar(x, y1, color='r')
+            plt.bar(x, y2_m, bottom=y1, color='b')
+            plt.show()
+            plt.savefig("window_and_elec_count.png")
 
-        # Comment out plot for debugging
-        #plt.bar(x, y1, color='r')
-        #plt.bar(x, y2_m, bottom=y1, color='b')
-        #plt.show()
-        #plt.savefig("window_and_elec_count.png")
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
         pool_obj=multiprocessing.Pool()

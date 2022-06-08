@@ -10,36 +10,37 @@ import json
 import pandas as pd
 from multiprocessing import freeze_support
 
-
-# Define path of outer directory for samples:
-path="../TUH_data_sample"
-
-# Create class for data and find all edf files in path, and save in EEG_dict:
-TUH=TUH_data(path=path)
-
-deletePickle=False
-if exists("TUH_EEG_dict.pkl") and deletePickle:
-    os.remove("TUH_EEG_dict.pkl")
-    os.remove("index_patient_df.pkl")
-
-if exists("TUH_EEG_dict.pkl"):
-    saved_dict=open("TUH_EEG_dict.pkl","rb")
-    TUH.EEG_dict=pickle.load(saved_dict)
-    TUH.index_patient_df=pd.read_pickle("index_patient_df.pkl")
-    print("Preprocessed data loaded succesfully")
-
-else:
-    # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
-    # Ywindows (labels as list of strings) to use for electrode artifact classifier:
-    windowssz = 10
+if __name__ == '__main__':
     freeze_support()
-    TUH.parallelElectrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
 
-    save_dict=open("TUH_EEG_dict.pkl","wb")
-    pickle.dump(TUH.EEG_dict,save_dict)
-    save_dict.close()
-    TUH.index_patient_df.to_pickle("index_patient_df.pkl")
-    print("Preprocessed data savved succesfully")
+    # Define path of outer directory for samples:
+    path="../TUH_data_sample"
+
+    # Create class for data and find all edf files in path, and save in EEG_dict:
+    TUH=TUH_data(path=path)
+
+    deletePickle=True
+    if exists("TUH_EEG_dict.pkl") and deletePickle:
+        os.remove("TUH_EEG_dict.pkl")
+        os.remove("index_patient_df.pkl")
+
+    if exists("TUH_EEG_dict.pkl"):
+        saved_dict=open("TUH_EEG_dict.pkl","rb")
+        TUH.EEG_dict=pickle.load(saved_dict)
+        TUH.index_patient_df=pd.read_pickle("index_patient_df.pkl")
+        print("Preprocessed data loaded succesfully")
+
+    else:
+        # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
+        # Ywindows (labels as list of strings) to use for electrode artifact classifier:
+        windowssz = 10
+        TUH.ParallelElectrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
+
+        save_dict=open("TUH_EEG_dict.pkl","wb")
+        pickle.dump(TUH.EEG_dict,save_dict)
+        save_dict.close()
+        TUH.index_patient_df.to_pickle("index_patient_df.pkl")
+        print("Preprocessed data saved succesfully")
 """
 elecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])
 
