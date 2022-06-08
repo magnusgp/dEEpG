@@ -12,6 +12,8 @@ from raw_utils import oneHotEncoder
 from tqdm import *
 from labelFunctions import label_TUH, annotate_TUH, solveLabelChannelRelation
 import matplotlib.pyplot as plt
+import multiprocessing
+from itertools import repeat
 
 plt.rcParams["font.family"] = "Times New Roman"
 
@@ -76,9 +78,6 @@ class TUH_data:
 
             annotations=solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
 
-            #subjects_TUAR19[k] = {'path': self.EEG_dict[k]['path']}
-
-            #self.EEG_dict[k] = subjects_TUAR19[k]
             self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
 
@@ -145,6 +144,59 @@ class TUH_data:
             plt.bar(x, y2_m, bottom=y1, color='b')
             plt.show()
             plt.savefig("window_and_elec_count.png")
+
+    def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
+        tic = time.time()
+        pool_obj=multiprocessing.Pool()
+        pool_obj.starmap(self.parallelPrep,zip(range(len(self.EEG_dict)),repeat(tWindow),repeat(tStep),repeat(plot)))
+
+        toc = time.time()
+        print("\n~~~~~~~~~~~~~~~~~~~~\n"
+              "it took %imin:%is to run electrode classifier preprocess-pipeline for %i file(s)\nwith window length [%.2fs] and t_step [%.2fs]"
+              "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
+                                            tWindow, tStep))
+
+    def parallelPrep(self,k,tWindow=100, tStep=100 *.25,plot=False):
+        annotations = solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
+
+        self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
+                                           read_raw_edf_param={'preload': True})
+
+        self.EEG_dict[k]["rawData"] = TUH_rename_ch(self.EEG_dict[k]["rawData"])
+        TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
+                    'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']  # A1, A2 removed
+        self.EEG_dict[k]["rawData"].pick_channels(ch_names=TUH_pick)
+        self.EEG_dict[k]["rawData"].reorder_channels(TUH_pick)
+
+        if k == 0 and plot:
+            # Plot the energy voltage potential against frequency.
+            self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+
+            raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"], df=annotations)
+            raw_anno.plot()
+            plt.title("Untouched raw signal")
+            plt.show()
+
+        simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
+                         downSam=250)
+
+        if k == 0:
+            self.sfreq = self.EEG_dict[k]["rawData"].info["sfreq"]
+            self.ch_names = self.EEG_dict[k]["rawData"].info["ch_names"]
+            if plot:
+                self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
+
+                raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"], df=annotations)
+                raw_anno.plot()
+                plt.title("Raw signal after simple preprocessing")
+                plt.show()
+
+        # Generate output windows for (X,y) as (array, label)
+        self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k], \
+        self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
+                                                                  t_max=self.EEG_dict[k]["rawData"].times[-1],
+                                                                  tStep=self.EEG_dict[k]["tStep"],
+                                                                  electrodeCLF=True, df=annotations)
 
 
 
