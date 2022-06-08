@@ -8,7 +8,7 @@ import torch
 from preprocessFunctions import simplePreprocess, rereference, preprocessRaw
 import matplotlib.pyplot as plt
 from scipy import signal, stats
-from raw_utils import oneHotEncoder
+#from raw_utils import oneHotEncoder
 from tqdm import *
 from labelFunctions import label_TUH, annotate_TUH, solveLabelChannelRelation
 import matplotlib.pyplot as plt
@@ -89,7 +89,7 @@ class TUH_data:
 
             if k == 0 and plot:
                 #Plot the energy voltage potential against frequency.
-                self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
+                self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
 
                 raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"],df=annotations)
                 raw_anno.plot()
@@ -140,8 +140,8 @@ class TUH_data:
                 y2_m = [0]
                 print("Number of recorded counts for elec and windows dosen't match in dataframe")
 
-            plt.bar(x, y1, color='r')
-            plt.bar(x, y2_m, bottom=y1, color='b')
+            plt.bar(x, y1,0.6, color='r')
+            plt.bar(x, y2_m,0.6, bottom=y1, color='b')
             plt.show()
             plt.savefig("window_and_elec_count.png")
 
@@ -157,6 +157,7 @@ class TUH_data:
                                             tWindow, tStep))
 
     def parallelPrep(self,k,tWindow=100, tStep=100 *.25,plot=False):
+        print(f"Initializing prep of file {k}.")
         annotations = solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
 
         self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,

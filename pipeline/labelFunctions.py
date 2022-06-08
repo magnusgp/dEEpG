@@ -45,12 +45,12 @@ def label_TUH(dataFrame=False, window=[0, 0], header=None,channel=None):  # save
     return return_list
 
 
-# The function "annotate_TUH()" takes a raw signal and a path for a csv file with annotations/labels in it.
+# The function "annotate_TUH()" takes a raw signal and a anntot for a csv file with annotations/labels in it.
 # The annotations are read and added to the raw signal. The function is mainly made for the purpose of making
 # plots with the artifacts showing.
 def annotate_TUH(raw,df=None):
-    t_start=df['t_start'].to_numpy()
-    dura=df['t_end'].to_numpy()-t_start
+    t_start=df['t_start'].to_numpy().astype(float)
+    dura=df['t_end'].to_numpy().astype(float)-t_start
     labels=df['label'].to_numpy().tolist()
     chan_names=df['channel'].to_numpy().tolist()
     t_start=t_start.tolist()
@@ -73,6 +73,8 @@ def annotate_TUH(raw,df=None):
     for ele in sorted(delete,reverse=True):
         print(f"Annotation {labels[ele]} on non-existing channel {chan_names[ele]} removed from annotations.")
         del t_start[ele], dura[ele],labels[ele],chan_names[ele]
+
+    chan_names=[[ch] for ch in chan_names]
 
     anno=mne.Annotations(onset=t_start,
                             duration=dura,

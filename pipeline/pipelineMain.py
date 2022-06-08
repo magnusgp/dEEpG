@@ -1,5 +1,5 @@
 from loadFunctions import TUH_data
-from braindecode.datasets import create_from_X_y
+#from braindecode.datasets import create_from_X_y
 from clfs import electrodeCLF
 import pickle
 from cvFunctions import splitDataset
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
         # Ywindows (labels as list of strings) to use for electrode artifact classifier:
         windowssz = 10
-        TUH.ParallelElectrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
+        TUH.parallelElectrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
 
         save_dict=open("TUH_EEG_dict.pkl","wb")
         pickle.dump(TUH.EEG_dict,save_dict)
