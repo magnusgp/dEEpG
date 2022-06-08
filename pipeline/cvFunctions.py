@@ -142,7 +142,7 @@ def CrossValidation_1(models, X, Y, n_splits=3, random_state=None):
         print('%s: %.3f' % (name, np.mean(dict_BA[name])))
         if np.mean(dict[name]) > best_model[0][1]:
             best_model = []
-            best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name])])
+            best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name]), np.mean(dict_BA[name])])
     return best_model
 
 def splitDataset(data, ratio, shuffle=False, Kfold = False):
@@ -221,10 +221,12 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
     results_f1 = list()
     dict = {}
     dict_f1 = {}
+    dict_BA = {}
     best_model = [[0, 0, 0]]
     for name, model in models.items():
         dict[name] = list()
         dict_f1[name] = list()
+        dict_BA[name] = list()
 
     for train_index, test_index in group_kfold.split(X, Y, groups):
         print("TRAIN:", train_index, "TEST:", test_index)
@@ -242,15 +244,20 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
             dict[name].append(acc)
             f1 = f1_score(Y_test[0], yhat)
             dict_f1[name].append(f1)
+            BA = balanced_accuracy_score(Y_test[0], yhat)
+            dict_BA[name].append(BA)
             # summarize the results
             print('>%s: %.3f' % (name, acc))
+            print('>%s: %.3f' % (name, f1))
+            print('>%s: %.3f' % (name, BA))
     # summarize the average accuracy
     for name, model in models.items():
         print('%s: %.3f' % (name, np.mean(dict[name])))
         print('%s: %.3f' % (name, np.mean(dict_f1[name])))
+        print('%s: %.3f' % (name, np.mean(dict_BA[name])))
         if np.mean(dict[name]) > best_model[0][1]:
             best_model = []
-            best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name])])
+            best_model.append([name, np.mean(dict[name]), np.mean(dict_f1[name]), np.mean(dict_BA[name])])
     return best_model
 
 def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2, random_state=None):
@@ -295,6 +302,8 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
 
     # cv_outer = KFold(n_splits=n_splits_outer, shuffle=True, random_state=random_state)
     outer_results = list()
+    outer_results_f1 = list()
+    outer_results_BA = list()
     best_modeL_score = 0
 
     X = np.squeeze(X)
@@ -349,10 +358,15 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
         yhat = best_model.predict(X_test[0], groups=g_test)
         # evaluate the model
         acc = accuracy_score(Y_test[0], yhat)
+        f1 = f1_score(Y_test, yhat)
+        BA = balanced_accuracy_score(Y_test, yhat)
         # store the result
         outer_results.append(acc)
+        outer_results_f1.append(f1)
+        outer_results_BA.append(BA)
         # report progress
-        print('>acc=%.3f, est=%.3f, cfg=%s' % (acc, result.best_score_, result.best_params_))
+        print('>acc=%.3f, f1_score=%.3f, b_acc_score=%.3f, est=%.3f, cfg=%s' % (
+            acc, f1, BA, result.best_score_, result.best_params_))
         # store the best performing model
         if acc > best_modeL_score:
             best_modeL_score = acc
@@ -360,8 +374,10 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
             best_model_params = result.best_params_
     # summarize the estimated performance of the model
     print('Accuracy: %.3f (%.3f)' % (np.mean(outer_results), std(outer_results)))
+    print('f1 score: %.3f (%.3f)' % (np.mean(outer_results_f1), std(outer_results_f1)))
+    print('Balanced accuracy: %.3f (%.3f)' % (np.mean(outer_results_BA), std(outer_results_BA)))
     # report the best configuration
-    print('Best Config: %s for model %s' % (best_model_params, best_model_))
+    print('Best Config based in acc: %s for model %s' % (best_model_params, best_model_))
 
     return [np.mean(outer_results), std(outer_results), best_model_]
 
