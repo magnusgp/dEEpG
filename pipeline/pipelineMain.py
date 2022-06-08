@@ -8,20 +8,23 @@ from os.path import exists
 import os
 import json
 import pandas as pd
-from multiprocessing import freeze_support
+from multiprocessing import freeze_support,set_start_method
+from statFunctions import sessionStat
 
 if __name__ == '__main__':
+    set_start_method("spawn")
     freeze_support()
 
     # Define path of outer directory for samples:
-    path="../TUH_data_sample"
+    path="TUHdata"
 
     # Create class for data and find all edf files in path, and save in EEG_dict:
     TUH=TUH_data(path=path)
 
-    deletePickle=True
+    deletePickle=False
     if exists("TUH_EEG_dict.pkl") and deletePickle:
         os.remove("TUH_EEG_dict.pkl")
+    if exists("index_patient_df.pkl") and deletePickle:
         os.remove("index_patient_df.pkl")
 
     if exists("TUH_EEG_dict.pkl"):
@@ -41,6 +44,8 @@ if __name__ == '__main__':
         save_dict.close()
         TUH.index_patient_df.to_pickle("index_patient_df.pkl")
         print("Preprocessed data saved succesfully")
+
+    #sessionStat(EEG_dict=TUH.EEG_dict)
 """
 elecX,elecY,windowInfo=TUH.makeDatasetFromIds(ids=[0])
 

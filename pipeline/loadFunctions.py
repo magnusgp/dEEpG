@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 from itertools import repeat
 
-plt.rcParams["font.family"] = "Times New Roman"
+#plt.rcParams["font.family"] = "Times New Roman"
 
 ##These functions are either inspired from or modified copies of code written by David Nyrnberg:
 # https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG/tree/0bfd1a9349f60f44e6f7df5aa6820434e44263a2/Transfer%20learning%20project
@@ -100,7 +100,6 @@ class TUH_data:
 
     def electrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
-        subjects_TUAR19 = defaultdict(dict)
         for k in tqdm(range(len(self.EEG_dict))):
 
             annotations=solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
@@ -179,8 +178,18 @@ class TUH_data:
 
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
-        pool_obj=multiprocessing.Pool()
-        pool_obj.starmap(self.parallelPrep,zip(range(len(self.EEG_dict)),repeat(tWindow),repeat(tStep),repeat(plot)))
+        manager=multiprocessing.Manager()
+        queue=manager.Queue()
+        args = [(k, tWindow, tStep, plot, queue) for k in range(len(self.EEG_dict))]
+
+        with multiprocessing.get_context("spawn").Pool() as pool:
+            pool.starmap(self.parallelPrep,args)
+
+        for k in range(len(self.EEG_dict)):
+            result=queue.get()
+            self.EEG_dict[k]=result[0]
+            self.index_patient_df["window_count"][k] = result[1]
+            self.index_patient_df["elec_count"][k] = result[2]
 
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
@@ -188,7 +197,7 @@ class TUH_data:
               "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
                                             tWindow, tStep))
 
-    def parallelPrep(self,k,tWindow=100, tStep=100 *.25,plot=False):
+    def parallelPrep(self,k,tWindow=100, tStep=100 *.25,plot=False,queue=None):
         print(f"Initializing prep of file {k}.")
         annotations = solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
 
@@ -201,35 +210,20 @@ class TUH_data:
         self.EEG_dict[k]["rawData"].pick_channels(ch_names=TUH_pick)
         self.EEG_dict[k]["rawData"].reorder_channels(TUH_pick)
 
-        if k == 0 and plot:
-            # Plot the energy voltage potential against frequency.
-            self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=128, average=True)
-
-            raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"], df=annotations)
-            raw_anno.plot()
-            plt.title("Untouched raw signal")
-            plt.show()
-
         simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
                          downSam=250)
 
-        if k == 0:
-            self.sfreq = self.EEG_dict[k]["rawData"].info["sfreq"]
-            self.ch_names = self.EEG_dict[k]["rawData"].info["ch_names"]
-            if plot:
-                self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
-
-                raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"], df=annotations)
-                raw_anno.plot()
-                plt.title("Raw signal after simple preprocessing")
-                plt.show()
-
         # Generate output windows for (X,y) as (array, label)
-        self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k], \
+        self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k],\
         self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
                                                                   t_max=self.EEG_dict[k]["rawData"].times[-1],
                                                                   tStep=self.EEG_dict[k]["tStep"],
                                                                   electrodeCLF=True, df=annotations)
+
+        queue.put((self.EEG_dict[k],self.index_patient_df["window_count"][k],self.index_patient_df["elec_count"][k]))
+
+        print(f"Finished prep of file {k}.")
+
 
 
 
@@ -339,7 +333,6 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=Fa
     # initialize variables for segments
     window_EEG = defaultdict(tuple)
     window_width = int(EEG_series["tWindow"] * edf_fS)
-    label_path = EEG_series['path'].split(".edf")[0] + ".csv"
 
     # segment all N-1 windows (by positive lookahead)
     for i in range(0, t_N - window_width, t_overlap):
@@ -387,7 +380,6 @@ def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
     edf_fS = EEG_series["rawData"].info["sfreq"]
     t_N = int(t_max * edf_fS)
     window_width = int(EEG_series["tWindow"] * edf_fS)
-    label_path = EEG_series['path'].split(".edf")[0] + ".csv"
 
     for i in range(0, t_N - window_width, t_step):
         t_start = i / edf_fS
