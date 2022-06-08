@@ -71,7 +71,7 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     """
     TUH = TUH_data(path=dictpath)
     windowssz = 100
-    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=True)
+    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
     all_ids = TUH.index_patient_df.patient_id.unique()
     all_idx = TUH.index_patient_df.index.unique()
     X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
@@ -105,6 +105,8 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     #Use pickle to save classifier
     filename = 'finalized_model.sav'
     pickle.dump(new_model, open(filename, 'wb'))
+
+
 
 
 

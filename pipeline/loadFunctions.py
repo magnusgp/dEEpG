@@ -20,6 +20,33 @@ plt.rcParams["font.family"] = "Times New Roman"
 ##These functions are either inspired from or modified copies of code written by David Nyrnberg:
 # https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG/tree/0bfd1a9349f60f44e6f7df5aa6820434e44263a2/Transfer%20learning%20project
 
+class Gaussian:
+    def plot(mean, std, lower_bound=None, upper_bound=None, resolution=None,
+             title=None, x_label=None, y_label=None, legend_label=None, legend_location="best"):
+        lower_bound = (mean - 4 * std) if lower_bound is None else lower_bound
+        upper_bound = (mean + 4 * std) if upper_bound is None else upper_bound
+        resolution = 100
+
+        title = title or "Gaussian Distribution"
+        x_label = x_label or "x"
+        y_label = y_label or "N(x|μ,σ)"
+        legend_label = legend_label or "μ={}, σ={}".format(mean, std)
+
+        X = np.linspace(lower_bound, upper_bound, resolution)
+        dist_X = Gaussian._distribution(X, mean, std)
+
+        plt.title(title)
+
+        plt.plot(X, dist_X, label=legend_label)
+
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+        plt.legend(loc=legend_location)
+
+        return plt
+
+    def _distribution(X, mean, std):
+        return 1. / (np.sqrt(2 * np.pi) * std) * np.exp(-0.5 * (1. / std * (X - mean)) ** 2)
 
 class TUH_data:
     def __init__(self, path):
@@ -144,6 +171,11 @@ class TUH_data:
             plt.bar(x, y2_m, bottom=y1, color='b')
             plt.show()
             plt.savefig("window_and_elec_count.png")
+
+            #Gaussian distribution of elec and window count
+            plot = Gaussian(np.mean(y1), np.std(y1))
+            plot = Gaussian(np.mean(y2), np.std(y2))
+            plt.show()
 
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()

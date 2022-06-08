@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="plot for count fo windows and elec">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="update new CV-functions with new accuracy meassures">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/cvFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/cvFunctions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -516,7 +515,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654600426777</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="update new CV-functions with new accuracy meassures">
+      <created>1654674735462</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1654674735463</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -551,7 +557,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Spectrogram maker works" />
     <MESSAGE value="montageTest" />
     <MESSAGE value="electrode prep, sliding window changed" />
     <MESSAGE value="classify electrode intervals created" />
@@ -576,24 +581,25 @@
     <MESSAGE value="unversioned files" />
     <MESSAGE value="counter update for windows and elec + measurres for classification" />
     <MESSAGE value="plot for count fo windows and elec" />
-    <option name="LAST_COMMIT_MESSAGE" value="plot for count fo windows and elec" />
+    <MESSAGE value="update new CV-functions with new accuracy meassures" />
+    <option name="LAST_COMMIT_MESSAGE" value="update new CV-functions with new accuracy meassures" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>59</line>
+          <line>65</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>53</line>
+          <line>59</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>42</line>
+          <line>48</line>
           <option name="timeStamp" value="138" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -620,11 +626,6 @@
           <url>file://$PROJECT_DIR$/pipeline/raw_utils.py</url>
           <line>108</line>
           <option name="timeStamp" value="143" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
-          <line>146</line>
-          <option name="timeStamp" value="159" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
