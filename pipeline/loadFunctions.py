@@ -141,11 +141,11 @@ class TUH_data:
             print("Number of recorded counts for elec and windows dosen't match in dataframe")
 
 
-
-        plt.bar(x, y1, color='r')
-        plt.bar(x, y2_m, bottom=y1, color='b')
-        plt.show()
-        plt.savefig("window_and_elec_count.png")
+        # Comment out plot for debugging
+        #plt.bar(x, y1, color='r')
+        #plt.bar(x, y2_m, bottom=y1, color='b')
+        #plt.show()
+        #plt.savefig("window_and_elec_count.png")
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
         pool_obj=multiprocessing.Pool()

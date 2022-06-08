@@ -203,6 +203,8 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
             # All windows in the same group should have the same index
             groups[i] = [groups[i]] * len(X[i])
 
+    print("Total number of groups found: ", len(groups))
+
     # Each group should consist of all session from one patient
     groups = np.squeeze(groups)
 
@@ -225,6 +227,7 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
     for name, model in models.items():
         dict[name] = list()
         dict_f1[name] = list()
+    print("Starting KFold CV with n = %d folds" % group_kfold.n_splits)
 
     for train_index, test_index in group_kfold.split(X, Y, groups):
         print("TRAIN:", train_index, "TEST:", test_index)
@@ -235,7 +238,7 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
         # evaluate each model in turn
         for name, model in models.items():
             # evaluate the model and store results
-            # TODO: Bug here, we should use the same model for all groups
+            # TODO: Bug here?
             model.fit(X_train[0], Y_train[0])
             yhat = model.predict(X_test[0])
             acc = accuracy_score(Y_test[0], yhat)
