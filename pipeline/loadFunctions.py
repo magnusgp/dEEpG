@@ -177,6 +177,12 @@ class TUH_data:
             plot = Gaussian(np.mean(y2), np.std(y2))
             plt.show()
 
+            #Plot histogram of window and elec count
+            plt.bar(y2, y1, align='center')  # A bar chart
+            plt.xlabel('window_count')
+            plt.ylabel('elec_count')
+            plt.show()
+
     def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
         tic = time.time()
         pool_obj=multiprocessing.Pool()
