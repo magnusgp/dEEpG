@@ -100,7 +100,7 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
 
     else:
         pass
-        return print("No validation or evalution has been done, due to lack of choice")
+        return print("No validation or evalution has been done, due to lack of choice.")
 
     #Use pickle to save classifier
     filename = 'finalized_model.sav'
@@ -118,4 +118,4 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
 if __name__ == "__main__":
     path = "../TUH_data_sample"
     TUH = TUH_data(path=path)
-    score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=True)
+    score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=False)

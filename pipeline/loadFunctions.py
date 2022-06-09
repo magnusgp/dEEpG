@@ -21,7 +21,7 @@ plt.rcParams["font.family"] = "Times New Roman"
 # https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG/tree/0bfd1a9349f60f44e6f7df5aa6820434e44263a2/Transfer%20learning%20project
 
 class Gaussian:
-    def plot(mean, std, lower_bound=None, upper_bound=None, resolution=None,
+    def plot(mean, std, name, lower_bound=None, upper_bound=None, resolution=None,
              title=None, x_label=None, y_label=None, legend_label=None, legend_location="best"):
         lower_bound = (mean - 4 * std) if lower_bound is None else lower_bound
         upper_bound = (mean + 4 * std) if upper_bound is None else upper_bound
@@ -30,7 +30,7 @@ class Gaussian:
         title = title or "Gaussian Distribution"
         x_label = x_label or "x"
         y_label = y_label or "N(x|μ,σ)"
-        legend_label = legend_label or "μ={}, σ={}".format(mean, std)
+        legend_label = legend_label or "μ={}, σ={}, type={}".format(mean, std, name)
 
         X = np.linspace(lower_bound, upper_bound, resolution)
         dist_X = Gaussian._distribution(X, mean, std)
@@ -176,17 +176,17 @@ class TUH_data:
             fig1.savefig("window_and_elec_count.png")
 
             #Gaussian distribution of elec and window count
-            plot = Gaussian.plot(np.mean(y1), np.std(y1))
-            plot = Gaussian.plot(np.mean(y2), np.std(y2))
+            plot = Gaussian.plot(np.mean(y1), np.std(y1), "elec_count")
+            plot = Gaussian.plot(np.mean(y2), np.std(y2), "window_count")
             fig2 = plt.gcf()
             plt.show()
             fig2.savefig("Gaussian_window_and_elec_count.png")
 
             #Plot histogram of window and elec count
-            plt.bar(y2, y1, align='center')  # A bar chart
+            plt.bar(y2, y1, width = 2, align='center')  # A bar chart
+            fig3 = plt.gcf()
             plt.xlabel('window_count')
             plt.ylabel('elec_count')
-            fig3 = plt.gcf()
             plt.show()
             fig3.savefig("Histogram_window_and_elec_count.png")
 
