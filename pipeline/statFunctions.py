@@ -9,6 +9,7 @@ def sessionStat(EEG_dict):
     years = []
     age = []
     gender = []
+
     for k in range(len(EEG_dict)):
         #Collect data about the files:
         data=EEG_dict[k]["rawData"]
