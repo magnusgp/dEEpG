@@ -14,6 +14,7 @@ from labelFunctions import label_TUH, annotate_TUH, solveLabelChannelRelation
 import matplotlib.pyplot as plt
 import multiprocessing
 from itertools import repeat
+import pickle
 
 #plt.rcParams["font.family"] = "Times New Roman"
 
@@ -304,7 +305,13 @@ class TUH_data:
                                                                   t_max=self.EEG_dict[k]["rawData"].times[-1],
                                                                   tStep=self.EEG_dict[k]["tStep"],
                                                                   electrodeCLF=True, df=annotations)
-        print(f"Finished prep of file {k}.")
+        filename=self.EEG_dict[k]['id']+self.EEG_dict[k]['patient_id']+ self.EEG_dict[k]['session'] +os.path.split(self.EEG_dict[k]['path'])[1][:-4]
+        save_dict=open(f"pickles/EEG_dict{filename}.pkl","wb")
+        pickle.dump(self.EEG_dict[k],save_dict)
+        save_dict.close()
+        self.index_patient_df[self.index_patient_df['index']==k].to_pickle(f"pickles/index_patient_df{filename}.pkl")
+
+        print(f"Finished prep of file {k}.")    
 
         return (self.EEG_dict[k],self.index_patient_df["window_count"][k],self.index_patient_df["elec_count"][k])
 
