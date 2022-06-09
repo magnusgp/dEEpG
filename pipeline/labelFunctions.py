@@ -14,20 +14,15 @@ def label_TUH(dataFrame=False, window=[0, 0], header=None,channel=None):  # save
     if channel:
         chan_names = df['channel'].to_numpy().tolist()
         low_char = {'FP1': 'Fp1', 'FP2': 'Fp2', 'FZ': 'Fz', 'CZ': 'Cz', 'PZ': 'Pz'}
+        #If channel name is in dictionary, name is changed to small end character.
         for i in range(len(chan_names)):
-            # remove numbers behind channel names:
-            chan_names[i] = [chan_names[i][:-3], chan_names[i][-2:]]
-
-            # Loop through all channel names in reverse order, so if something is removed it does not affect other index.
-            # Change certain channels to have smaller letters:
-            for k in range(len(chan_names[i]) - 1, -1, -1):
-                if chan_names[i][k] in low_char:
-                    chan_names[i][k] = low_char[chan_names[i][k]]
+            if chan_names[i] in low_char.keys():
+                chan_names[i] = low_char[chan_names[i]]
 
         label_TUH = df[(pd.to_numeric(df['t_start']).between(window[0], window[1]) |
                        pd.to_numeric(df['t_end']).between(window[0], window[1]) |
                        (within_con0 & within_con1))
-                       & (np.sum(np.asarray(chan_names)==np.asarray(channel),axis=1).tolist())
+                       & (np.asarray(chan_names)==np.asarray(channel)).tolist()
                         & (df['label'].to_numpy()=='elec')]
                         #Handle double labels in the solveLabelChannelRelations function, so only keeping
                         # these in case we would like other checks.
