@@ -30,7 +30,7 @@ class Gaussian:
 
         title = title or "Gaussian Distribution"
         x_label = x_label or "x"
-        y_label = y_label or "N(x|μ,σ)"
+        y_label = y_label or "N(x|mu,std)"
         legend_label = legend_label or "μ={}, σ={}, type={}".format(mean, std, name)
 
         X = np.linspace(lower_bound, upper_bound, resolution)
