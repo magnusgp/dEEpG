@@ -10,18 +10,20 @@ import json
 import pandas as pd
 from multiprocessing import freeze_support,set_start_method
 from statFunctions import sessionStat
+import threading
+
 
 if __name__ == '__main__':
     set_start_method("spawn")
     freeze_support()
 
     # Define path of outer directory for samples:
-    path="TUHdata"
+    path="..\TUH_data_sample"
 
     # Create class for data and find all edf files in path, and save in EEG_dict:
     TUH=TUH_data(path=path)
 
-    deletePickle=False
+    deletePickle=True
     if exists("TUH_EEG_dict.pkl") and deletePickle:
         os.remove("TUH_EEG_dict.pkl")
     if exists("index_patient_df.pkl") and deletePickle:
@@ -37,7 +39,8 @@ if __name__ == '__main__':
         # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
         # Ywindows (labels as list of strings) to use for electrode artifact classifier:
         windowssz = 10
-        TUH.parallelElectrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False) #Problems with the plots
+        TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25)
+        #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
 
         save_dict=open("TUH_EEG_dict.pkl","wb")
         pickle.dump(TUH.EEG_dict,save_dict)
