@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="Intermediate pickles">
+      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,22 +46,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="exceleditor.install" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/marie/PycharmProjects/FagprojektEEG/pipeline&quot;
+  }
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\marie\PycharmProjects\FagprojektEEG\pipeline" />
       <recent name="C:\Users\marie\PycharmProjects\dEEpG\David" />
       <recent name="C:\Users\marie\PycharmProjects\dEEpG\Load" />
       <recent name="C:\Users\marie\PycharmProjects\dEEpG" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\marie\PycharmProjects\FagprojektEEG" />
       <recent name="$PROJECT_DIR$/scripts" />
       <recent name="C:\Users\marie\PycharmProjects\dEEpG" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.clfs">
+  <component name="RunManager" selected="Python.pipelineMain">
     <configuration name="clfs" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dEEpG" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -83,7 +86,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="labelFunctions" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="pipelineMain" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="dEEpG" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -95,7 +98,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pipeline/labelFunctions.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\marie\PycharmProjects\FagprojektEEG\pipeline\pipelineMain.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -171,16 +174,14 @@
       <item itemvalue="Python.pipelineMain" />
       <item itemvalue="Python.pipeline_main" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
-      <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.clfs" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.pipelineMain" />
         <item itemvalue="Python.clfs" />
         <item itemvalue="Python.pipeline_main" />
         <item itemvalue="Python.plot_tuh_eeg_corpus" />
-        <item itemvalue="Python.pipelineMain" />
-        <item itemvalue="Python.labelFunctions" />
       </list>
     </recent_temporary>
   </component>
@@ -192,146 +193,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645627443933</updated>
-    </task>
-    <task id="LOCAL-00002" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1646210602178</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1646210602178</updated>
-    </task>
-    <task id="LOCAL-00003" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647437747048</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1647437747048</updated>
-    </task>
-    <task id="LOCAL-00004" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647437877128</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1647437877128</updated>
-    </task>
-    <task id="LOCAL-00005" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647438156890</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1647438156890</updated>
-    </task>
-    <task id="LOCAL-00006" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647438377335</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1647438377335</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Two temple data samples">
-      <created>1647439137416</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1647439137416</updated>
-    </task>
-    <task id="LOCAL-00008" summary="David EEG loader and prep implement">
-      <created>1648046740264</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1648046740264</updated>
-    </task>
-    <task id="LOCAL-00009" summary="David EEG loader and prep implement">
-      <created>1648046786090</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1648046786090</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Changing Davids preprocess code to make X and y arrays">
-      <created>1648644139919</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1648644139919</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Changing Davids preprocess code to make X and y arrays">
-      <created>1648644460238</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1648644460238</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Label_TUH fixed">
-      <created>1648645553495</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1648645553495</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Dataset of windows with labels">
-      <created>1648648022245</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1648648022245</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Code to load dataset as windows with labels">
-      <created>1648727132055</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1648727132056</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Preprocess modified">
-      <created>1649241087409</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1649241087410</updated>
-    </task>
-    <task id="LOCAL-00016" summary="Preprocess modified">
-      <created>1649246342681</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1649246342681</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Spectrogram maker works">
-      <created>1649248703473</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1649248703473</updated>
-    </task>
-    <task id="LOCAL-00018" summary="montageTest">
-      <created>1650014226240</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1650014226240</updated>
-    </task>
-    <task id="LOCAL-00019" summary="electrode prep, sliding window changed">
-      <created>1650460611799</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1650460611799</updated>
-    </task>
-    <task id="LOCAL-00020" summary="classify electrode intervals created">
-      <created>1650466865406</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1650466865406</updated>
-    </task>
-    <task id="LOCAL-00021" summary="classify electrode intervals created">
-      <created>1650467513148</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1650467513148</updated>
     </task>
     <task id="LOCAL-00022" summary="classify electrode intervals created">
       <created>1650467527269</created>
@@ -494,49 +355,189 @@
       <option name="project" value="LOCAL" />
       <updated>1654265663487</updated>
     </task>
-    <task id="LOCAL-00045" summary="counter update for windows and elec + measurres for classification">
-      <created>1654523993861</created>
+    <task id="LOCAL-00045" summary="Comments and small fix to annotation algorithm">
+      <created>1654506329822</created>
       <option name="number" value="00045" />
       <option name="presentableId" value="LOCAL-00045" />
       <option name="project" value="LOCAL" />
-      <updated>1654523993868</updated>
+      <updated>1654506329822</updated>
     </task>
-    <task id="LOCAL-00046" summary="plot for count fo windows and elec">
-      <created>1654600426775</created>
+    <task id="LOCAL-00046" summary="Comments and small fix to annotation algorithm">
+      <created>1654506359782</created>
       <option name="number" value="00046" />
       <option name="presentableId" value="LOCAL-00046" />
       <option name="project" value="LOCAL" />
-      <updated>1654600426777</updated>
+      <updated>1654506359782</updated>
     </task>
-    <task id="LOCAL-00047" summary="update new CV-functions with new accuracy meassures">
-      <created>1654674735462</created>
+    <task id="LOCAL-00047" summary="requirements file made">
+      <created>1654509313537</created>
       <option name="number" value="00047" />
       <option name="presentableId" value="LOCAL-00047" />
       <option name="project" value="LOCAL" />
-      <updated>1654674735463</updated>
+      <updated>1654509313537</updated>
     </task>
-    <task id="LOCAL-00048" summary="Gaussian distribution of elec and window count">
-      <created>1654679605407</created>
+    <task id="LOCAL-00048" summary="requirements file made">
+      <created>1654510463961</created>
       <option name="number" value="00048" />
       <option name="presentableId" value="LOCAL-00048" />
       <option name="project" value="LOCAL" />
-      <updated>1654679605408</updated>
+      <updated>1654510463961</updated>
     </task>
-    <task id="LOCAL-00049" summary="New plots for Gaussian distribution of elec and window count + histogram plot">
-      <created>1654684444934</created>
+    <task id="LOCAL-00049" summary="extra data files">
+      <created>1654510715716</created>
       <option name="number" value="00049" />
       <option name="presentableId" value="LOCAL-00049" />
       <option name="project" value="LOCAL" />
-      <updated>1654684444934</updated>
+      <updated>1654510715716</updated>
     </task>
-    <task id="LOCAL-00050" summary="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)">
-      <created>1654687320428</created>
+    <task id="LOCAL-00050" summary="Fix of solveLabelChannelRelation() to  work for both types of csv setups">
+      <created>1654519520744</created>
       <option name="number" value="00050" />
       <option name="presentableId" value="LOCAL-00050" />
       <option name="project" value="LOCAL" />
-      <updated>1654687320436</updated>
+      <updated>1654519520744</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="extra data files">
+      <created>1654519705274</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1654519705274</updated>
+    </task>
+    <task id="LOCAL-00052" summary="extra data files">
+      <created>1654519726901</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1654519726901</updated>
+    </task>
+    <task id="LOCAL-00053" summary="extra data files">
+      <created>1654519771835</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1654519771835</updated>
+    </task>
+    <task id="LOCAL-00054" summary="xml file change">
+      <created>1654520793277</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1654520793277</updated>
+    </task>
+    <task id="LOCAL-00055" summary="PipelineMain save pickles of EEG_dict and index_df">
+      <created>1654524072373</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1654524072373</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Attempt to implement parallel programming on preprocessing of the files">
+      <created>1654673040866</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1654673040866</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Extra files">
+      <created>1654673259484</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1654673259484</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Extra files">
+      <created>1654673281672</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1654673281672</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Extra files">
+      <created>1654673318584</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1654673318584</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Working parallel programming of preprocess">
+      <created>1654674718499</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1654674718499</updated>
+    </task>
+    <task id="LOCAL-00061" summary="Fix bugs in plots, hereunder fixing the annotation_TUH function">
+      <created>1654679620562</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1654679620562</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Creation of function for plotting statistics about the patients and sessions">
+      <created>1654694052121</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1654694052121</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Removal of tqdm bars since they make a lot of mixed output on the HPC">
+      <created>1654694102485</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1654694102485</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Trying to make multiprocessing work by queue. Still fails on the hpc after approx 150 files.">
+      <created>1654694163384</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1654694163384</updated>
+    </task>
+    <task id="LOCAL-00065" summary="StatFunction for mr Benjamin">
+      <created>1654759728461</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1654759728461</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Upfate on label_TUH to only handle one channel per annotation rather than old way with channel pairs. This is now handled in solveLabelChannelRelation.">
+      <created>1654760163836</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1654760163836</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Attempts at parallel programming">
+      <created>1654760203333</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1654760203333</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Attempts at parallel programming">
+      <created>1654760321558</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1654760321558</updated>
+    </task>
+    <task id="LOCAL-00069" summary="Actual fix to label_TUH">
+      <created>1654766880762</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1654766880762</updated>
+    </task>
+    <task id="LOCAL-00070" summary="Intermediate pickles">
+      <created>1654776221191</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1654776221191</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -571,18 +572,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="label magi" />
-    <MESSAGE value="label magi updates" />
-    <MESSAGE value="Changes by marie" />
-    <MESSAGE value="shelves patches" />
-    <MESSAGE value="Changes to solveLabelChannelRelation, splitting of double labels etc." />
-    <MESSAGE value="split functions between loadFunction.py and new labelFunctions.py" />
-    <MESSAGE value="change structure to have raw and windows in EEG_dict and two functions for handling of this" />
-    <MESSAGE value="pandas df patient id index overview" />
-    <MESSAGE value="spring cleaning" />
-    <MESSAGE value="spring cleaning 2.0" />
-    <MESSAGE value="rename of Cv.py" />
-    <MESSAGE value="custom splitDataset function added" />
     <MESSAGE value="check for saved TUH instance added" />
     <MESSAGE value="save class instance" />
     <MESSAGE value=".xml updates" />
@@ -590,32 +579,29 @@
     <MESSAGE value="added data split by patient id to main" />
     <MESSAGE value="bug fixes" />
     <MESSAGE value="unversioned files" />
-    <MESSAGE value="counter update for windows and elec + measurres for classification" />
-    <MESSAGE value="plot for count fo windows and elec" />
-    <MESSAGE value="update new CV-functions with new accuracy meassures" />
-    <MESSAGE value="Gaussian distribution of elec and window count" />
-    <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot" />
-    <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)" />
-    <option name="LAST_COMMIT_MESSAGE" value="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)" />
+    <MESSAGE value="Comments and small fix to annotation algorithm" />
+    <MESSAGE value="requirements file made" />
+    <MESSAGE value="Fix of solveLabelChannelRelation() to  work for both types of csv setups" />
+    <MESSAGE value="extra data files" />
+    <MESSAGE value="xml file change" />
+    <MESSAGE value="PipelineMain save pickles of EEG_dict and index_df" />
+    <MESSAGE value="Attempt to implement parallel programming on preprocessing of the files" />
+    <MESSAGE value="Extra files" />
+    <MESSAGE value="Working parallel programming of preprocess" />
+    <MESSAGE value="Fix bugs in plots, hereunder fixing the annotation_TUH function" />
+    <MESSAGE value="Creation of function for plotting statistics about the patients and sessions" />
+    <MESSAGE value="Removal of tqdm bars since they make a lot of mixed output on the HPC" />
+    <MESSAGE value="Trying to make multiprocessing work by queue. Still fails on the hpc after approx 150 files." />
+    <MESSAGE value="StatFunction for mr Benjamin" />
+    <MESSAGE value="Upfate on label_TUH to only handle one channel per annotation rather than old way with channel pairs. This is now handled in solveLabelChannelRelation." />
+    <MESSAGE value="Attempts at parallel programming" />
+    <MESSAGE value="Actual fix to label_TUH" />
+    <MESSAGE value="Intermediate pickles" />
+    <option name="LAST_COMMIT_MESSAGE" value="Intermediate pickles" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>65</line>
-          <option name="timeStamp" value="71" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>59</line>
-          <option name="timeStamp" value="72" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>48</line>
-          <option name="timeStamp" value="138" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/raw_utils.py</url>
           <line>118</line>
@@ -640,6 +626,41 @@
           <url>file://$PROJECT_DIR$/pipeline/raw_utils.py</url>
           <line>108</line>
           <option name="timeStamp" value="143" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/labelFunctions.py</url>
+          <line>173</line>
+          <option name="timeStamp" value="165" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/statFunctions.py</url>
+          <line>21</line>
+          <option name="timeStamp" value="188" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/statFunctions.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="189" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
+          <line>52</line>
+          <option name="timeStamp" value="193" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>261</line>
+          <option name="timeStamp" value="197" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>393</line>
+          <option name="timeStamp" value="200" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pipeline/loadFunctions.py</url>
+          <line>311</line>
+          <option name="timeStamp" value="211" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
