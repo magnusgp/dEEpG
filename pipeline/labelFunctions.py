@@ -12,22 +12,22 @@ def label_TUH(dataFrame=False, window=[0, 0], header=None,channel=None):  # save
     within_con1 = (pd.to_numeric(df['t_start']) <= window[1]) & (window[1] <= pd.to_numeric(df['t_end']))
 
     if channel:
-        chan_names = df['channel'].to_numpy().tolist()
         low_char = {'FP1': 'Fp1', 'FP2': 'Fp2', 'FZ': 'Fz', 'CZ': 'Cz', 'PZ': 'Pz'}
         #If channel name is in dictionary, name is changed to small end character.
-        for i in range(len(chan_names)):
-            if chan_names[i] in low_char.keys():
-                chan_names[i] = low_char[chan_names[i]]
+        for i in range(len(df['channel'])):
+            if df['channel'][i] in low_char.keys():
+                df['channel'][i] = low_char[df['channel'][i]]
 
         label_TUH = df[(pd.to_numeric(df['t_start']).between(window[0], window[1]) |
                        pd.to_numeric(df['t_end']).between(window[0], window[1]) |
                        (within_con0 & within_con1))
-                       & (np.asarray(chan_names)==np.asarray(channel)).tolist()
+                       & (df['channel']==channel)
                         & (df['label'].to_numpy()=='elec')]
                         #Handle double labels in the solveLabelChannelRelations function, so only keeping
                         # these in case we would like other checks.
                         # |(df['label'].to_numpy()=='musc_elec')|(df['label'].to_numpy()=='eyem_elec')|
                           # (df['label'].to_numpy()=='shiv_elec')|(df['label'].to_numpy()=='chew_elec'))]
+                        #(np.asarray(chan_names)==np.asarray(channel)).tolist()
     else:
         label_TUH = df[df['t_start'].between(window[0], window[1]) |
                    df['t_end'].between(window[0], window[1]) |
