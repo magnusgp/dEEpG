@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="update new CV-functions with new accuracy meassures">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
@@ -192,13 +192,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645627443933</updated>
-    </task>
-    <task id="LOCAL-00001" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1646210526672</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1646210526672</updated>
     </task>
     <task id="LOCAL-00002" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
       <created>1646210602178</created>
@@ -522,7 +515,28 @@
       <option name="project" value="LOCAL" />
       <updated>1654674735463</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Gaussian distribution of elec and window count">
+      <created>1654679605407</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1654679605408</updated>
+    </task>
+    <task id="LOCAL-00049" summary="New plots for Gaussian distribution of elec and window count + histogram plot">
+      <created>1654684444934</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1654684444934</updated>
+    </task>
+    <task id="LOCAL-00050" summary="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)">
+      <created>1654687320428</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1654687320436</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -557,9 +571,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="montageTest" />
-    <MESSAGE value="electrode prep, sliding window changed" />
-    <MESSAGE value="classify electrode intervals created" />
     <MESSAGE value="label magi" />
     <MESSAGE value="label magi updates" />
     <MESSAGE value="Changes by marie" />
@@ -582,7 +593,10 @@
     <MESSAGE value="counter update for windows and elec + measurres for classification" />
     <MESSAGE value="plot for count fo windows and elec" />
     <MESSAGE value="update new CV-functions with new accuracy meassures" />
-    <option name="LAST_COMMIT_MESSAGE" value="update new CV-functions with new accuracy meassures" />
+    <MESSAGE value="Gaussian distribution of elec and window count" />
+    <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot" />
+    <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)" />
+    <option name="LAST_COMMIT_MESSAGE" value="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
