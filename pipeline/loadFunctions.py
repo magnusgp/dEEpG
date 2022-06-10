@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 from itertools import repeat
 import pickle
+from os.path import exists
 
 #plt.rcParams["font.family"] = "Times New Roman"
 
@@ -339,14 +340,25 @@ class TUH_data:
 
         print(f"Finished prep of file {k}.")
 
+    def indexNotPickled(self):
+        indexes=[]
+        for k in range(len(self.EEG_dict)):
+            filename = self.EEG_dict[k]['id'] + self.EEG_dict[k]['patient_id'] + self.EEG_dict[k]['session'] + \
+                   os.path.split(self.EEG_dict[k]['path'])[1][:-4]
+            if not exists(f"pickles/EEG_dict{filename}.pkl") and not exists(f"pickles/index_patient_df{filename}.pkl"):
+                indexes.append(k)
+        return indexes
+
     def parallelElectrodeCLFPrepVer2(self, tWindow=100, tStep=100 *.25):
         tic = time.time()
+        indexes=self.indexNotPickled()
         manager=multiprocessing.Manager()
         queue=manager.Queue()
-        args = [(k, tWindow, tStep, queue) for k in range(len(self.EEG_dict))]
+        args = [(k, tWindow, tStep, queue) for k in indexes]
         with multiprocessing.Pool() as pool:
             results=pool.starmap(self.parallelPrepVer2,args)
-
+        """
+        Commented out the use of results, since we now save pickles along the way.
         if len(results)==len(self.EEG_dict):
             for k in range(len(results)):
                 self.EEG_dict[k] = results[k][0]
@@ -354,7 +366,7 @@ class TUH_data:
                 self.index_patient_df["elec_count"][k] = results[k][2]
 
         else:
-            print("Something went wrong, results does not match EEG_dict length.")
+            print("Something went wrong, results does not match EEG_dict length.")"""
 
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
@@ -393,6 +405,17 @@ class TUH_data:
         print(f"Finished prep of file {k}.")    
 
         return (self.EEG_dict[k],self.index_patient_df["window_count"][k],self.index_patient_df["elec_count"][k])
+
+    def collectEEG_dictFromPickles(self):
+        for k in range(len(self.EEG_dict)):
+            filename = self.EEG_dict[k]['id'] + self.EEG_dict[k]['patient_id'] + self.EEG_dict[k]['session'] + \
+                       os.path.split(self.EEG_dict[k]['path'])[1][:-4]
+            if exists(f"pickles/EEG_dict{filename}.pkl") and exists(f"pickles/index_patient_df{filename}.pkl"):
+                saved_dict = open(f"pickles/EEG_dict{filename}.pkl", "rb")
+                self.EEG_dict[k] = pickle.load(saved_dict)
+                temp_df=pd.read_pickle(f"pickles/index_patient_df{filename}.pkl")
+                self.index_patient_df["window_count"][k] = temp_df["window_count"][0]
+                self.index_patient_df["elec_count"][k] = temp_df["elec_count"][0]
 
 
     def parallelElectrodeCLFPrepVer3(self, tWindow=100, tStep=100 *.25):

@@ -23,12 +23,12 @@ if __name__ == '__main__':
     # Create class for data and find all edf files in path, and save in EEG_dict:
     TUH=TUH_data(path=path)
 
-    deletePickle=True
+    deletePickle=False
     if exists("TUH_EEG_dict.pkl") and deletePickle:
         os.remove("TUH_EEG_dict.pkl")
     if exists("index_patient_df.pkl") and deletePickle:
         os.remove("index_patient_df.pkl")
-    if exists("pickles"):
+    if exists("pickles") and deletePickle:
         for filename in os.listdir("pickles"):
             file_path = os.path.join("pickles", filename)
             try:
@@ -48,6 +48,7 @@ if __name__ == '__main__':
         windowssz = 10
         #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25)
         TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+        TUH.collectEEG_dictFromPickles()
 
         save_dict=open("TUH_EEG_dict.pkl","wb")
         pickle.dump(TUH.EEG_dict,save_dict)
