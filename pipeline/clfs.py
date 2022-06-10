@@ -18,14 +18,14 @@ from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
 import pickle
-from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2
+from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2, finalGroupKFold
 from collections import defaultdict
 from tqdm import *
 import time
 from loadFunctions import TUH_data
 import os
 
-def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
+def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -70,8 +70,9 @@ def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_valida
         TUH = pickle.load(open(filename, 'rb'))
     """
     TUH = TUH_data(path=dictpath)
-    windowssz = 100
-    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
+    windowssz = 10
+    TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+    TUH.sessionStat()
     all_ids = TUH.index_patient_df.patient_id.unique()
     all_idx = TUH.index_patient_df.index.unique()
     X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
@@ -88,8 +89,8 @@ def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_valida
         #C_model = C_model_data[0][0]
         #NB_model = models[C_model]
         #best_model = GroupKFold_2(NB_model, C_model, TUH, X, y, TUH.index_patient_df)[2]
-        model, namee = SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM'
-        best_model = finalGroupKFold(model, name, TUH.index_patient_df, X, y)
+        model, name = SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM'
+        mean, std, best_model = finalGroupKFold('Linear SVM', TUH.index_patient_df, X, y)
         # debug mode
         #best_model = GroupKFold_2(SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM', TUH, X, y, TUH.index_patient_df)[2]
         #best_model = SVC(C=0.001, kernel='linear', verbose=True)
@@ -116,8 +117,8 @@ def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_valida
         return print("No validation or evalution has been done, due to lack of choice.")
 
     #Use pickle to save classifier
-    filename = 'finalized_model.sav'
-    pickle.dump(new_model, open(filename, 'wb'))
+    #filename = 'finalized_model.sav'
+    #pickle.dump(new_model, open(filename, 'wb'))
 
 
 
@@ -130,9 +131,5 @@ def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_valida
 
 if __name__ == "__main__":
     path = "../TUH_data_sample"
-    TUH = TUH_data(path=path)
-    windowssz = 10
-    TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
-    TUH.sessionStat()
-    P = TUH.index_patient_df
-    score = electrodeCLF(dictpath=path, index_df= P, name = "all", multidim=False, Cross_validation=False)
+
+    score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=True)
