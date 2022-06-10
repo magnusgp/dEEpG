@@ -17,15 +17,16 @@ from sklearn.multioutput import MultiOutputClassifier
 from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
+#import pickle5 as pickle
 import pickle
-from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2
+from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2, finalGroupKFold
 from collections import defaultdict
 from tqdm import *
 import time
 from loadFunctions import TUH_data
 import os
 
-def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
+def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -69,10 +70,10 @@ def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_valida
     else:
         TUH = pickle.load(open(filename, 'rb'))
     """
-    TUH = TUH_data(path=dictpath)
+    TUH = TUH
     windowssz = 100
-    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
-    all_ids = TUH.index_patient_df.patient_id.unique()
+    #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
+    #all_ids = TUH.index_patient_df.patient_id.unique()
     all_idx = TUH.index_patient_df.index.unique()
     X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
     # Only view the first 25 % of the data:
@@ -129,10 +130,21 @@ def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_valida
     return print("Model has been evaluated and stored")
 
 if __name__ == "__main__":
+    # non pickle stuff
+    """
     path = "../TUH_data_sample"
     TUH = TUH_data(path=path)
     windowssz = 10
     TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
     TUH.sessionStat()
     P = TUH.index_patient_df
-    score = electrodeCLF(dictpath=path, index_df= P, name = "all", multidim=False, Cross_validation=False)
+    """
+    # pickle stuff
+    path = ""
+    TUH = TUH_data(path=path)
+
+    saved_dict = open("TUH_EEG_dict.pkl", "rb")
+    TUH.EEG_dict = pickle.load(saved_dict)
+    TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")
+
+    score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = "all", multidim=False, Cross_validation=False)
