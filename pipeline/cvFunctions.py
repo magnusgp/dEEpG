@@ -29,6 +29,7 @@ from sklearn.metrics import f1_score
 import random
 import pandas as pd
 from loadFunctions import TUH_data
+import matplotlib.pyplot as plt
 
 def CrossValidation_2(model, name, X, Y, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
@@ -454,7 +455,7 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
     return [np.mean(outer_results), std(outer_results), best_model_]
 
 
-def finalGroupKFold(model, name, ids, X, Y, groups, n_splits_outer=3, n_splits_inner=2, random_state=None):
+def finalGroupKFold(name, ids, X, Y, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
         "Nearest Neighbors",
         "Linear SVM",
@@ -467,6 +468,8 @@ def finalGroupKFold(model, name, ids, X, Y, groups, n_splits_outer=3, n_splits_i
         #    "Naive Bayes",
         #    "QDA",
     ]
+    if name not in names:
+        print("The selected model is not valid. Please try again mark")
 
     classifiers = [
         KNeighborsClassifier(3),
@@ -508,8 +511,34 @@ def finalGroupKFold(model, name, ids, X, Y, groups, n_splits_outer=3, n_splits_i
     outer_results_BA = list()
     best_modeL_score = 0
 
+    split_train_plot = []
+    split_train_plot_elec = []
+    split_train_plot_F = []
+    split_train_elec_F = []
+    split_test_plot = []
+    split_test_plot_elec = []
+    split_test_plot_F = []
+    split_test_elec_F = []
+
     for train_index, test_index in group_kfold_outer.split(X, Y, allgroups):
         # Split the data
+
+        for k in list(set(map(allgroups.__getitem__, train_index))):
+            split_train_plot.append(sum(ids[ids['patient_id']==k]['window_count'].tolist()))
+            split_train_plot_elec.append(sum(ids[ids['patient_id'] == k]['elec_count'].tolist()))
+        split_train_plot_F.append(sum(split_train_plot))
+        split_train_elec_F.append(sum(split_train_plot_elec))
+        split_train_plot = []
+        split_train_plot_elec = []
+
+        for k in list(set(map(allgroups.__getitem__, test_index))):
+            split_test_plot.append(sum(ids[ids['patient_id'] == k]['window_count'].tolist()))
+            split_test_plot_elec.append(sum(ids[ids['patient_id'] == k]['elec_count'].tolist()))
+        split_test_plot_F.append(sum(split_test_plot))
+        split_test_elec_F.append(sum(split_test_plot_elec))
+        split_test_plot = []
+        split_test_plot_elec = []
+
         X_train, X_test = list(map(X.__getitem__, train_index)), list(map(X.__getitem__, test_index))
         Y_train, Y_test = list(map(Y.__getitem__, train_index)), list(map(Y.__getitem__, test_index))
 
@@ -521,22 +550,29 @@ def finalGroupKFold(model, name, ids, X, Y, groups, n_splits_outer=3, n_splits_i
 
         if name == "Nearest Neighbors":
             space['n_neighbors'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            model = classifiers[0]
         if name == "Linear SVM":
             space['C'] = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+            model = classifiers[1]
         if name == "RBF SVM":
             space['gamma'] = [1, 2, 5, 10, 20]
+            model = classifiers[2]
         if name == "Gaussian Process":
             space['kernel'] = ['rbf', 'sigmoid', 'poly']
             space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+            model = classifiers[3]
         if name == "Decision Tree":
             space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            model = classifiers[4]
         if name == "Random Forest":
             space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             space['n_estimators'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             space['max_features'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            model = classifiers[5]
         if name == "Neural Net":
             space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
             space['max_itter'] = [1, 10, 100, 1000, 10000]
+            model = classifiers[6]
 
         # define search
         # We can do more jobs here, check documentation
@@ -565,6 +601,50 @@ def finalGroupKFold(model, name, ids, X, Y, groups, n_splits_outer=3, n_splits_i
             best_modeL_score = acc
             best_model_ = best_model
             best_model_params = result.best_params_
+
+    # prop for split
+    Prop_train = []
+    E_mes_train = np.ones(len(split_train_elec_F))
+    k = np.zeros(len(split_train_elec_F))
+    for i in range(len(split_train_elec_F)):
+        k = split_train_elec_F[i] / split_train_plot_F[i]
+        E_mes_train[i] = E_mes_train[i] - k
+        Prop_train.append(k)
+    E_mes_train = list(E_mes_train)
+
+
+    Prop_test = []
+    E_mes_test = np.ones(len(split_test_elec_F))
+    u = np.zeros(len(split_test_elec_F))
+    for i in range(len(split_test_elec_F)):
+        u = split_test_elec_F[i] / split_test_plot_F[i]
+        E_mes_test[i] = E_mes_test[i] - u
+        Prop_test.append(u)
+    E_mes_test = list(E_mes_test)
+
+
+    x = list(np.arange(1, len(Prop_train)+1))
+    #Plot results - train
+    plt.bar(x, Prop_train, 0.6, color='r', label = "elec")
+    plt.bar(x, E_mes_train, 0.6, bottom=Prop_train, color='b')
+    plt.legend(loc = "upper left")
+    plt.title('Train_splits')
+    plt.xlabel('Split')
+    plt.ylabel('Distribution')
+    plt.savefig("Train_splits.count - Crossvalidation.png")
+    plt.show()
+
+    x2 = list(np.arange(1, len(Prop_test)+1))
+    # Plot results - test
+    plt.bar(x2, Prop_test, 0.6, color='r', label = "elec")
+    plt.bar(x2, E_mes_test, 0.6, bottom=Prop_test, color='b')
+    plt.legend(loc = "upper left")
+    plt.title('Test_splits')
+    plt.xlabel('Split')
+    plt.ylabel('Distribution')
+    plt.savefig("Test_splits.count - Crossvalidation.png")
+    plt.show()
+
     # summarize the estimated performance of the model
     print('Accuracy: %.3f (%.3f)' % (np.mean(outer_results), std(outer_results)))
     print('f1 score: %.3f (%.3f)' % (np.mean(outer_results_f1), std(outer_results_f1)))

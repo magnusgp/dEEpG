@@ -70,10 +70,18 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
     else:
         TUH = pickle.load(open(filename, 'rb'))
     """
+    # Pickle stuff
     TUH = TUH
     windowssz = 100
     #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
     #all_ids = TUH.index_patient_df.patient_id.unique()
+
+    # Non-pickle stuff
+    #TUH = TUH_data(path=dictpath)
+    #windowssz = 10
+    #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+    #TUH.sessionStat()
+
     all_idx = TUH.index_patient_df.index.unique()
     X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
     # Only view the first 25 % of the data:
@@ -89,8 +97,8 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
         #C_model = C_model_data[0][0]
         #NB_model = models[C_model]
         #best_model = GroupKFold_2(NB_model, C_model, TUH, X, y, TUH.index_patient_df)[2]
-        model, namee = SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM'
-        best_model = finalGroupKFold(model, name, TUH.index_patient_df, X, y)
+        model, name = SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM'
+        mean, std, best_model = finalGroupKFold('Linear SVM', TUH.index_patient_df, X, y)
         # debug mode
         #best_model = GroupKFold_2(SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM', TUH, X, y, TUH.index_patient_df)[2]
         #best_model = SVC(C=0.001, kernel='linear', verbose=True)
@@ -117,8 +125,8 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
         return print("No validation or evalution has been done, due to lack of choice.")
 
     #Use pickle to save classifier
-    filename = 'finalized_model.sav'
-    pickle.dump(new_model, open(filename, 'wb'))
+    #filename = 'finalized_model.sav'
+    #pickle.dump(new_model, open(filename, 'wb'))
 
 
 
@@ -147,4 +155,4 @@ if __name__ == "__main__":
     TUH.EEG_dict = pickle.load(saved_dict)
     TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")
 
-    score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = "all", multidim=False, Cross_validation=False)
+    score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = "all", multidim=False, Cross_validation=True)
