@@ -71,23 +71,34 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
     """
     TUH = TUH_data(path=dictpath)
     windowssz = 100
-    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=True)
+    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
     all_ids = TUH.index_patient_df.patient_id.unique()
     all_idx = TUH.index_patient_df.index.unique()
     X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
+    # Only view the first 25 % of the data:
+    for i in range(len(X)):
+        X[i] = X[i][:int(len(X[i]) * .25)]
+        y[i] = y[i][:int(len(y[i]) * .25)]
 
     if Cross_validation == True:
-        print("\n\nInitializing Cross Validation")
+        n_splits = 2
+        print("\n\nInitializing Group Kfold Cross Validation with n = {} splits".format(n_splits))
         #C_model_data = CrossValidation_1(models, X, y)
-        C_model_data = GroupKFoldCV(ids = TUH.index_patient_df, X=X, Y=y, models=models, n_splits=5, random_state=42)
+        C_model_data = GroupKFoldCV(ids = TUH.index_patient_df, X=X, Y=y, models=models, n_splits=n_splits, random_state=42)
         C_model = C_model_data[0][0]
         NB_model = models[C_model]
         best_model = GroupKFold_2(NB_model, C_model, TUH, X, y, TUH.index_patient_df)[2]
+        # debug mode
+        #best_model = GroupKFold_2(SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM', TUH, X, y, TUH.index_patient_df)[2]
+        #best_model = SVC(C=0.001, kernel='linear', verbose=True)
+
+        # Print the results:
         print("\n\nBest model: {}".format(best_model))
         print("Training best model on all data")
 
         #Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=0)
-        Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.2, shuffle=True)
+        Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.334, shuffle=True)
+
         # Print lengths of test and train datasetes in a table
         print("\n\nTrain and Test dataset sizes:")
         print(tabulate([["Train", len(Xtrain)], ["Test", len(Xtest)]], headers=['Dataset', 'Size'], numalign='left'))
