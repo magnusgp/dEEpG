@@ -9,9 +9,22 @@ from sklearn.model_selection import GroupKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
+
+# classifiers
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.model_selection import train_test_split
 from sklearn import datasets
 from sklearn import svm
+
+# score metric
 from sklearn.metrics import f1_score
 import random
 import pandas as pd
@@ -407,6 +420,127 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
         # define search
         # We can do more jobs here, check documentation
         search = GridSearchCV(model, space, scoring='accuracy', cv=group_kfold_inner, refit=True)
+        # execute search
+        print("\n\nTraining model: ", name)
+
+        result = search.fit(X_train, Y_train, groups=list(map(allgroups.__getitem__, train_index)))
+        # get the best performing model fit on the whole training set
+        best_model = result.best_estimator_
+        # evaluate model on the hold out dataset
+        yhat = best_model.predict(X_test)
+        # evaluate the model
+        acc = accuracy_score(Y_test, yhat)
+        f1 = f1_score(Y_test, yhat)
+        BA = balanced_accuracy_score(Y_test, yhat)
+        # store the result
+        outer_results.append(acc)
+        outer_results_f1.append(f1)
+        outer_results_BA.append(BA)
+        # report progress
+        print('>acc=%.3f, f1_score=%.3f, b_acc_score=%.3f, est=%.3f, cfg=%s' % (
+            acc, f1, BA, result.best_score_, result.best_params_))
+        # store the best performing model
+        if acc > best_modeL_score:
+            best_modeL_score = acc
+            best_model_ = best_model
+            best_model_params = result.best_params_
+    # summarize the estimated performance of the model
+    print('Accuracy: %.3f (%.3f)' % (np.mean(outer_results), std(outer_results)))
+    print('f1 score: %.3f (%.3f)' % (np.mean(outer_results_f1), std(outer_results_f1)))
+    print('Balanced accuracy: %.3f (%.3f)' % (np.mean(outer_results_BA), std(outer_results_BA)))
+    # report the best configuration
+    print('Best Config based in acc: %s for model %s' % (best_model_params, best_model_))
+
+    return [np.mean(outer_results), std(outer_results), best_model_]
+
+
+def finalGroupKFold(model, name, ids, X, Y, groups, n_splits_outer=3, n_splits_inner=2, random_state=None):
+    names = [
+        "Nearest Neighbors",
+        "Linear SVM",
+        "RBF SVM",
+        "Gaussian Process",
+        "Decision Tree",
+        "Random Forest",
+        "Neural Net",
+        #    "AdaBoost",
+        #    "Naive Bayes",
+        #    "QDA",
+    ]
+
+    classifiers = [
+        KNeighborsClassifier(3),
+        SVC(kernel="linear", C=0.025, verbose=True),
+        SVC(gamma=2, C=1, verbose=True),
+        GaussianProcessClassifier(1.0 * RBF(1.0)),
+        DecisionTreeClassifier(max_depth=5),
+        RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, verbose=True),
+        MLPClassifier(alpha=1, max_iter=1000, verbose=True),
+        #AdaBoostClassifier(),
+        #GaussianNB(),
+        #QuadraticDiscriminantAnalysis(),
+    ]
+
+
+    groups = defaultdict(list)
+    for i in range(len(ids)):
+        groups[ids['patient_id'][i]].append(i)
+
+    allgroups = []
+
+    for i in range(len(X)):
+        # All windows in the same group should have the same group index
+        for j in range(len(groups.values())):
+            if i in list(groups.values())[j]:
+                for _ in range(len(X[i])):
+                    allgroups.append(list(groups.keys())[j])
+
+    X = np.squeeze(X)
+    X = [x for xs in X for x in xs]
+    Y = np.squeeze(Y)
+    Y = [x for xs in Y for x in xs]
+
+    group_kfold_outer = GroupKFold(n_splits=len(groups))
+    group_kfold_outer.get_n_splits(X, Y, groups)
+
+    outer_results = list()
+    outer_results_f1 = list()
+    outer_results_BA = list()
+    best_modeL_score = 0
+
+    for train_index, test_index in group_kfold_outer.split(X, Y, allgroups):
+        # Split the data
+        X_train, X_test = list(map(X.__getitem__, train_index)), list(map(X.__getitem__, test_index))
+        Y_train, Y_test = list(map(Y.__getitem__, train_index)), list(map(Y.__getitem__, test_index))
+
+        # configure the cross-validation procedure
+        group_kfold_inner = GroupKFold(n_splits=len(list(set(map(allgroups.__getitem__, train_index)))))
+        group_kfold_inner.get_n_splits(X_train, Y_train, list(map(allgroups.__getitem__, train_index)))
+
+        space = dict()
+
+        if name == "Nearest Neighbors":
+            space['n_neighbors'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        if name == "Linear SVM":
+            space['C'] = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+        if name == "RBF SVM":
+            space['gamma'] = [1, 2, 5, 10, 20]
+        if name == "Gaussian Process":
+            space['kernel'] = ['rbf', 'sigmoid', 'poly']
+            space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+        if name == "Decision Tree":
+            space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        if name == "Random Forest":
+            space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            space['n_estimators'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            space['max_features'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        if name == "Neural Net":
+            space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+            space['max_itter'] = [1, 10, 100, 1000, 10000]
+
+        # define search
+        # We can do more jobs here, check documentation
+        search = GridSearchCV(model, space, scoring='accuracy', cv=group_kfold_inner, refit=True, n_jobs=-1)
         # execute search
         print("\n\nTraining model: ", name)
 

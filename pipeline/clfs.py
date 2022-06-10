@@ -18,7 +18,7 @@ from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
 import pickle
-from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2
+from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2, finalGroupKFold
 from collections import defaultdict
 from tqdm import *
 import time
@@ -84,10 +84,12 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
         n_splits = 2
         print("\n\nInitializing Group Kfold Cross Validation with n = {} splits".format(n_splits))
         #C_model_data = CrossValidation_1(models, X, y)
-        C_model_data = GroupKFoldCV(ids = TUH.index_patient_df, X=X, Y=y, models=models, n_splits=n_splits, random_state=42)
-        C_model = C_model_data[0][0]
-        NB_model = models[C_model]
-        best_model = GroupKFold_2(NB_model, C_model, TUH, X, y, TUH.index_patient_df)[2]
+        #C_model_data = GroupKFoldCV(ids = TUH.index_patient_df, X=X, Y=y, models=models, n_splits=n_splits, random_state=42)
+        #C_model = C_model_data[0][0]
+        #NB_model = models[C_model]
+        #best_model = GroupKFold_2(NB_model, C_model, TUH, X, y, TUH.index_patient_df)[2]
+        model, namee = SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM'
+        best_model = finalGroupKFold(model, name, TUH.index_patient_df, X, y)
         # debug mode
         #best_model = GroupKFold_2(SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM', TUH, X, y, TUH.index_patient_df)[2]
         #best_model = SVC(C=0.001, kernel='linear', verbose=True)
@@ -129,4 +131,4 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
 if __name__ == "__main__":
     path = "../TUH_data_sample"
     TUH = TUH_data(path=path)
-    score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=False)
+    score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=True, Evaluation=False)
