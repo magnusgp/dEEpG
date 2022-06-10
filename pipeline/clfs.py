@@ -25,7 +25,7 @@ import time
 from loadFunctions import TUH_data
 import os
 
-def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
+def electrodeCLF(dictpath, index_df, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -129,4 +129,8 @@ def electrodeCLF(dictpath, name = "all", multidim = True, Cross_validation = Fal
 if __name__ == "__main__":
     path = "../TUH_data_sample"
     TUH = TUH_data(path=path)
-    score = electrodeCLF(dictpath=path, name = "all", multidim=False, Cross_validation=False)
+    windowssz = 10
+    TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+    TUH.sessionStat()
+    P = TUH.index_patient_df
+    score = electrodeCLF(dictpath=path, index_df= P, name = "all", multidim=False, Cross_validation=False)

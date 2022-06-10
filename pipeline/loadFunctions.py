@@ -153,6 +153,8 @@ class TUH_data:
         plt.savefig("patient_statistics.png", dpi=1000, bbox_inches='tight')
         plt.show()
 
+
+
     def readRawEdf(self, edfDict=None, tWindow=120, tStep=30,
                    read_raw_edf_param={'preload': True, "stim_channel": "auto"}):
         try:
