@@ -14,7 +14,7 @@ from labelFunctions import label_TUH, annotate_TUH, solveLabelChannelRelation
 import matplotlib.pyplot as plt
 import multiprocessing
 from itertools import repeat
-import pickle
+import pickle as pickle
 from os.path import exists
 
 #plt.rcParams["font.family"] = "Times New Roman"
@@ -291,27 +291,6 @@ class TUH_data:
               "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
                                             tWindow, tStep))
 
-    def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25):
-        tic = time.time()
-        manager=multiprocessing.Manager()
-        queue=manager.Queue()
-        args = [(k, tWindow, tStep, queue) for k in range(len(self.EEG_dict))]
-
-        with multiprocessing.get_context("spawn").Pool() as pool:
-            pool.starmap(self.parallelPrep,args)
-
-        for k in range(len(self.EEG_dict)):
-            result=queue.get()
-            self.EEG_dict[k]=result[0]
-            self.index_patient_df["window_count"][k] = result[1]
-            self.index_patient_df["elec_count"][k] = result[2]
-
-        toc = time.time()
-        print("\n~~~~~~~~~~~~~~~~~~~~\n"
-              "it took %imin:%is to run electrode classifier preprocess-pipeline for %i file(s)\nwith window length [%.2fs] and t_step [%.2fs]"
-              "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
-                                            tWindow, tStep))
-
 
     def parallelPrep(self,k,tWindow=100, tStep=100 *.25,queue=None):
         print(f"Initializing prep of file {k}.")
@@ -355,10 +334,9 @@ class TUH_data:
         manager=multiprocessing.Manager()
         queue=manager.Queue()
         args = [(k, tWindow, tStep, queue) for k in indexes]
-        with multiprocessing.Pool() as pool:
+        with multiprocessing.get_context("spawn").Pool() as pool:
             results=pool.starmap(self.parallelPrepVer2,args)
-        """
-        Commented out the use of results, since we now save pickles along the way.
+
         if len(results)==len(self.EEG_dict):
             for k in range(len(results)):
                 self.EEG_dict[k] = results[k][0]
@@ -366,7 +344,7 @@ class TUH_data:
                 self.index_patient_df["elec_count"][k] = results[k][2]
 
         else:
-            print("Something went wrong, results does not match EEG_dict length.")"""
+            print("Something went wrong, results does not match EEG_dict length.")
 
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
@@ -407,15 +385,14 @@ class TUH_data:
         return (self.EEG_dict[k],self.index_patient_df["window_count"][k],self.index_patient_df["elec_count"][k])
 
     def collectEEG_dictFromPickles(self):
-        for k in range(len(self.EEG_dict)):
-            filename = self.EEG_dict[k]['id'] + self.EEG_dict[k]['patient_id'] + self.EEG_dict[k]['session'] + \
-                       os.path.split(self.EEG_dict[k]['path'])[1][:-4]
-            if exists(f"pickles/EEG_dict{filename}.pkl") and exists(f"pickles/index_patient_df{filename}.pkl"):
-                saved_dict = open(f"pickles/EEG_dict{filename}.pkl", "rb")
-                self.EEG_dict[k] = pickle.load(saved_dict)
-                temp_df=pd.read_pickle(f"pickles/index_patient_df{filename}.pkl")
-                self.index_patient_df["window_count"][k] = temp_df["window_count"][0]
-                self.index_patient_df["elec_count"][k] = temp_df["elec_count"][0]
+        for filename in tqdm(os.listdir("pickles")):
+            if filename[:8]=='EEG_dict':
+                if exists('pickles/index_patient_df'+filename[8:]):
+                    temp_df = pd.read_pickle(f"pickles/index_patient_df{filename[8:]}")
+                    id=temp_df['index'].to_list()[0]
+                    saved_dict = open(f"pickles/{filename}", "rb")
+                    self.EEG_dict[id] = pickle.load(saved_dict)
+                    self.index_patient_df = pd.concat([self.index_patient_df,temp_df])
 
 
     def parallelElectrodeCLFPrepVer3(self, tWindow=100, tStep=100 *.25):
