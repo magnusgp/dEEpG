@@ -71,13 +71,13 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
         TUH = pickle.load(open(filename, 'rb'))
     """
     # Pickle stuff
-    TUH = TUH
-    windowssz = 100
+    #TUH = TUH
+    #windowssz = 100
     #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
     #all_ids = TUH.index_patient_df.patient_id.unique()
 
     # Non-pickle stuff
-    #TUH = TUH_data(path=dictpath)
+    #TUH = TUH_data(path=path)
     #windowssz = 10
     #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
     #TUH.sessionStat()
@@ -139,12 +139,13 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
 
 if __name__ == "__main__":
     # non pickle stuff
-    """
+
     path = "../TUH_data_sample"
     TUH = TUH_data(path=path)
     windowssz = 10
-    TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+    TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25)
     TUH.sessionStat()
+    
     P = TUH.index_patient_df
     """
     # pickle stuff
@@ -154,5 +155,7 @@ if __name__ == "__main__":
     saved_dict = open("TUH_EEG_dict.pkl", "rb")
     TUH.EEG_dict = pickle.load(saved_dict)
     TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")
+    TUH.sessionStat()
+        """
 
     score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = "all", multidim=False, Cross_validation=True)

@@ -15,18 +15,18 @@ if __name__ == '__main__':
     TUH = TUH_data(path=path)
 
     #Comment in this bit if data set is to be collected from pickles:
-    """
+
     TUH.collectEEG_dictFromPickles()
     save_dict = open("TUH_EEG_dict.pkl", "wb")
     pickle.dump(TUH.EEG_dict, save_dict)
     save_dict.close()
-    TUH.index_patient_df.to_pickle("index_patient_df.pkl")"""
-
+    TUH.index_patient_df.to_pickle("index_patient_df.pkl")
+    """
     # Comment out this bit if data set is to be collected from pickles:
     # Opens pickles to define data set and info about it
     saved_dict = open("TUH_EEG_dict.pkl", "rb")
     TUH.EEG_dict = pickle.load(saved_dict)
-    TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")
+    TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")"""
 
     #plot code begins:
     x = TUH.index_patient_df['patient_id'].tolist()
