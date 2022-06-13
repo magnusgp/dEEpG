@@ -487,7 +487,7 @@ def finalGroupKFold(name, ids, X, Y, n_splits_outer=3, n_splits_inner=2, random_
 
     groups = defaultdict(list)
     for i in range(len(ids)):
-        groups[ids['patient_id'][i]].append(i)
+        groups[ids['patient_id'][i]].append(ids['index'][i])
 
     allgroups = []
 
