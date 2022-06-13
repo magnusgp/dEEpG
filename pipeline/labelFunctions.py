@@ -179,10 +179,6 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
                         plotmat[k, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
                     anno_df = pd.concat([anno_df,anno_new],ignore_index=True)
 
-            else:
-                #print("Annotation was not appended since channel was not a match")
-                pass
-
     if plot:
         sns.heatmap(plotmat)
         plt.show()
