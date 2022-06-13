@@ -494,7 +494,8 @@ def finalGroupKFold(name, ids, X, Y, n_splits_outer=3, n_splits_inner=2, random_
     for i in range(len(X)):
         # All windows in the same group should have the same group index
         for j in range(len(groups.values())):
-            if i in list(groups.values())[j]:
+            if ids['index'][i] in list(groups.values())[j]:
+
                 for _ in range(len(X[i])):
                     allgroups.append(list(groups.keys())[j])
 

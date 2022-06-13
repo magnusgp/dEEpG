@@ -1,6 +1,6 @@
 #Short script created to just use collectDataSetFromPickles.py to collect
 # a dataset for debugging use.
-from loadFunctions import TUH_data
+from loadFunctions import TUH_data,dumpPickles,openPickles
 import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,14 +16,20 @@ if __name__ == '__main__':
 
     #Comment in this bit if data set is to be collected from pickles:
     TUH.collectEEG_dictFromPickles()
+    dumpPickles(EEG_dict=TUH.EEG_dict,df=TUH.index_patient_df)
+    """
     save_dict = open("TUH_EEG_dict.pkl", "wb")
     pickle.dump(TUH.EEG_dict, save_dict)
     save_dict.close()
-    TUH.index_patient_df.to_pickle("index_patient_df.pkl")
+    TUH.index_patient_df.to_pickle("index_patient_df.pkl")"""
 
     # Comment out this bit if data set is to be collected from pickles:
     # Opens pickles to define data set and info about it
     """
+    EEG_dict,index_patient_df=openPickles()
+    TUH.EEG_dict=EEG_dict
+    TUH.index_patient_df =index_patient_df
+    
     saved_dict = open("TUH_EEG_dict.pkl", "rb")
     TUH.EEG_dict = pickle.load(saved_dict)
     TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")

@@ -334,9 +334,12 @@ class TUH_data:
         manager=multiprocessing.Manager()
         queue=manager.Queue()
         args = [(k, tWindow, tStep, queue) for k in indexes]
+        #Start multiple processes with starmap:
         with multiprocessing.get_context("spawn").Pool() as pool:
             results=pool.starmap(self.parallelPrepVer2,args)
 
+        #If all processes returned a result, collect data set from the results, otherwise it will be done
+        # from the intermediate pickles.
         if len(results)==len(self.EEG_dict):
             for k in range(len(results)):
                 self.EEG_dict[k] = results[k][0]
@@ -354,17 +357,22 @@ class TUH_data:
 
     def parallelPrepVer2(self,k,tWindow=100, tStep=100 *.25,queue=None):
         print(f"Initializing prep of file {k} with path {self.EEG_dict[k]['path']}.")
+        #Get dictionary of labels for our channels:
         annotations = solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
 
+        #Load raw data and save in self.EEG_dict[k]['rawData']
         self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
                                            read_raw_edf_param={'preload': True})
 
+        #Change channel names and only include the ones we will use, order all channels in the same way:
         self.EEG_dict[k]["rawData"] = TUH_rename_ch(self.EEG_dict[k]["rawData"])
         TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
                     'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']  # A1, A2 removed
         self.EEG_dict[k]["rawData"].pick_channels(ch_names=TUH_pick)
         self.EEG_dict[k]["rawData"].reorder_channels(TUH_pick)
 
+        #Simple preprocessing has a bandpass with excluding the low and high frequencies. Furthermore it makes a
+        # band stop filter over the american line noise at 60 Hz. And downsamples everything to be same frequency.
         simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
                          downSam=250)
 
@@ -374,14 +382,19 @@ class TUH_data:
                                                                   t_max=self.EEG_dict[k]["rawData"].times[-1],
                                                                   tStep=self.EEG_dict[k]["tStep"],
                                                                   electrodeCLF=True, df=annotations)
+
+        #Save pickle of the data in EEG_dict and for the row in the index_patient_df coresponding to this data file:
         filename=self.EEG_dict[k]['id']+self.EEG_dict[k]['patient_id']+ self.EEG_dict[k]['session'] +os.path.split(self.EEG_dict[k]['path'])[1][:-4]
-        save_dict=open(f"pickles/EEG_dict{filename}.pkl","wb")
+        """save_dict=open(f"pickles/EEG_dict{filename}.pkl","wb")
         pickle.dump(self.EEG_dict[k],save_dict)
         save_dict.close()
-        self.index_patient_df[self.index_patient_df['index']==k].to_pickle(f"pickles/index_patient_df{filename}.pkl")
+        self.index_patient_df[self.index_patient_df['index']==k].to_pickle(f"pickles/index_patient_df{filename}.pkl")"""
+        dumpPickles(EEG_dict=self.EEG_dict[k],df=self.index_patient_df[self.index_patient_df['index']==k],
+                    EEG_path=f"pickles/EEG_dict{filename}.pkl",df_path=f"pickles/index_patient_df{filename}.pkl")
 
         print(f"Finished prep of file {k}.")    
-
+        #Return the data and info in index_patient_df in case the code runs succesfully all the way, it will be used to
+        # create the big pickle of the data set.
         return (self.EEG_dict[k],self.index_patient_df["window_count"][k],self.index_patient_df["elec_count"][k])
 
     def collectEEG_dictFromPickles(self):
@@ -671,4 +684,16 @@ def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
     plt.title("channel spectrogram: " + ch_names[chan])
 
     return plt
+
+def openPickles(EEG_path="TUH_EEG_dict.pkl",df_path="index_patient_df.pkl"):
+    saved_dict = open(EEG_path, "rb")
+    EEG_dict = pickle.load(saved_dict)
+    index_patient_df = pd.read_pickle(df_path)
+    return EEG_dict,index_patient_df
+
+def dumpPickles(EEG_dict, df, EEG_path="TUH_EEG_dict.pkl",df_path="index_patient_df.pkl"):
+    save_dict = open(EEG_path, "wb")
+    pickle.dump(EEG_dict, save_dict)
+    save_dict.close()
+    df.to_pickle(df_path)
 

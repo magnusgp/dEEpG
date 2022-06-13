@@ -23,7 +23,7 @@ from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, Grou
 from collections import defaultdict
 from tqdm import *
 import time
-from loadFunctions import TUH_data
+from loadFunctions import TUH_data, openPickles
 import os
 
 def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
@@ -151,8 +151,11 @@ if __name__ == "__main__":
     path = ""
     TUH = TUH_data(path=path)
 
-    saved_dict = open("TUH_EEG_dict.pkl", "rb")
-    TUH.EEG_dict = pickle.load(saved_dict)
-    TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")
+    EEG_dict,index_patient_df=openPickles()
+    TUH.EEG_dict = EEG_dict
+    TUH.index_patient_df = index_patient_df
+    TUH.sessionStat()
 
     score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = "all", multidim=False, Cross_validation=True)
+    print("Sript is done, this is the score:")
+    print(score)

@@ -1,4 +1,4 @@
-from loadFunctions import TUH_data
+from loadFunctions import TUH_data,dumpPickles,openPickles
 #from braindecode.datasets import create_from_X_y
 from clfs import electrodeCLF
 import pickle as pickle
@@ -37,9 +37,13 @@ if __name__ == '__main__':
                 print('Failed to delete %s. Reason: %s' % (file_path, e))
 
     if exists("TUH_EEG_dict.pkl") and exists("index_patient_df.pkl"):
-        saved_dict=open("TUH_EEG_dict.pkl","rb")
+        EEG_dict, index_patient_df = openPickles()
+        TUH.EEG_dict = EEG_dict
+        TUH.index_patient_df = index_patient_df
+
+        """saved_dict=open("TUH_EEG_dict.pkl","rb")
         TUH.EEG_dict=pickle.load(saved_dict)
-        TUH.index_patient_df=pd.read_pickle("index_patient_df.pkl")
+        TUH.index_patient_df=pd.read_pickle("index_patient_df.pkl")"""
         print("Preprocessed data loaded succesfully")
 
     else:
@@ -55,10 +59,12 @@ if __name__ == '__main__':
             TUH=TUH_data(path="")
             TUH.collectEEG_dictFromPickles()
 
-        save_dict=open("TUH_EEG_dict.pkl","wb")
+        dumpPickles(EEG_dict=TUH.EEG_dict, df=TUH.index_patient_df)
+
+        """save_dict=open("TUH_EEG_dict.pkl","wb")
         pickle.dump(TUH.EEG_dict,save_dict)
         save_dict.close()
-        TUH.index_patient_df.to_pickle("index_patient_df.pkl")
+        TUH.index_patient_df.to_pickle("index_patient_df.pkl")"""
         print("Preprocessed data saved succesfully")
 
         # plot code begins:
