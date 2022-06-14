@@ -262,7 +262,7 @@ class TUH_data:
             #plt.show()
             #fig2.savefig("Gaussian_window_and_elec_count.png")
 
-            #Plot histogram of window and elec count
+            #Plot histogram of window and elec countt
             plt.scatter(y2, y1, alpha = 0.5, color = 'black')  # A bar chart
             fig3 = plt.gcf()
             plt.xlabel('window_count')

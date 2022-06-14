@@ -746,7 +746,7 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     plt.savefig("Test_splits gender distribution - Cross validation.png")
     plt.show()
 
-    #Plot distribution of age in splits
+    #Plot distribution of age in splitss
     bins = np.linspace(0, 100, 100)
     for i in range(len(x)):
         plt.hist(age_train_F[i], bins, label = i)
