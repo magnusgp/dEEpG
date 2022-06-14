@@ -256,14 +256,14 @@ class TUH_data:
             fig1.savefig("window_and_elec_count.png")
 
             #Gaussian distribution of elec and window count
-            plot = Gaussian.plot(np.mean(y1), np.std(y1), "elec_count")
-            plot = Gaussian.plot(np.mean(y2), np.std(y2), "window_count")
-            fig2 = plt.gcf()
-            plt.show()
-            fig2.savefig("Gaussian_window_and_elec_count.png")
+            #plot = Gaussian.plot(np.mean(y1), np.std(y1), "elec_count")
+            #plot = Gaussian.plot(np.mean(y2), np.std(y2), "window_count")
+            #fig2 = plt.gcf()
+            #plt.show()
+            #fig2.savefig("Gaussian_window_and_elec_count.png")
 
-            #Plot histogram of window and elec count
-            plt.bar(y2, y1, width = 2, align='center')  # A bar chart
+            #Plot histogram of window and elec countt
+            plt.scatter(y2, y1, alpha = 0.5, color = 'black')  # A bar chart
             fig3 = plt.gcf()
             plt.xlabel('window_count')
             plt.ylabel('elec_count')

@@ -523,27 +523,81 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     split_test_plot_F = []
     split_test_elec_F = []
 
-    print("\n\nTotal number of groups found: ", len(groups))
-    print("\n\nTotal length of all groups: ", len(allgroups))
+    male_count_train = 0
+    female_count_train = 0
+    unknown_count_train = 0
+    male_count_train_F = []
+    female_count_train_F = []
+    unknown_count_train_F = []
+
+    male_count_test = 0
+    female_count_test = 0
+    unknown_count_test = 0
+    male_count_test_F = []
+    female_count_test_F = []
+    unknown_count_test_F = []
+
+    age_train = []
+    age_train_F = []
+    age_test = []
+    age_test_F = []
 
     for train_index, test_index in group_kfold_outer.split(X, Y, allgroups):
         # Split the data
 
         for k in list(set(map(allgroups.__getitem__, train_index))):
+            if 'Male' in ids[ids['patient_id']==k]['Gender'].tolist():
+                male_count_train += 1
+            elif 'Female' in ids[ids['patient_id']==k]['Gender'].tolist():
+                female_count_train += 1
+            else:
+                unknown_count_train += 1
             split_train_plot.append(sum(ids[ids['patient_id']==k]['window_count'].tolist()))
             split_train_plot_elec.append(sum(ids[ids['patient_id'] == k]['elec_count'].tolist()))
+
+            age_train.append(ids[ids['patient_id']==k]['Age'].tolist()[0])
+
+        age_train_F.append(age_train)
+        age_train = []
+
         split_train_plot_F.append(sum(split_train_plot))
         split_train_elec_F.append(sum(split_train_plot_elec))
         split_train_plot = []
         split_train_plot_elec = []
 
+        male_count_train_F.append(male_count_train)
+        female_count_train_F.append(female_count_train)
+        unknown_count_train_F.append(unknown_count_train)
+        male_count_train = 0
+        female_count_train = 0
+        unknown_count_train = 0
+
         for k in list(set(map(allgroups.__getitem__, test_index))):
+            if 'Male' in ids[ids['patient_id']==k]['Gender'].tolist():
+                male_count_test += 1
+            elif 'Female' in ids[ids['patient_id']==k]['Gender'].tolist():
+                female_count_test += 1
+            else:
+                unknown_count_test += 1
+
             split_test_plot.append(sum(ids[ids['patient_id'] == k]['window_count'].tolist()))
             split_test_plot_elec.append(sum(ids[ids['patient_id'] == k]['elec_count'].tolist()))
+
+            age_test.append(ids[ids['patient_id'] == k]['Age'].tolist()[0])
+        age_test_F.append(age_test)
+        age_test = []
+
         split_test_plot_F.append(sum(split_test_plot))
         split_test_elec_F.append(sum(split_test_plot_elec))
         split_test_plot = []
         split_test_plot_elec = []
+
+        male_count_test_F.append(male_count_test)
+        female_count_test_F.append(female_count_test)
+        unknown_count_test_F.append(unknown_count_test)
+        male_count_test = 0
+        female_count_test = 0
+        unknown_count_test = 0
 
         X_train, X_test = list(map(X.__getitem__, train_index)), list(map(X.__getitem__, test_index))
         Y_train, Y_test = list(map(Y.__getitem__, train_index)), list(map(Y.__getitem__, test_index))
@@ -629,6 +683,7 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     E_mes_test = list(E_mes_test)
 
 
+    #Plot distribution of elec and window count in splits (bars)
     x = list(np.arange(1, len(Prop_train)+1))
     #Plot results - train
     plt.bar(x, Prop_train, 0.6, color='r', label = "elec")
@@ -637,7 +692,7 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     plt.title('Train_splits')
     plt.xlabel('Split')
     plt.ylabel('Distribution')
-    plt.savefig("Train_splits.count - Crossvalidation.png")
+    plt.savefig("Train_splits.count - Cross validation.png")
     plt.show()
 
     x2 = list(np.arange(1, len(Prop_test)+1))
@@ -648,7 +703,65 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     plt.title('Test_splits')
     plt.xlabel('Split')
     plt.ylabel('Distribution')
-    plt.savefig("Test_splits.count - Crossvalidation.png")
+    plt.savefig("Test_splits.count - Cross validation.png")
+    plt.show()
+
+    #Plot distribution of elec and window count in splits (scatter)
+    try:
+        C = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'lime', 'indigo', 'violet']
+        for k in range(len(split_train_plot_F)) :
+            plt.scatter(split_train_plot_F[k], split_train_elec_F[k], color=C[k])
+            plt.scatter(split_test_plot_F[k], split_test_elec_F[k], color=C[k])
+        plt.xlabel('Window_count')
+        plt.ylabel('elec_count')
+        plt.savefig("Splits_scatter.png")
+        plt.show()
+    except:
+        print("The plot sucks - max splits is 10")
+
+    #Plot distrubution of gender in outter layer of splits
+    y1 = np.array(male_count_train_F)
+    y2 = np.array(female_count_train_F)
+    y3 = np.array(unknown_count_train_F)
+    plt.bar(x, y1, color='r')
+    plt.bar(x, y2, bottom=y1, color='b')
+    plt.bar(x, y3, bottom=y1 + y2, color='y')
+    plt.xlabel("Splits")
+    plt.ylabel("Patients")
+    plt.legend(["Male", "Female", "Unknown"])
+    plt.title("Train_splits gender distribution - Cross validation")
+    plt.savefig("Train_splits gender distribution - Cross validation.png")
+    plt.show()
+
+    y1 = np.array(male_count_test_F)
+    y2 = np.array(female_count_test_F)
+    y3 = np.array(unknown_count_test_F)
+    plt.bar(x, y1, color='r')
+    plt.bar(x, y2, bottom=y1, color='b')
+    plt.bar(x, y3, bottom=y1 + y2, color='y')
+    plt.xlabel("Splits")
+    plt.ylabel("Patients")
+    plt.legend(["Male", "Female", "Unknown"])
+    plt.title("Test_splits gender distribution - Cross validation")
+    plt.savefig("Test_splits gender distribution - Cross validation.png")
+    plt.show()
+
+    #Plot distribution of age in splitss
+    bins = np.linspace(0, 100, 100)
+    for i in range(len(x)):
+        plt.hist(age_train_F[i], bins, label = i)
+    plt.legend(loc='upper right')
+    plt.xlabel("Age")
+    plt.ylabel("Occurrence")
+    plt.savefig("Train_splits age distribution - Cross validation.png")
+    plt.show()
+
+    for i in range(len(x)):
+        plt.hist(age_test_F[i], bins, label=i)
+    plt.legend(loc='upper right')
+    plt.xlabel("Age")
+    plt.ylabel("Occurrence")
+    plt.savefig("Test_splits age distribution - Cross validation.png")
     plt.show()
 
     # summarize the estimated performance of the model

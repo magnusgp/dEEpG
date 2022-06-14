@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)">
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="New plots of age, gender and more in cv splits">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pipeline/loadFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/loadFunctions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -192,13 +190,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645627443933</updated>
-    </task>
-    <task id="LOCAL-00002" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1646210602178</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1646210602178</updated>
     </task>
     <task id="LOCAL-00003" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
       <created>1647437747048</created>
@@ -536,7 +527,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654687320436</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="New plots of age, gender and more in cv splits">
+      <created>1655196068416</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1655196068429</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -571,7 +569,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="label magi" />
     <MESSAGE value="label magi updates" />
     <MESSAGE value="Changes by marie" />
     <MESSAGE value="shelves patches" />
@@ -596,24 +593,25 @@
     <MESSAGE value="Gaussian distribution of elec and window count" />
     <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot" />
     <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)" />
-    <option name="LAST_COMMIT_MESSAGE" value="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)" />
+    <MESSAGE value="New plots of age, gender and more in cv splits" />
+    <option name="LAST_COMMIT_MESSAGE" value="New plots of age, gender and more in cv splits" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>65</line>
+          <line>67</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>59</line>
+          <line>61</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pipeline/pipelineMain.py</url>
-          <line>48</line>
+          <line>50</line>
           <option name="timeStamp" value="138" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

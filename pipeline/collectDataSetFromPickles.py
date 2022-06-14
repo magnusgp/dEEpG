@@ -1,6 +1,6 @@
 #Short script created to just use collectDataSetFromPickles.py to collect
 # a dataset for debugging use.
-from loadFunctions import TUH_data,dumpPickles,openPickles
+from loadFunctions import TUH_data
 import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,18 +25,11 @@ if __name__ == '__main__':
 
     # Comment out this bit if data set is to be collected from pickles:
     # Opens pickles to define data set and info about it
-    """
-    EEG_dict,index_patient_df=openPickles()
-    TUH.EEG_dict=EEG_dict
-    TUH.index_patient_df =index_patient_df
-    
     saved_dict = open("TUH_EEG_dict.pkl", "rb")
     TUH.EEG_dict = pickle.load(saved_dict)
     TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")
-    print("Opened pickle succesfully")"""
 
     #plot code begins:
-    """
     x = TUH.index_patient_df['patient_id'].tolist()
     y1 = TUH.index_patient_df['elec_count'].tolist()
     y2 = TUH.index_patient_df['window_count'].tolist()
@@ -67,5 +60,5 @@ if __name__ == '__main__':
     plt.xlabel('window_count')
     plt.ylabel('elec_count')
     plt.show()
-    fig3.savefig("Histogram_window_and_elec_count.png")"""
+    fig3.savefig("Histogram_window_and_elec_count.png")
 
