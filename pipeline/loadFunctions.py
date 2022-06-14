@@ -270,55 +270,6 @@ class TUH_data:
             plt.show()
             fig3.savefig("Histogram_window_and_elec_count.png")
 
-    def parallelElectrodeCLFPrep(self, tWindow=100, tStep=100 *.25,plot=False):
-        tic = time.time()
-        manager=multiprocessing.Manager()
-        queue=manager.Queue()
-        args = [(k, tWindow, tStep, plot, queue) for k in range(len(self.EEG_dict))]
-
-        with multiprocessing.get_context("spawn").Pool() as pool:
-            pool.starmap(self.parallelPrep,args)
-
-        for k in range(len(self.EEG_dict)):
-            result=queue.get()
-            self.EEG_dict[k]=result[0]
-            self.index_patient_df["window_count"][k] = result[1]
-            self.index_patient_df["elec_count"][k] = result[2]
-
-        toc = time.time()
-        print("\n~~~~~~~~~~~~~~~~~~~~\n"
-              "it took %imin:%is to run electrode classifier preprocess-pipeline for %i file(s)\nwith window length [%.2fs] and t_step [%.2fs]"
-              "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
-                                            tWindow, tStep))
-
-
-    def parallelPrep(self,k,tWindow=100, tStep=100 *.25,queue=None):
-        print(f"Initializing prep of file {k}.")
-        annotations = solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
-
-        self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
-                                           read_raw_edf_param={'preload': True})
-
-        self.EEG_dict[k]["rawData"] = TUH_rename_ch(self.EEG_dict[k]["rawData"])
-        TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
-                    'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']  # A1, A2 removed
-        self.EEG_dict[k]["rawData"].pick_channels(ch_names=TUH_pick)
-        self.EEG_dict[k]["rawData"].reorder_channels(TUH_pick)
-
-        simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
-                         downSam=250)
-
-        # Generate output windows for (X,y) as (array, label)
-        self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k],\
-        self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
-                                                                  t_max=self.EEG_dict[k]["rawData"].times[-1],
-                                                                  tStep=self.EEG_dict[k]["tStep"],
-                                                                  electrodeCLF=True, df=annotations)
-
-        queue.put((self.EEG_dict[k],self.index_patient_df["window_count"][k],self.index_patient_df["elec_count"][k]))
-
-        print(f"Finished prep of file {k}.")
-
     def indexNotPickled(self):
         indexes=[]
         for k in range(len(self.EEG_dict)):
