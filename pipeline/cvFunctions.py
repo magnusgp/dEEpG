@@ -222,12 +222,13 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
 
     allgroups = []
 
-    for i in range(len(X)):
-        # All windows in the same group should have the same group index
-        for j in range(len(groups.values())):
-            if i in list(groups.values())[j]:
-                for _ in range(len(X[i])):
-                    allgroups.append(list(groups.keys())[j])
+    # All windows in the same group should have the same group index
+    for j in groups.values():
+        Xt, Yt = TUH.makeDataSetFromIds(j)
+        for _ in range(len(Xt)):
+            allgroups.append(list(groups.keys())[j])
+        X.append(Xt)
+        Y.append(Yt)
 
     # Merge windows lists in X that have the same group index
     for i in range(len(X)):
@@ -337,12 +338,13 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
 
     allgroups = []
 
-    for i in range(len(X)):
-        # All windows in the same group should have the same group index
-        for j in range(len(groups.values())):
-            if i in list(groups.values())[j]:
-                for _ in range(len(X[i])):
-                    allgroups.append(list(groups.keys())[j])
+    # All windows in the same group should have the same group index
+    for j in groups.values():
+        Xt, Yt = TUH.makeDataSetFromIds(j)
+        for _ in range(len(Xt)):
+            allgroups.append(list(groups.keys())[j])
+        X.append(Xt)
+        Y.append(Yt)
 
     # Merge windows lists in X that have the same group index
     """
@@ -455,7 +457,7 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
     return [np.mean(outer_results), std(outer_results), best_model_]
 
 
-def finalGroupKFold(name, ids, X, Y, n_splits_outer=3, n_splits_inner=2, random_state=None):
+def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
         "Nearest Neighbors",
         "Linear SVM",
@@ -520,6 +522,9 @@ def finalGroupKFold(name, ids, X, Y, n_splits_outer=3, n_splits_inner=2, random_
     split_test_plot_elec = []
     split_test_plot_F = []
     split_test_elec_F = []
+
+    print("\n\nTotal number of groups found: ", len(groups))
+    print("\n\nTotal length of all groups: ", len(allgroups))
 
     for train_index, test_index in group_kfold_outer.split(X, Y, allgroups):
         # Split the data
