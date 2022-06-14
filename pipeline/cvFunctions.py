@@ -749,12 +749,16 @@ def finalGroupKFold(name, ids, X, Y, n_splits_outer=3, n_splits_inner=2, random_
     for i in range(len(x)):
         plt.hist(age_train_F[i], bins, label = i)
     plt.legend(loc='upper right')
+    plt.xlabel("Age")
+    plt.ylabel("Occurrence")
     plt.savefig("Train_splits age distribution - Cross validation.png")
     plt.show()
 
     for i in range(len(x)):
         plt.hist(age_test_F[i], bins, label=i)
     plt.legend(loc='upper right')
+    plt.xlabel("Age")
+    plt.ylabel("Occurrence")
     plt.savefig("Test_splits age distribution - Cross validation.png")
     plt.show()
 
