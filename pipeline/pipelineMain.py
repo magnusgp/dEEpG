@@ -12,6 +12,8 @@ from multiprocessing import freeze_support,set_start_method
 from statFunctions import sessionStat
 import threading
 import numpy as np
+import matplotlib.pyplot as plt
+from loadFunctions import Gaussian
 
 if __name__ == '__main__':
     set_start_method("spawn")
