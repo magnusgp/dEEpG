@@ -26,7 +26,7 @@ import time
 from loadFunctions import TUH_data, openPickles
 import os
 
-def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation = False, Evaluation = False):
+def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation = False, Evaluation = False, loadFromPickle = False):
     h = 0.02  # step size in the mesh
 
     names = [
@@ -71,16 +71,19 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
         TUH = pickle.load(open(filename, 'rb'))
     """
     # Pickle stuff
-    TUH = TUH
-    windowssz = 100
-    #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
-    #all_ids = TUH.index_patient_df.patient_id.unique()
-
-    # Non-pickle stuff
-    #TUH = TUH_data(path=dictpath)
-    #windowssz = 10
-    #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
-    #TUH.sessionStat()
+    if loadFromPickle:
+        TUH = TUH
+        windowssz = 100
+        #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
+        #all_ids = TUH.index_patient_df.patient_id.unique()
+    else:
+        # Non-pickle stuff
+        #dictpath = ""
+        #TUH = TUH_data(path=dictpath)
+        TUH = TUH
+        windowssz = 10
+        #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+        #TUH.sessionStat()
 
     all_idx = TUH.index_patient_df.index.unique()
     X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
@@ -98,7 +101,7 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
         #NB_model = models[C_model]
         #best_model = GroupKFold_2(NB_model, C_model, TUH, X, y, TUH.index_patient_df)[2]
         model, name = SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM'
-        mean, std, best_model = finalGroupKFold('Linear SVM', TUH.index_patient_df, X, y)
+        mean, std, best_model = finalGroupKFold(name, TUH.index_patient_df, X, y, TUH)
         # debug mode
         #best_model = GroupKFold_2(SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM', TUH, X, y, TUH.index_patient_df)[2]
         #best_model = SVC(C=0.001, kernel='linear', verbose=True)
@@ -128,33 +131,31 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
     #filename = 'finalized_model.sav'
     #pickle.dump(new_model, open(filename, 'wb'))
 
-
-
-
-
     if Evaluation == True:
         pass
 
     return print("Model has been evaluated and stored")
 
 if __name__ == "__main__":
+    pickling = True
     # non pickle stuff
-    """
-    path = "../TUH_data_sample"
-    TUH = TUH_data(path=path)
-    windowssz = 10
-    TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
-    TUH.sessionStat()
-    P = TUH.index_patient_df
-    """
+    if not pickling:
+        path = "../TUH_data_sample"
+        TUH = TUH_data(path=path)
+        windowssz = 100
+        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+        TUH.sessionStat()
+        P = TUH.index_patient_df
     # pickle stuff
-    path = ""
-    TUH = TUH_data(path=path)
+    if pickling:
+        path = ""
+        TUH = TUH_data(path=path)
 
-    saved_dict = open("TUH_EEG_dict.pkl", "rb")
-    TUH.EEG_dict = pickle.load(saved_dict)
-    TUH.index_patient_df = pd.read_pickle("index_patient_df.pkl")
-
+        EEG_dict,index_patient_df=openPickles()
+        TUH.EEG_dict = EEG_dict
+        TUH.index_patient_df = index_patient_df
+        TUH.sessionStat()
+    # scoring
     score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = "all", multidim=False, Cross_validation=True)
     print("Sript is done, this is the score:")
     print(score)
