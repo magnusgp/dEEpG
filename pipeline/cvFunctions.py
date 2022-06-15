@@ -777,6 +777,17 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
     # report the best configuration
     print('Best Config based in acc: %s for model %s' % (best_model_params, best_model_))
 
+    # put all performance metrics into a dataframe
+    performance_metrics = pd.DataFrame(
+        {'Accuracy': outer_results,
+            'f1_score': outer_results_f1,
+            'Balanced accuracy': outer_results_BA})
+    performance_metrics.index = outer_results_BA.index
+    # save to a txt file with the name of the classifier
+    performance_metrics.to_csv(str(best_model_) + '_performance_metrics_cross_validation.csv')
+    print('Performance metrics saved to performance_metrics_cross_validation.csv')
+    print('---------------------------------------------------------------------------------------------------------------------')
+
     return [np.mean(outer_results), std(outer_results), best_model_]
     
 if __name__ == "__main__":
