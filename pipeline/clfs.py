@@ -155,6 +155,7 @@ if __name__ == "__main__":
         TUH.EEG_dict = EEG_dict
         TUH.index_patient_df = index_patient_df
         TUH.sessionStat()
+
     # scoring
     score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = "all", multidim=False, Cross_validation=True)
     print("Sript is done, this is the score:")

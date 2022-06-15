@@ -481,7 +481,7 @@ class TUH_data:
 
 
     def makeDatasetFromIds(self,ids=None):
-        # Needs list of Ids/indexes in EEG_dict. Function electrodeCLFPrep should be called beforehand.
+        # Needs list of Ids/indexes in EEG_dict. One of the functions electrodeCLFPrep should be called beforehand.
         # Collects all windows of all given ids into one list of X (window data) and Y corresponding labels
         Xwindows = []
         Ywindows = []

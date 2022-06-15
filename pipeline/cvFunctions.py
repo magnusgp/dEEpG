@@ -772,7 +772,7 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     print('Best Config based in acc: %s for model %s' % (best_model_params, best_model_))
 
     return [np.mean(outer_results), std(outer_results), best_model_]
-
+    
 if __name__ == "__main__":
     pass
     #Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
