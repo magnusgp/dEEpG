@@ -8,7 +8,7 @@ def simplePreprocess(MNE_raw=None, lpfq=1, hpfq=40, notchfq=60, downSam=100, cap
     MNE_raw.set_montage(mne.channels.make_standard_montage(kind=cap_setup, head_size=0.095), on_missing="warn")
 
     # In america there is a line-noise at around 60 Hz, which i
-    MNE_raw.notch_filter(freqs=notchfq, notch_widths=5)
+    MNE_raw.notch_filter(freqs=notchfq, notch_widths=1)
 
     # Resample so all signals have the same sampling frequency
     MNE_raw.resample(sfreq=downSam)
