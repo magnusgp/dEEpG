@@ -165,7 +165,7 @@ def splitDataset(data, ratio, shuffle=False):
 
     # Get patient IDs and shuffle them random
     ids = []
-    for i in range(len(data)):
+    for i in data.keys():
         ids.append(data[i]['patient_id'])
 
     patients = list(set(ids))
@@ -183,7 +183,7 @@ def splitDataset(data, ratio, shuffle=False):
     # Make test and training datasets
     test_data = []
     train_data = []
-    for i in range(len(data)):
+    for i in data.keys():
         if data[i]['patient_id'] in test:
             test_data.append(data[i])
         elif data[i]['patient_id'] in train:
@@ -687,7 +687,7 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     x = list(np.arange(1, len(Prop_train)+1))
     #Plot results - train
     plt.bar(x, Prop_train, 0.6, color='r', label = "elec")
-    plt.bar(x, E_mes_train, 0.6, bottom=Prop_train, color='b')
+    plt.bar(x, E_mes_train, 0.6, bottom=Prop_train, color='b', label="null")
     plt.legend(loc = "upper left")
     plt.title('Train_splits')
     plt.xlabel('Split')
