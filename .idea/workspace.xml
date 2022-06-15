@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="New plots of age, gender and more in cv splits">
+      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/.finalized_model.sav.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pipeline/cvFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/cvFunctions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/skraldespand.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/skraldespand.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,11 +172,11 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.clfs" />
+      <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.pipelineMain" />
       <item itemvalue="Python.pipeline_main" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
-      <item itemvalue="Python.labelFunctions" />
-      <item itemvalue="Python.clfs" />
     </list>
     <recent_temporary>
       <list>
