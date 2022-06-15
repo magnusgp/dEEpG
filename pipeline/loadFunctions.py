@@ -85,7 +85,7 @@ class TUH_data:
         age = []
         gender = []
 
-        for k in range(len(self.EEG_dict)):
+        for k in self.EEG_dict.keys():
             # Collect data about the files:
             data = self.EEG_dict[k]["rawData"]
             session_lengths.append(data.n_times / data.info['sfreq'])
@@ -128,6 +128,8 @@ class TUH_data:
                         gender.append('Male')
                     elif s.find('boy') != -1:
                         gender.append('Male')
+                    else:
+                        gender.append('Unknown')
                     self.index_patient_df['Gender'][k] = gender[-1]
                 except:
                     pass
@@ -137,20 +139,33 @@ class TUH_data:
         print("Average session length: {:.3f}".format(np.mean(session_lengths)))
         print("Average patient age: {:.3f}".format(np.mean(age)))
 
-        fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(12, 3))
+        #Check that all years are fairly recent.
+        years=np.asarray(years)
+        old_record=years[years<=1975]
+        print("Found old recordings from:")
+        print(old_record)
+        print("These are not included in plot")
+        years=years[years >= 1975].tolist()
 
-        ax[0].hist(session_lengths, bins=20, rwidth=0.90, color="#000088")
-        ax[0].grid(axis='y')
-        ax[0].set_ylabel(r'{Count}', size=18)
-        ax[0].set_xlabel(r'{Session length}', size=18)
+        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(8, 8))
+
+        ax[0,0].hist(session_lengths, bins=20, rwidth=0.90, color="#000088")
+        ax[0,0].grid(axis='y')
+        ax[0,0].set_ylabel(r'Count', size=18)
+        ax[0,0].set_xlabel(r'Session length', size=18)
         # ax[0].set_yscale('log')
-        ax[1].hist(years, bins=8, rwidth=0.90, color="#000088")
-        ax[1].grid(axis='y')
-        ax[1].set_xlabel(r'{Year of recording}', size=18)
-        ax[2].hist(age, bins=20, rwidth=0.90, color="#000088")
-        ax[2].grid(axis='y')
-        ax[2].set_xlabel(r'{Age of patient}', size=18)
-        # plt.tight_layout()
+        ax[0,1].hist(years, bins=20, rwidth=0.90, color="#000088")
+        ax[0,1].grid(axis='y')
+        ax[0,1].set_xlabel(r'Year of recording', size=18)
+        ax[1,0].hist(age, bins=20, rwidth=0.90, color="#000088")
+        ax[1,0].grid(axis='y')
+        ax[1,0].set_ylabel(r'Count', size=18)
+        ax[1,0].set_xlabel(r'Age of patient', size=18)
+        #ax[1,1].bar(, y1, color='r')
+        ax[1,1].hist(gender, bins=3, rwidth=0.90, color="#000088")
+        ax[1,1].grid(axis='y')
+        ax[1,1].set_xlabel(r'Gender of patient', size=18)
+        #plt.tight_layout()
         plt.savefig("patient_statistics.png", dpi=1000, bbox_inches='tight')
         plt.show()
 
@@ -195,16 +210,21 @@ class TUH_data:
             self.EEG_dict[k]["rawData"].reorder_channels(TUH_pick)
 
             if k == 0 and plot:
-                #Plot the energy voltage potential against frequency.
-                self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
+                """#Plot the energy voltage potential against frequency.
+                figpsd, ax = plt.subplots(nrows=2,ncols=1,figsize=(10, 6))
+                self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, ax=ax[0], fmax=125, average=True, show=False)
+                ax[0].set_title('Power Spectral Density (PSD) before filtering',size=18)
+                ax[0].set_ylabel('PSD (dB)', size=14)"""
 
-                """
-                raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"],df=annotations)
+                """raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"],df=annotations)
+                #mne.viz.plot_raw(raw_anno,clipping=1)
                 raw_anno.plot()
-                plt.title("Untouched raw signal")
-                plt.show()
+                #plt.title("Untouched raw signal with elec artifacts")
                 plt.savefig('Untouched_raw_signal.png')
-                """
+                plt.show()"""
+                pass
+
+
             simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
                      downSam=250)
 
@@ -212,15 +232,21 @@ class TUH_data:
                 self.sfreq = self.EEG_dict[k]["rawData"].info["sfreq"]
                 self.ch_names = self.EEG_dict[k]["rawData"].info["ch_names"]
                 if plot:
-                    self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125, average=True)
+                    """self.EEG_dict[k]["rawData"].plot_psd(tmax=np.inf, fmax=125,ax=ax[1], average=True, show=False)
+                    ax[1].set_title('Power Spectral Density (PSD) after filtering',size=18)
+                    ax[1].set_xlabel('Frequency (Hz)',size=14)
+                    ax[1].set_ylabel('PSD (dB)', size=14)
+                    figpsd.set_tight_layout(True)
+                    plt.savefig("psd_before_after.png", dpi=1000, bbox_inches='tight')
+                    plt.show()"""
 
-                    """
                     raw_anno = annotate_TUH(self.EEG_dict[k]["rawData"], df=annotations)
-                    raw_anno.plot()
-                    plt.title("Raw signal after simple preprocessing")
-                    plt.show()
+                    raw_anno.plot(clipping=1)
+                    #plt.title("Raw signal with elec artifact after simple preprocessing")
                     plt.savefig('Raw_signal_post_processing.png')
-                    """
+                    plt.show()
+
+
 
             # Generate output windows for (X,y) as (array, label)
             self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k], self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
