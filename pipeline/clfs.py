@@ -85,12 +85,12 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
         #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
         #TUH.sessionStat()
 
-    all_idx = TUH.index_patient_df.index.unique()
-    X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
+    #all_idx = TUH.index_patient_df.index.unique()
+    #X, y, windowInfo = TUH.makeDatasetFromIds(ids=all_idx)
     # Only view the first 25 % of the data:
-    for i in range(len(X)):
-        X[i] = X[i][:int(len(X[i]) * .25)]
-        y[i] = y[i][:int(len(y[i]) * .25)]
+    #for i in range(len(X)):
+    #    X[i] = X[i][:int(len(X[i]) * .25)]
+    #    y[i] = y[i][:int(len(y[i]) * .25)]
 
     if Cross_validation == True:
         n_splits = 2
@@ -101,7 +101,7 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
         #NB_model = models[C_model]
         #best_model = GroupKFold_2(NB_model, C_model, TUH, X, y, TUH.index_patient_df)[2]
         model, name = SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM'
-        mean, std, best_model = finalGroupKFold(name, TUH.index_patient_df, X, y, TUH)
+        mean, std, best_model = finalGroupKFold(name, TUH.index_patient_df, TUH)
         # debug mode
         #best_model = GroupKFold_2(SVC(C=0.025, kernel='linear', verbose=True), 'Linear SVM', TUH, X, y, TUH.index_patient_df)[2]
         #best_model = SVC(C=0.001, kernel='linear', verbose=True)
@@ -134,16 +134,17 @@ def electrodeCLF(TUH, index_df, name = "all", multidim = True, Cross_validation 
     if Evaluation == True:
         pass
 
-    return print("Model has been evaluated and stored")
+    return print("Finished processing!")
 
 if __name__ == "__main__":
-    pickling = True
+    pickling = False
     # non pickle stuff
     if not pickling:
         path = "../TUH_data_sample"
         TUH = TUH_data(path=path)
         windowssz = 100
-        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+        #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
+        TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25, plot=False)
         TUH.sessionStat()
         P = TUH.index_patient_df
     # pickle stuff
