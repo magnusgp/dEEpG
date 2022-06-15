@@ -224,7 +224,7 @@ def GroupKFoldCV(ids, X, Y, models, n_splits=5, random_state=None):
 
     # All windows in the same group should have the same group index
     for j in groups.values():
-        Xt, Yt = TUH.makeDataSetFromIds(j)
+        Xt, Yt = TUH.makeDatasetFromIds(j)
         for _ in range(len(Xt)):
             allgroups.append(list(groups.keys())[j])
         X.append(Xt)
@@ -340,7 +340,7 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
 
     # All windows in the same group should have the same group index
     for j in groups.values():
-        Xt, Yt = TUH.makeDataSetFromIds(j)
+        Xt, Yt = TUH.makeDatasetFromIds(j)
         for _ in range(len(Xt)):
             allgroups.append(list(groups.keys())[j])
         X.append(Xt)
@@ -456,8 +456,7 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
 
     return [np.mean(outer_results), std(outer_results), best_model_]
 
-
-def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, random_state=None):
+def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
         "Nearest Neighbors",
         "Linear SVM",
@@ -491,20 +490,27 @@ def finalGroupKFold(name, ids, X, Y, TUH, n_splits_outer=3, n_splits_inner=2, ra
     for i in ids.index:
         groups[ids['patient_id'][i]].append(ids['index'][i])
 
-    allgroups = []
+    allgroups, X, Y = [], [], []
+    # All windows in the same group should have the same group index
+    for j in groups.values():
+        Xt, Yt, windowInfo = TUH.makeDatasetFromIds(j)
+        c = 0
+        for k in range(len(j)):
+            X.append(Xt[k])
+            Y.append(Yt[k])
+            c += len(Xt[k])
+        allgroups.append([c * [list(groups.keys())[list(groups.values()).index(j)]]])
 
-    for i in range(len(X)):
-        # All windows in the same group should have the same group index
-        for j in range(len(groups.values())):
-            if ids['index'][i] in list(groups.values())[j]:
 
-                for _ in range(len(X[i])):
-                    allgroups.append(list(groups.keys())[j])
+    allgroups = [g for gs in allgroups for g in gs]
+    allgroups = [g for gs in allgroups for g in gs]
 
-    X = np.squeeze(X)
+
+
+    #X = np.squeeze(X)
     X = [x for xs in X for x in xs]
-    Y = np.squeeze(Y)
-    Y = [x for xs in Y for x in xs]
+    #Y = np.squeeze(Y)
+    Y = [y for ys in Y for y in ys]
 
     group_kfold_outer = GroupKFold(n_splits=len(groups))
     group_kfold_outer.get_n_splits(X, Y, groups)
