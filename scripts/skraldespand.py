@@ -125,3 +125,29 @@ def prep(self, tWindow=100, tStep=100 * .25, plot=False):
     # Save and fit classifier
     new_model = classifiers[best_model_index].fit(Xtrain, ytrain)
     """
+
+
+    # allgroups ?
+    """
+    allgroups, X, Y = [], [], []
+    # All windows in the same group should have the same group index
+    for j in groups.values():
+        Xt, Yt, windowInfo = TUH.makeDatasetFromIds(j)
+        for k in range(len(j)):
+            X.append(Xt[k])
+            Y.append(Yt[k])
+            for idx in list(groups.values()):
+                if len(j) > 1:
+                    if j[k] == list(groups.values()).index(idx):
+                        for l in range(len(Xt)):
+                            if type(l) == int:
+                                for __ in range(len(Xt[0])):
+                                    allgroups.append(list(groups.keys())[j[k]])
+                            else:
+                                for __ in range(len(Xt[l])):
+                                    allgroups.append(list(groups.keys())[j[k]])
+                elif len(j) == 1:
+                    if j == list(groups.values()).index(idx):
+                        for _ in range(len(Xt[k])):
+                            allgroups.append(list(groups.keys())[j[k]])
+    """
