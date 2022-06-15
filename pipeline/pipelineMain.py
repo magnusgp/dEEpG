@@ -1,7 +1,7 @@
 from loadFunctions import TUH_data,dumpPickles,openPickles
 #from braindecode.datasets import create_from_X_y
 from clfs import electrodeCLF
-import pickle as pickle
+import pickle
 from cvFunctions import splitDataset
 from datetime import datetime
 from os.path import exists
