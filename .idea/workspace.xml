@@ -4,14 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="New plots of age, gender and more in cv splits">
-      <change beforePath="$PROJECT_DIR$/.idea/dEEpG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dEEpG.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="681eb482-4823-466c-900b-a027fa28e27f" name="Changes" comment="save results">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_03_06_2022,_15_25_[Changes]1/00013103_s001_t000.edf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TUH_data_sample/010/00001006/s001_2003_04_28/00001006_s001_t001.edf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TUH_data_sample/039/00003977/s001_2007_03_26/00003977_s001_t000.edf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TUH_data_sample/039/00003977/s001_2007_03_26/00003977_s001_t001.edf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TUH_data_sample/131/00013103/s001_2015_09_30/00013103_s001_t000.edf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/.finalized_model.sav.icloud" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/clfs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/clfs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pipeline/cvFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pipeline/cvFunctions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/skraldespand.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/skraldespand.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,11 +174,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.clfs" />
-      <item itemvalue="Python.labelFunctions" />
       <item itemvalue="Python.pipelineMain" />
       <item itemvalue="Python.pipeline_main" />
       <item itemvalue="Python.plot_tuh_eeg_corpus" />
+      <item itemvalue="Python.labelFunctions" />
+      <item itemvalue="Python.clfs" />
     </list>
     <recent_temporary>
       <list>
@@ -196,41 +198,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645627443933</updated>
-    </task>
-    <task id="LOCAL-00003" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647437747048</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1647437747048</updated>
-    </task>
-    <task id="LOCAL-00004" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647437877128</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1647437877128</updated>
-    </task>
-    <task id="LOCAL-00005" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647438156890</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1647438156890</updated>
-    </task>
-    <task id="LOCAL-00006" summary="loadData script and preprocessing from david Nyrnberg. Script to use functions called prepareData">
-      <created>1647438377335</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1647438377335</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Two temple data samples">
-      <created>1647439137416</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1647439137416</updated>
     </task>
     <task id="LOCAL-00008" summary="David EEG loader and prep implement">
       <created>1648046740264</created>
@@ -540,7 +507,42 @@
       <option name="project" value="LOCAL" />
       <updated>1655196068429</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="clfs now writes a text file with results">
+      <created>1655301421418</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1655301421418</updated>
+    </task>
+    <task id="LOCAL-00053" summary="cvFunctions now writes a csv file with results">
+      <created>1655301443771</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1655301443771</updated>
+    </task>
+    <task id="LOCAL-00054" summary="even more trash">
+      <created>1655301455199</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1655301455199</updated>
+    </task>
+    <task id="LOCAL-00055" summary="misc/workspace">
+      <created>1655301465855</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1655301465855</updated>
+    </task>
+    <task id="LOCAL-00056" summary="save results">
+      <created>1655362145726</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1655362145727</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -575,11 +577,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="label magi updates" />
-    <MESSAGE value="Changes by marie" />
-    <MESSAGE value="shelves patches" />
-    <MESSAGE value="Changes to solveLabelChannelRelation, splitting of double labels etc." />
-    <MESSAGE value="split functions between loadFunction.py and new labelFunctions.py" />
     <MESSAGE value="change structure to have raw and windows in EEG_dict and two functions for handling of this" />
     <MESSAGE value="pandas df patient id index overview" />
     <MESSAGE value="spring cleaning" />
@@ -600,7 +597,12 @@
     <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot" />
     <MESSAGE value="New plots for Gaussian distribution of elec and window count + histogram plot (nu gemmes plottene)" />
     <MESSAGE value="New plots of age, gender and more in cv splits" />
-    <option name="LAST_COMMIT_MESSAGE" value="New plots of age, gender and more in cv splits" />
+    <MESSAGE value="clfs now writes a text file with results" />
+    <MESSAGE value="cvFunctions now writes a csv file with results" />
+    <MESSAGE value="even more trash" />
+    <MESSAGE value="misc/workspace" />
+    <MESSAGE value="save results" />
+    <option name="LAST_COMMIT_MESSAGE" value="save results" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
