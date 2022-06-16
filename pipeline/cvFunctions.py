@@ -637,7 +637,7 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
             model = classifiers[5]
         if name == "Neural Net":
             space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
-            space['max_itter'] = [1, 10, 100, 1000, 10000]
+            space['max_iter'] = [1, 10, 100, 1000, 10000]
             model = classifiers[6]
 
         # define search
@@ -783,7 +783,7 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
             'f1_score': outer_results_f1,
             'Balanced accuracy': outer_results_BA})
     performance_metrics.index = outer_results_BA.index
-    # save to a txt file with the name of the classifier
+    # save to a csv file with the name of the classifier
     performance_metrics.to_csv(str(best_model_) + '_performance_metrics_cross_validation.csv')
     print('Performance metrics saved to performance_metrics_cross_validation.csv')
     print('---------------------------------------------------------------------------------------------------------------------')
