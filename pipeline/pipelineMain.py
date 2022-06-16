@@ -20,7 +20,7 @@ if __name__ == '__main__':
     freeze_support()
 
     # Define path of outer directory for samples:
-    path="TUHdata"
+    path="..\TUH_data_sample"
 
     # Create class for data and find all edf files in path, and save in EEG_dict:
     TUH=TUH_data(path=path)
@@ -48,28 +48,6 @@ if __name__ == '__main__':
         TUH.index_patient_df=pd.read_pickle("index_patient_df.pkl")"""
         print("Preprocessed data loaded succesfully")
 
-    else:
-        # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
-        # Ywindows (labels as list of strings) to use for electrode artifact classifier:
-        windowssz = 10
-        #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25)
-        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
-
-        # Check i EEG_dict has not already been made. If it has not been made, it means not all preprocessing
-        # was succesful and we should instead collect from the pickles:
-        if np.sum(TUH.index_patient_df["window_count"].to_list())==0:
-            TUH=TUH_data(path="")
-            TUH.collectEEG_dictFromPickles()
-
-        dumpPickles(EEG_dict=TUH.EEG_dict, df=TUH.index_patient_df)
-
-        """save_dict=open("TUH_EEG_dict.pkl","wb")
-        pickle.dump(TUH.EEG_dict,save_dict)
-        save_dict.close()
-        TUH.index_patient_df.to_pickle("index_patient_df.pkl")"""
-        print("Preprocessed data saved succesfully")
-
-        # plot code begins:
         x = TUH.index_patient_df['patient_id'].tolist()
         y1 = TUH.index_patient_df['elec_count'].tolist()
         y2 = TUH.index_patient_df['window_count'].tolist()
@@ -79,30 +57,83 @@ if __name__ == '__main__':
                 y2_m.append(item1 - item2)
         except:
             y2_m = [0]
-            print("Number of recorded counts for elec and windows doesn't match in dataframe")
+            print("Number of recorded counts for elec and windows dosen't match in dataframe")
 
-        plt.bar(x, y1, 0.6, color='r')
-        plt.bar(x, y2_m, 0.6, bottom=y1, color='b')
+        f, (ax2, ax) = plt.subplots(2, 1, sharex=True, facecolor='w')
+        ax.bar(x, y1, 0.6, color='r', label="elec")
+        ax.bar(x, y2_m, 0.6, bottom=y1, color='b', label="null")
+        ax2.bar(x, y1, 0.6, color='r', label="elec")
+        ax2.bar(x, y2_m, 0.6, bottom=y1, color='b', label="null")
+
+        ax.set_ylim(0, 25000)
+        ax2.set_ylim(52000, 71000)
+        ax.spines['top'].set_visible(False)
+        ax.tick_params(axis='x', bottom=False)
+        ax2.spines['bottom'].set_visible(False)
+        ax2.tick_params(axis='x',bottom=False)
+        ax2.xaxis.set_ticklabels([])
+
+        d = .015  # how big to make the diagonal lines in axes coordinates
+        # arguments to pass plot, just so we don't keep repeating them
+        kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+        ax.plot((-d, +d), (1 - d, 1 + d), **kwargs)
+        ax.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+
+        kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
+        ax2.plot((1 - d, 1 + d),(-d, +d), **kwargs)
+        ax2.plot((-d, +d), (-d, +d), **kwargs)
+        ax2.legend(loc="upper left")
+        plt.ylabel("Window count", size=14)
+        f.add_subplot(111,frame_on=False)
+        plt.tick_params(labelcolor="none", bottom=False, left=False)
+        plt.xlabel("The data files",size=14)
+        plt.title("Count of elec and null windows in data files", size=18)
+
         fig1 = plt.gcf()
         plt.show()
-        fig1.savefig("window_and_elec_count.png")
+        fig1.savefig("window_and_elec_count.png", dpi=220)
 
-        # Gaussian distribution of elec and window count
-        plot = Gaussian.plot(np.mean(y1), np.std(y1), "elec_count")
-        plot = Gaussian.plot(np.mean(y2), np.std(y2), "window_count")
-        fig2 = plt.gcf()
+        """
+        plt.bar(x, y1, 0.6, color='r',label="elec")
+        plt.bar(x, y2_m, 0.6, bottom=y1, color='b', label="null")
+        
+        
+        ax1=plt.gca()
+        ax1.axes.xaxis.set_ticklabels([])
+        ax1.axes.set_yscale('log')
+        plt.legend(loc="upper left")
+        fig1 = plt.gcf()
         plt.show()
-        fig2.savefig("Gaussian_window_and_elec_count.png")
+        fig1.savefig("window_and_elec_count.png", dpi=220)"""
 
-        # Plot histogram of window and elec count
-        plt.bar(y2, y1, width=2, align='center')  # A bar chart
+
+        # Plot histogram of window and elec countt
+        plt.scatter(y2, y1, alpha=0.5, color='black')  # A bar chart
         fig3 = plt.gcf()
-        plt.xlabel('window_count')
-        plt.ylabel('elec_count')
+        plt.xlabel('Window count',size=14)
+        plt.ylabel('Elec count',size=14)
+        plt.title("Data files plotted with window vs. elec count",size=18)
         plt.show()
-        fig3.savefig("Histogram_window_and_elec_count.png")
+        fig3.savefig("Histogram_window_and_elec_count.png", dpi=220)
 
-    TUH.sessionStat()
+    else:
+        # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
+        # Ywindows (labels as list of strings) to use for electrode artifact classifier:
+        windowssz = 10
+        #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25)
+        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25, limit=1000)
+
+        # Check i EEG_dict has not already been made. If it has not been made, it means not all preprocessing
+        # was succesful and we should instead collect from the pickles:
+        if np.sum(TUH.index_patient_df["window_count"].to_list())==0:
+            TUH=TUH_data(path="")
+            TUH.collectEEG_dictFromPickles()
+
+        dumpPickles(EEG_dict=TUH.EEG_dict, df=TUH.index_patient_df)
+
+        print("Preprocessed data saved succesfully")
+
+    #TUH.sessionStat()
 
 
 """
