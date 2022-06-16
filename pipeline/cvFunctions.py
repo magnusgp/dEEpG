@@ -10,6 +10,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
 
+from plot_cv import plot_cv_indices
+
 # classifiers
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -20,6 +22,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn import datasets
 from sklearn import svm
@@ -30,6 +33,7 @@ import random
 import pandas as pd
 from loadFunctions import TUH_data
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 
 def CrossValidation_2(model, name, X, Y, n_splits_outer=3, n_splits_inner=2, random_state=None):
     names = [
@@ -40,6 +44,7 @@ def CrossValidation_2(model, name, X, Y, n_splits_outer=3, n_splits_inner=2, ran
         "Decision Tree",
         "Random Forest",
         "Neural Net",
+        "Logistic Regression",
         #    "AdaBoost",
         #    "Naive Bayes",
         #    "QDA",
@@ -465,6 +470,7 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
         "Decision Tree",
         "Random Forest",
         "Neural Net",
+        "Logistic Regression",
         #    "AdaBoost",
         #    "Naive Bayes",
         #    "QDA",
@@ -480,6 +486,8 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
         DecisionTreeClassifier(max_depth=5),
         RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, verbose=True),
         MLPClassifier(alpha=1, max_iter=1000, verbose=True),
+        LogisticRegression(random_state=0),
+        
         #AdaBoostClassifier(),
         #GaussianNB(),
         #QuadraticDiscriminantAnalysis(),
@@ -547,6 +555,27 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
     age_train_F = []
     age_test = []
     age_test_F = []
+    
+    cvs = [GroupKFold]
+    
+    rng = np.random.RandomState(1338)
+    cmap_data = plt.cm.Paired
+    cmap_cv = plt.cm.coolwarm
+    n_splits = 5
+    
+    for cv in cvs:
+        fig, ax = plt.subplots(figsize=(6,3))
+        plot_cv_indices(cv(n_splits), X, Y, allgroups, ax, n_splits)
+        ax.legend(
+        [Patch(color=cmap_cv(0.8)), Patch(color=cmap_cv(0.02))],
+        ["Testing set", "Training set"],
+        loc=(1.02, 0.8),
+        )
+        
+        plt.tight_layout()
+        fig.subplots_adjust(right=0.7)
+        
+        plt.savefig("GroupKFold_behaviour.png")
 
     for train_index, test_index in group_kfold_outer.split(X, Y, allgroups):
         # Split the data
@@ -622,10 +651,11 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
             model = classifiers[1]
         if name == "RBF SVM":
             space['gamma'] = [1, 2, 5, 10, 20]
+            space['C'] = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
             model = classifiers[2]
         if name == "Gaussian Process":
             space['kernel'] = ['rbf', 'sigmoid', 'poly']
-            space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+            #space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
             model = classifiers[3]
         if name == "Decision Tree":
             space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -637,8 +667,12 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
             model = classifiers[5]
         if name == "Neural Net":
             space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
-            space['max_itter'] = [1, 10, 100, 1000, 10000]
+            space['max_iter'] = [1, 10, 100, 1000, 10000]
             model = classifiers[6]
+        if name == "Logistic Regression":
+            space['penalty'] = ['elasticnet', 'l1', 'l2', 'none']
+            space['solver'] = ['saga']
+            model = classifiers[7]
 
         # define search
         # We can do more jobs here, check documentation
@@ -777,6 +811,16 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
     # report the best configuration
     print('Best Config based in acc: %s for model %s' % (best_model_params, best_model_))
 
+    # put all performance metrics into a dataframe
+    #performance_metrics = pd.DataFrame(
+    #    {'Accuracy': outer_results,
+    #        'f1_score': outer_results_f1,
+    #        'Balanced accuracy': outer_results_BA})
+    #performance_metrics.index = outer_results_BA.index
+    # save to a txt file with the name of the classifier
+    #performance_metrics.to_csv(str(best_model_) + '_performance_metrics_cross_validation.csv')
+    #print('Performance metrics saved to performance_metrics_cross_validation.csv')
+    #print('---------------------------------------------------------------------------------------------------------------------')
     return [np.mean(outer_results), std(outer_results), best_model_]
     
 if __name__ == "__main__":
