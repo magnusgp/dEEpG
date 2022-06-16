@@ -627,6 +627,8 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=Fa
             while new_elec_count!=elec_goal and new_window_count!=limit:
                 window_key=random.choice(list(window_EEG.keys()))
                 window=window_EEG[window_key]
+                del window_EEG[window_key]
+
                 if window[1]==['elec']:
                     if new_elec_count<elec_goal:
                         new_window_EEG[window_key]=window
