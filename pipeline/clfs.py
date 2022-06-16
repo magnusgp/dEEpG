@@ -14,6 +14,7 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.multioutput import MultiOutputClassifier
+from sklearn.linear_model import LogisticRegression
 from tabulate import tabulate
 import pandas as pd
 from operator import itemgetter
@@ -41,6 +42,7 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
         "Decision Tree",
         "Random Forest",
         "Neural Net",
+        "Logistic Regression",
     ]
 
     if name not in names:
@@ -55,6 +57,7 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
         DecisionTreeClassifier(max_depth=5),
         RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, verbose=True),
         MLPClassifier(alpha=1, max_iter=1000, verbose=True),
+        LogisticRegression(random_state=0),
     ]
 
     #Create dict for classification
@@ -82,6 +85,7 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
         score = new_model.score(Xtest, ytest)
         print("\n\nBest model: {}".format(best_model))
         print("\n\nBest model score: {} %".format(str(score * 100)))
+        print("Time: {} s".format(str(time.time() - start_time)))
 
     else:
         pass
@@ -91,11 +95,11 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
         pass
 
     # Create text file with name of the best model, its parameters, its score and the time it took to train it
-    with open("results/electrode_clf_results.txt", "a") as f:
-        f.write("\n\nBest model: {}".format(best_model))
-        f.write("\n\nBest model parameters: {}".format(best_model.get_params()))
-        f.write("\n\nBest model score: {} %".format(str(score * 100)))
-        f.write("\n\nTime to train model: {}".format(str(time.time() - start_time)))
+    #with open("results/electrode_clf_results.txt", "a") as f:
+    #    f.write("\n\nBest model: {}".format(best_model))
+    #    f.write("\n\nBest model parameters: {}".format(best_model.get_params()))
+    #    f.write("\n\nBest model score: {} %".format(str(score * 100)))
+    #    f.write("\n\nTime to train model: {}".format(str(time.time() - start_time)))
 
     return print("Finished processing!")
 
@@ -115,7 +119,7 @@ if __name__ == "__main__":
     n_outer_splits = args.outer_splits
     n_inner_splits = args.inner_splits
 
-    pickling = False
+    pickling = True
     # non pickle stuff
     if not pickling:
         path = "../TUH_data_sample"
@@ -133,7 +137,7 @@ if __name__ == "__main__":
         EEG_dict,index_patient_df=openPickles()
         TUH.EEG_dict = EEG_dict
         TUH.index_patient_df = index_patient_df
-        TUH.sessionStat()
+        #TUH.sessionStat()
 
     # scoring
     score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = name, Cross_validation=True, Evaluation=False, n_outer_splits=n_outer_splits, n_inner_splits=n_inner_splits)
