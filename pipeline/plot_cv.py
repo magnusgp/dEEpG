@@ -11,7 +11,7 @@ n_splits = 4
 def plot_cv_indices(cv, X, y, group, ax, n_splits, lw=10):
     """Create a sample plot for indices of a cross-validation object."""
     glist, clist = [], []
-    id = 0
+    id = -1
     for i in range(len(group)):
         if group[i] not in glist:
             id = id + 1
