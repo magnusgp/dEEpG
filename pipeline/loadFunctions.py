@@ -16,6 +16,7 @@ import multiprocessing
 from itertools import repeat
 import pickle as pickle
 from os.path import exists
+import random
 
 #plt.rcParams["font.family"] = "Times New Roman"
 
@@ -305,12 +306,12 @@ class TUH_data:
                 indexes.append(k)
         return indexes
 
-    def parallelElectrodeCLFPrepVer2(self, tWindow=100, tStep=100 *.25):
+    def parallelElectrodeCLFPrepVer2(self, tWindow=100, tStep=100 *.25,limit=None):
         tic = time.time()
         indexes=self.indexNotPickled()
         manager=multiprocessing.Manager()
         queue=manager.Queue()
-        args = [(k, tWindow, tStep, queue) for k in indexes]
+        args = [(k, tWindow, tStep, queue, limit) for k in indexes]
         #Start multiple processes with starmap:
         with multiprocessing.get_context("spawn").Pool() as pool:
             results=pool.starmap(self.parallelPrepVer2,args)
@@ -332,7 +333,7 @@ class TUH_data:
               "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
                                             tWindow, tStep))
 
-    def parallelPrepVer2(self,k,tWindow=100, tStep=100 *.25,queue=None):
+    def parallelPrepVer2(self,k,tWindow=100, tStep=100 *.25,queue=None,limit=None):
         print(f"Initializing prep of file {k} with path {self.EEG_dict[k]['path']}.")
         #Get dictionary of labels for our channels:
         annotations = solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
@@ -358,7 +359,7 @@ class TUH_data:
         self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
                                                                   t_max=self.EEG_dict[k]["rawData"].times[-1],
                                                                   tStep=self.EEG_dict[k]["tStep"],
-                                                                  electrodeCLF=True, df=annotations)
+                                                                  electrodeCLF=True, df=annotations, limit=limit)
 
         #Save pickle of the data in EEG_dict and for the row in the index_patient_df coresponding to this data file:
         filename=self.EEG_dict[k]['id']+self.EEG_dict[k]['patient_id']+ self.EEG_dict[k]['session'] +os.path.split(self.EEG_dict[k]['path'])[1][:-4]
@@ -544,7 +545,7 @@ def makeArrayWindow(MNE_raw=None, t0=0, tWindow=120):
     return chWindows
 
 
-def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=False):
+def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=False, limit=None):
     #If electrodeCLF is set to true, the function outputs a window per channel
     # with labels assigned only for this channel.
 
@@ -608,6 +609,38 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=Fa
         else:
             window_label = label_TUH(dataFrame=df, window=[t_start, t_end])  # , saveDir=annoDir)
             window_EEG[window_key] = (window_data, window_label)
+
+    # If we want to select only a max amount from each person with priority for elec
+    # This is probably not the smartest way. Would be better to somehow not make all the
+    # windows, but decide the time intervals based on the annotation data frame. But we
+    # don't have much time.
+    if limit:
+        #If the limit is higher than the window count we don't want to remove any data
+        if limit<window_count:
+            new_window_EEG={}
+            new_elec_count=0
+            new_window_count=0
+            if elec_count<=limit/2:
+                elec_goal=elec_count
+            else:
+                elec_goal=limit//2
+            while new_elec_count!=elec_goal and new_window_count!=limit:
+                window_key=random.choice(list(window_EEG.keys()))
+                window=window_EEG[window_key]
+                del window_EEG[window_key]
+
+                if window[1]==['elec']:
+                    if new_elec_count<elec_goal:
+                        new_window_EEG[window_key]=window
+                        new_elec_count+=1
+                        new_window_count+=1
+                elif new_window_count<limit:
+                    new_window_EEG[window_key]=window
+                    new_window_count+=1
+
+            window_EEG=new_window_EEG
+            window_count=new_window_count
+            elec_count=new_elec_count
     return window_EEG, window_count, elec_count
 
 def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
