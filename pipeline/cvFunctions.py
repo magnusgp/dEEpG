@@ -461,7 +461,7 @@ def GroupKFold_2(model, name, TUH, X, Y, ids, n_splits_outer=3, n_splits_inner=2
 
     return [np.mean(outer_results), std(outer_results), best_model_]
 
-def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_state=None):
+def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_state=None, stratMethod = "patient"):
     names = [
         "Nearest Neighbors",
         "Linear SVM",
@@ -493,34 +493,38 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
         #QuadraticDiscriminantAnalysis(),
     ]
 
+    if stratMethod == "patient":
+        groups = defaultdict(list)
+        for i in ids.index:
+            groups[ids['patient_id'][i]].append(ids['index'][i])
 
-    groups = defaultdict(list)
-    for i in ids.index:
-        groups[ids['patient_id'][i]].append(ids['index'][i])
-
-    allgroups, X, Y = [], [], []
-    # All windows in the same group should have the same group index
-    for j in groups.values():
-        Xt, Yt, windowInfo = TUH.makeDatasetFromIds(j)
-        c = 0
-        for k in range(len(j)):
-            X.append(Xt[k])
-            Y.append(Yt[k])
-            c += len(Xt[k])
-        allgroups.append([c * [list(groups.keys())[list(groups.values()).index(j)]]])
+        allgroups, X, Y = [], [], []
+        # All windows in the same group should have the same group index
+        for j in groups.values():
+            Xt, Yt, windowInfo = TUH.makeDatasetFromIds(j)
+            c = 0
+            for k in range(len(j)):
+                X.append(Xt[k])
+                Y.append(Yt[k])
+                c += len(Xt[k])
+            allgroups.append([c * [list(groups.keys())[list(groups.values()).index(j)]]])
 
 
     allgroups = [g for gs in allgroups for g in gs]
     allgroups = [g for gs in allgroups for g in gs]
 
-
+    #g2 = []
+    #for i in range(5):
+    #    for j in range(len(allgroups)):
+    #        if allgroups[j] in list(set(allgroups))[i*((len(list(set(allgroups)))//5)):(i+1)*(len(list(set(allgroups)))//5)]:
+    #            g2.append(i)
 
     #X = np.squeeze(X)
     X = [x for xs in X for x in xs]
     #Y = np.squeeze(Y)
     Y = [y for ys in Y for y in ys]
 
-    group_kfold_outer = GroupKFold(n_splits=len(groups))
+    group_kfold_outer = GroupKFold(n_splits=n_splits_outer)
     group_kfold_outer.get_n_splits(X, Y, groups)
 
     outer_results = list()
@@ -576,6 +580,7 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
         fig.subplots_adjust(right=0.7)
         
         plt.savefig("GroupKFold_behaviour.png")
+        plt.show()
 
     for train_index, test_index in group_kfold_outer.split(X, Y, allgroups):
         # Split the data
@@ -638,7 +643,7 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
         Y_train, Y_test = list(map(Y.__getitem__, train_index)), list(map(Y.__getitem__, test_index))
 
         # configure the cross-validation procedure
-        group_kfold_inner = GroupKFold(n_splits=len(list(set(map(allgroups.__getitem__, train_index)))))
+        group_kfold_inner = GroupKFold(n_splits=n_splits_inner)
         group_kfold_inner.get_n_splits(X_train, Y_train, list(map(allgroups.__getitem__, train_index)))
 
         space = dict()
@@ -676,7 +681,7 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
 
         # define search
         # We can do more jobs here, check documentation
-        search = GridSearchCV(model, space, scoring='accuracy', cv=group_kfold_inner, refit=True, n_jobs=-1)
+        search = GridSearchCV(model, space, scoring='balanced_accuracy', cv=group_kfold_inner, refit=True, n_jobs=-1)
         # execute search
         print("\n\nTraining model: ", name)
 

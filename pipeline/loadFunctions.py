@@ -326,6 +326,7 @@ class TUH_data:
 
         else:
             print("Something went wrong, results does not match EEG_dict length.")
+            print(len(results),len(self.EEG_dict))
 
         toc = time.time()
         print("\n~~~~~~~~~~~~~~~~~~~~\n"
@@ -594,7 +595,7 @@ def slidingRawWindow(EEG_series=None, t_max=0, tStep=1,electrodeCLF=False, df=Fa
         t_start = (t_N - window_width) / edf_fS
         t_end = t_N / edf_fS
         window_key = "window_%.3fs_%.3fs" % (t_start, t_end)
-        window_data = makeArrayWindow(EEG_series["rawData"], t0=i, tWindow=window_width)
+        window_data = makeArrayWindow(EEG_series["rawData"], t0=1, tWindow=window_width)
         if electrodeCLF:
             for i in range(len(window_data)):
                 chan=EEG_series['rawData'].info['ch_names'][i]

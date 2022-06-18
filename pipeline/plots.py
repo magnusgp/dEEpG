@@ -1,4 +1,4 @@
-		plt.bar(x, y1, 0.6, color='r')
+"""		plt.bar(x, y1, 0.6, color='r')
         plt.bar(x, y2_m, 0.6, bottom=y1, color='b')
         fig1 = plt.gcf()
         plt.show()
@@ -18,3 +18,4 @@
         plt.ylabel('elec_count')
         plt.show()
         fig3.savefig("Histogram_window_and_elec_count.png")
+"""

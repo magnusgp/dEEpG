@@ -20,7 +20,7 @@ if __name__ == '__main__':
     freeze_support()
 
     # Define path of outer directory for samples:
-    path="..\TUH_data_sample"
+    path="data"
 
     # Create class for data and find all edf files in path, and save in EEG_dict:
     TUH=TUH_data(path=path)
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         # Ywindows (labels as list of strings) to use for electrode artifact classifier:
         windowssz = 10
         #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25)
-        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25, limit=1000)
+        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25, limit=500)
 
         # Check i EEG_dict has not already been made. If it has not been made, it means not all preprocessing
         # was succesful and we should instead collect from the pickles:

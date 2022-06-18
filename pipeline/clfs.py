@@ -64,8 +64,6 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
     models = dict(zip(names, classifiers))
 
     if Cross_validation == True:
-        n_splits_outer = 5
-        n_splits_inner = 5
         print("\n\nInitializing Group Kfold Cross Validation with n = {} outer splits and n = {} inner splits".format(n_splits_outer, n_splits_inner))
         name = name
         mean, std, best_model = finalGroupKFold(name, TUH.index_patient_df, TUH, n_splits_outer=n_splits_outer, n_splits_inner=n_splits_inner, random_state=None)
@@ -74,7 +72,7 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
         print("\n\nBest model: {}".format(best_model))
         print("Training best model on all data")
 
-        Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.334, shuffle=True)
+        Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.2, shuffle=True)
 
         # Print lengths of test and train datasetes in a table
         print("\n\nTrain and Test dataset sizes:")
@@ -107,7 +105,8 @@ if __name__ == "__main__":
     seed = 42
     np.random.seed(seed)
     random.seed(seed)
-
+    # Comment this in for bash arguments
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--classifier', action='store', type=str, required=True)
     parser.add_argument('--outer_splits', action='store', type=int, required=True)
@@ -118,8 +117,14 @@ if __name__ == "__main__":
     name = args.classifier
     n_outer_splits = args.outer_splits
     n_inner_splits = args.inner_splits
+    """
+    # Comment this out for bash arguments
+    name = "Nearest Neighbors"
+    n_outer_splits = 5
+    n_inner_splits = 5
 
-    pickling = True
+    # Remember to set this before run
+    pickling = False
     # non pickle stuff
     if not pickling:
         path = "../TUH_data_sample"
