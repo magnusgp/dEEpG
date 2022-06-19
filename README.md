@@ -20,8 +20,16 @@ python3 pipelineMain.py --limit 200
 Where the limit argument is the limit of windows in the downsampled dataset. To run the experiment without limit, use --limit 0
 
 ## Preprocessing
-To preprocess the raw .edf EEG data files, we use preprocessing tools which are inspired by tools created by David Nyrnberg. Those tools can be found in the following repository:
+To preprocess the raw .edf EEG data files, we use preprocessing tools which are inspired by tools created by David Nyrnberg. 
+Those tools can be found in the following repository:
 https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG
+
+The preprocessing of the files is done automatically when running the pipelineMain script:
+```python
+python3 pipelineMain.py --limit 0
+```
+
+The tools can be found in the files pipeline/loadFunctions.py, pipeline/labelFunctions.py and pipeline/preprocessFunctions.py
 
 ## Experiments
 The project carried 3 main experiments out:
