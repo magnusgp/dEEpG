@@ -14,9 +14,9 @@ To run the code and the experiments, the TUH EEG Artifact Corpus v2.0.0 is neede
 https://www.isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml
 
 In order to create the .pkl files for running experiment code, please run the following:
-'''python
+```python
 python3 pipelineMain.py --limit 200
-'''
+```
 Where the limit argument is the limit of windows in the downsampled dataset. To run the experiment without limit, use --limit 0
 
 ## Preprocessing
@@ -26,16 +26,16 @@ https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG
 ## Experiments
 The project carried 3 main experiments out:
 - **Model Selection Experiment**
-'''python
+```python
 python3 clfs.py --classifier "Nearest Neighbors" --n_outer_splits 5 --n_inner_splits 5 --fromPickle 1
-'''
+```
 Runs the Nearst Neighbors classifier with data from a .pkl file (created by the pipelineMain.py call) using GroupKFoldCV with 5 inner and outer splits.
 Remember to set the path for the correct .pkl file suitable for the experiment (with 11 files for model selection).
 
 - **Classification Experiment**
-'''python
+```python
 python3 clfs.py --classifier "Logistic Regression" --n_outer_splits 5 --n_inner_splits 5 --fromPickle 0
-'''
+```
 Runs the Logistic Regression classifier with data from raw .edf data using GroupKFoldCV with 5 inner and outer splits. 
 Remember to set the path for the correct .pkl file suitable for the experiment (with 310 files for model selection).
 
@@ -43,9 +43,9 @@ Remember to set the path for the correct .pkl file suitable for the experiment (
 
 
 - **Annotation Algorithm Experiment**
-'''python
+```python
 python3 visualizations.py
-'''
+```
 Runs the annotation algorithm and visualizes event types for overlap cheecking.
 
 ## Credits
