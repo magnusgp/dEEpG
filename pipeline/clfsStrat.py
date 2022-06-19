@@ -66,7 +66,7 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
     if Cross_validation == True:
         print("\n\nInitializing Group Kfold Cross Validation with n = {} outer splits and n = {} inner splits".format(n_splits_outer, n_splits_inner))
         name = name
-        mean, std, best_model = finalGroupKFold(name, TUH.index_patient_df, TUH, n_splits_outer=n_splits_outer, n_splits_inner=n_splits_inner, random_state=None)
+        mean, std, best_model = stratGroupKFold2(name, TUH.index_patient_df, TUH, n_splits_outer=n_splits_outer, n_splits_inner=n_splits_inner, random_state=None)
 
         # Print the results:
         print("\n\nBest model: {}".format(best_model))
@@ -120,8 +120,8 @@ if __name__ == "__main__":
     """
     # Comment this out for bash arguments
     name = "Nearest Neighbors"
-    n_outer_splits = 5
-    n_inner_splits = 5
+    n_outer_splits = 3
+    n_inner_splits = 2
 
     # Remember to set this before run
     pickling = True
@@ -145,6 +145,6 @@ if __name__ == "__main__":
         #TUH.sessionStat()
 
     # scoring
-    score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = name, Cross_validation=True, Evaluation=False, n_splits_outer=n_outer_splits, n_splits_inner   =n_inner_splits)
+    score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = name, Cross_validation=True, Evaluation=False, n_splits_outer=n_outer_splits, n_splits_inner =n_inner_splits)
     print("Script is done, this is the score:")
     print(score)
