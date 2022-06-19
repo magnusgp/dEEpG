@@ -45,16 +45,21 @@ Remember to set the path for the correct .pkl file suitable for the experiment (
 python3 clfs.py --classifier "Logistic Regression" --n_outer_splits 5 --n_inner_splits 5 --fromPickle 0
 ```
 Runs the Logistic Regression classifier with data from raw .edf data using GroupKFoldCV with 5 inner and outer splits. 
-Remember to set the path for the correct .pkl file suitable for the experiment (with 310 files for model selection).
+Remember to set the path for the correct .pkl file suitable for the experiment (with 177 files for model selection).
 
 - **CV Stratification Experiment**
+```python
+python3 clfs.py --classifier "Logistic Regression" --n_outer_splits 5 --n_inner_splits 5 --stratification 1
+```
+Runs the Logistic Regression classifier with data from .pkl data using stratified GroupKFoldCV with 5 inner and outer splits. 
+Remember to set the path for the correct .pkl file suitable for the experiment (with 177 files for model selection).
 
 
 - **Annotation Algorithm Experiment**
 ```python
 python3 visualizations.py
 ```
-Runs the annotation algorithm and visualizes event types for overlap cheecking.
+Runs the annotation algorithm and visualizes event types for overlap cheecking. Remember to set path for desired data file to be checked
 
 ## Credits
 The project was carried out by s204052, s204075 and s200431.
