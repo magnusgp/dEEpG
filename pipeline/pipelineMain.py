@@ -20,7 +20,7 @@ if __name__ == '__main__':
     freeze_support()
 
     # Define path of outer directory for samples:
-    path="data"
+    path="TUHdata"
 
     # Create class for data and find all edf files in path, and save in EEG_dict:
     TUH=TUH_data(path=path)
@@ -51,6 +51,7 @@ if __name__ == '__main__':
         x = TUH.index_patient_df['patient_id'].tolist()
         y1 = TUH.index_patient_df['elec_count'].tolist()
         y2 = TUH.index_patient_df['window_count'].tolist()
+
         try:
             y2_m = list()
             for item1, item2 in zip(y2, y1):
@@ -59,6 +60,8 @@ if __name__ == '__main__':
             y2_m = [0]
             print("Number of recorded counts for elec and windows dosen't match in dataframe")
 
+        """
+        #Nice plot for whole data set with y-axis jump
         f, (ax2, ax) = plt.subplots(2, 1, sharex=True, facecolor='w')
         ax.bar(x, y1, 0.6, color='r', label="elec")
         ax.bar(x, y2_m, 0.6, bottom=y1, color='b', label="null")
@@ -91,37 +94,38 @@ if __name__ == '__main__':
 
         fig1 = plt.gcf()
         plt.show()
-        fig1.savefig("window_and_elec_count.png", dpi=220)
-
-        """
-        plt.bar(x, y1, 0.6, color='r',label="elec")
-        plt.bar(x, y2_m, 0.6, bottom=y1, color='b', label="null")
-        
-        
-        ax1=plt.gca()
-        ax1.axes.xaxis.set_ticklabels([])
-        ax1.axes.set_yscale('log')
-        plt.legend(loc="upper left")
-        fig1 = plt.gcf()
-        plt.show()
         fig1.savefig("window_and_elec_count.png", dpi=220)"""
 
 
-        # Plot histogram of window and elec countt
+
+        plt.bar(x, y1, 0.8, color='r',label="elec")
+        plt.bar(x, y2_m, 0.8, bottom=y1, color='b', label="null")
+        ax1=plt.gca()
+        ax1.axes.xaxis.set_ticklabels([])
+        plt.legend(loc="upper left")
+        plt.ylabel("Window count", size=14)
+        plt.xlabel("The data files", size=14)
+        plt.title("Elec and null count in data files w. limitation", size=18)
+        fig1 = plt.gcf()
+        plt.show()
+        fig1.savefig("window_and_elec_count.png", dpi=220)
+
+
+        """# Plot histogram of window and elec countt
         plt.scatter(y2, y1, alpha=0.5, color='black')  # A bar chart
         fig3 = plt.gcf()
         plt.xlabel('Window count',size=14)
         plt.ylabel('Elec count',size=14)
         plt.title("Data files plotted with window vs. elec count",size=18)
         plt.show()
-        fig3.savefig("Histogram_window_and_elec_count.png", dpi=220)
+        fig3.savefig("Histogram_window_and_elec_count.png", dpi=220)"""
 
     else:
         # Load edf to raw, simple preprocessing, make Xwindows (all windows as arrays) and
         # Ywindows (labels as list of strings) to use for electrode artifact classifier:
-        windowssz = 10
+        windowssz = 5
         #TUH.electrodeCLFPrep(tWindow=windowssz, tStep=windowssz * .25)
-        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25, limit=500)
+        TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25, limit=1000)
 
         # Check i EEG_dict has not already been made. If it has not been made, it means not all preprocessing
         # was succesful and we should instead collect from the pickles:
