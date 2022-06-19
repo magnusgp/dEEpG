@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import GroupKFold
+from sklearn.model_selection import GroupKFold, StratifiedGroupKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
@@ -827,7 +827,380 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
     #print('Performance metrics saved to performance_metrics_cross_validation.csv')
     #print('---------------------------------------------------------------------------------------------------------------------')
     return [np.mean(outer_results), std(outer_results), best_model_]
-    
+
+def stratGroupKFold2(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_state=None, stratMethod="patient"):
+    names = [
+        "Nearest Neighbors",
+        "Linear SVM",
+        "RBF SVM",
+        "Gaussian Process",
+        "Decision Tree",
+        "Random Forest",
+        "Neural Net",
+        "Logistic Regression",
+        #    "AdaBoost",
+        #    "Naive Bayes",
+        #    "QDA",
+    ]
+    if name not in names:
+        print("The selected model is not valid. Please try again mark")
+
+    classifiers = [
+        KNeighborsClassifier(3),
+        SVC(kernel="linear", C=0.025, verbose=True),
+        SVC(gamma=2, C=1, verbose=True),
+        GaussianProcessClassifier(1.0 * RBF(1.0)),
+        DecisionTreeClassifier(max_depth=5),
+        RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, verbose=True),
+        MLPClassifier(alpha=1, max_iter=1000, verbose=True)
+    ]
+
+    if stratMethod == "patient":
+        groups = defaultdict(list)
+        for i in ids.index:
+            groups[ids['patient_id'][i]].append(ids['index'][i])
+
+        allgroups, X, Y = [], [], []
+        # All windows in the same group should have the same group index
+        for j in groups.values():
+            Xt, Yt, windowInfo = TUH.makeDatasetFromIds(j)
+            c = 0
+            for k in range(len(j)):
+                X=X+Xt[k]
+                Y=Y+Yt[k]
+                c += len(Xt[k])
+            allgroups=allgroups + c * [list(groups.keys())[list(groups.values()).index(j)]]
+
+    #allgroups =[g for gs in allgroups for g in gs]
+    #allgroups = [g for gs in allgroups for g in gs]
+
+    #MApping every patient id to a number, however it did not seem to help the splits and caused trouble with plots:
+    #unique_patients = list(set(allgroups))
+    #pat_dict = dict(zip(unique_patients, range(len(unique_patients))))
+    #allgroups = list(map(pat_dict.get, allgroups))
+
+    allgroups=np.asarray(allgroups, dtype='object')
+
+    # g2 = []
+    # for i in range(5):
+    #    for j in range(len(allgroups)):
+    #        if allgroups[j] in list(set(allgroups))[i*((len(list(set(allgroups)))//5)):(i+1)*(len(list(set(allgroups)))//5)]:
+    #            g2.append(i)
+
+    # X = np.squeeze(X)
+    #X = [[x] for x in X]
+    #X = [x for xs in X for x in xs]
+    X = np.asarray(X, dtype='object')
+    Y = np.squeeze(Y)
+    #Y = [y for ys in Y for y in ys]
+    #Y = np.asarray(Y, dtype='object')
+
+    group_kfold_outer = StratifiedGroupKFold(n_splits=n_splits_outer)
+    group_kfold_outer.get_n_splits(X, Y, groups)
+
+    outer_results = list()
+    outer_results_f1 = list()
+    outer_results_BA = list()
+    best_modeL_score = 0
+
+    split_train_plot = []
+    split_train_plot_elec = []
+    split_train_plot_F = []
+    split_train_elec_F = []
+    split_test_plot = []
+    split_test_plot_elec = []
+    split_test_plot_F = []
+    split_test_elec_F = []
+
+    male_count_train = 0
+    female_count_train = 0
+    unknown_count_train = 0
+    male_count_train_F = []
+    female_count_train_F = []
+    unknown_count_train_F = []
+
+    male_count_test = 0
+    female_count_test = 0
+    unknown_count_test = 0
+    male_count_test_F = []
+    female_count_test_F = []
+    unknown_count_test_F = []
+
+    age_train = []
+    age_train_F = []
+    age_test = []
+    age_test_F = []
+
+    cvs = [GroupKFold]
+
+    rng = np.random.RandomState(1338)
+    cmap_data = plt.cm.Paired
+    cmap_cv = plt.cm.coolwarm
+    n_splits = 3
+
+    for cv in cvs:
+        fig, ax = plt.subplots(figsize=(6, 3))
+        plot_cv_indices(cv(n_splits), X, Y, allgroups, ax, n_splits)
+        ax.legend(
+            [Patch(color=cmap_cv(0.8)), Patch(color=cmap_cv(0.02))],
+            ["Testing set", "Training set"],
+            loc=(1.02, 0.8),
+        )
+
+        plt.tight_layout()
+        fig.subplots_adjust(right=0.7)
+
+        plt.savefig("GroupKFold_behaviour.png")
+        plt.show()
+
+    for train_index, test_index in group_kfold_outer.split(X, Y, allgroups):
+        # Split the data
+
+        for k in list(set(map(allgroups.__getitem__, train_index))):
+            if 'Male' in ids[ids['patient_id'] == k]['Gender'].tolist():
+                male_count_train += 1
+            elif 'Female' in ids[ids['patient_id'] == k]['Gender'].tolist():
+                female_count_train += 1
+            else:
+                unknown_count_train += 1
+            split_train_plot.append(sum(ids[ids['patient_id'] == k]['window_count'].tolist()))
+            split_train_plot_elec.append(sum(ids[ids['patient_id'] == k]['elec_count'].tolist()))
+
+            age_train.append(ids[ids['patient_id'] == k]['Age'].tolist()[0])
+
+        age_train_F.append(age_train)
+        age_train = []
+
+        split_train_plot_F.append(sum(split_train_plot))
+        split_train_elec_F.append(sum(split_train_plot_elec))
+        split_train_plot = []
+        split_train_plot_elec = []
+
+        male_count_train_F.append(male_count_train)
+        female_count_train_F.append(female_count_train)
+        unknown_count_train_F.append(unknown_count_train)
+        male_count_train = 0
+        female_count_train = 0
+        unknown_count_train = 0
+
+        for k in list(set(map(allgroups.__getitem__, test_index))):
+            if 'Male' in ids[ids['patient_id'] == k]['Gender'].tolist():
+                male_count_test += 1
+            elif 'Female' in ids[ids['patient_id'] == k]['Gender'].tolist():
+                female_count_test += 1
+            else:
+                unknown_count_test += 1
+
+            split_test_plot.append(sum(ids[ids['patient_id'] == k]['window_count'].tolist()))
+            split_test_plot_elec.append(sum(ids[ids['patient_id'] == k]['elec_count'].tolist()))
+
+            age_test.append(ids[ids['patient_id'] == k]['Age'].tolist()[0])
+        age_test_F.append(age_test)
+        age_test = []
+
+        split_test_plot_F.append(sum(split_test_plot))
+        split_test_elec_F.append(sum(split_test_plot_elec))
+        split_test_plot = []
+        split_test_plot_elec = []
+
+        male_count_test_F.append(male_count_test)
+        female_count_test_F.append(female_count_test)
+        unknown_count_test_F.append(unknown_count_test)
+        male_count_test = 0
+        female_count_test = 0
+        unknown_count_test = 0
+
+        X_train, X_test = list(map(X.__getitem__, train_index)), list(map(X.__getitem__, test_index))
+        Y_train, Y_test = list(map(Y.__getitem__, train_index)), list(map(Y.__getitem__, test_index))
+        X_train = np.asarray(X_train, dtype='object')
+        X_test = np.asarray(X_test, dtype='object')
+        Y_train = np.asarray(Y_train, dtype='object')
+        Y_test = np.asarray(Y_test, dtype='object')
+
+        # configure the cross-validation procedure
+        group_kfold_inner = GroupKFold(n_splits=n_splits_inner)
+        group_kfold_inner.get_n_splits(X_train, Y_train, np.asarray(list(map(allgroups.__getitem__, train_index)),dtype='object'))
+
+        space = dict()
+
+        if name == "Nearest Neighbors":
+            space['n_neighbors'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            model = classifiers[0]
+        if name == "Linear SVM":
+            space['C'] = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+            model = classifiers[1]
+        if name == "RBF SVM":
+            space['gamma'] = [1, 2, 5, 10, 20]
+            space['C'] = [0.001, 0.01, 0.1, 1, 10, 100, 1000]
+            model = classifiers[2]
+        if name == "Gaussian Process":
+            space['kernel'] = ['rbf', 'sigmoid', 'poly']
+            # space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+            model = classifiers[3]
+        if name == "Decision Tree":
+            space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            model = classifiers[4]
+        if name == "Random Forest":
+            space['max_depth'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            space['n_estimators'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            space['max_features'] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            model = classifiers[5]
+        if name == "Neural Net":
+            space['alpha'] = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+            space['max_iter'] = [1, 10, 100, 1000, 10000]
+            model = classifiers[6]
+        if name == "Logistic Regression":
+            space['penalty'] = ['elasticnet', 'l1', 'l2', 'none']
+            space['solver'] = ['saga']
+            model = classifiers[7]
+
+        # define search
+        # We can do more jobs here, check documentation
+        search = GridSearchCV(model, space, scoring='balanced_accuracy', cv=group_kfold_inner, refit=True, n_jobs=-1)
+        # execute search
+        print("\n\nTraining model: ", name)
+
+        result = search.fit(X_train, Y_train, groups=list(map(allgroups.__getitem__, train_index)))
+        # get the best performing model fit on the whole training set
+        best_model = result.best_estimator_
+        # evaluate model on the hold out dataset
+        yhat = best_model.predict(X_test)
+        # evaluate the model
+        acc = accuracy_score(Y_test, yhat)
+        f1 = f1_score(Y_test, yhat)
+        BA = balanced_accuracy_score(Y_test, yhat)
+        # store the result
+        outer_results.append(acc)
+        outer_results_f1.append(f1)
+        outer_results_BA.append(BA)
+        # report progress
+        print('>acc=%.3f, f1_score=%.3f, b_acc_score=%.3f, est=%.3f, cfg=%s' % (
+            acc, f1, BA, result.best_score_, result.best_params_))
+        # store the best performing model
+        if acc > best_modeL_score:
+            best_modeL_score = acc
+            best_model_ = best_model
+            best_model_params = result.best_params_
+
+    # prop for split
+    Prop_train = []
+    E_mes_train = np.ones(len(split_train_elec_F))
+    k = np.zeros(len(split_train_elec_F))
+    for i in range(len(split_train_elec_F)):
+        k = split_train_elec_F[i] / split_train_plot_F[i]
+        E_mes_train[i] = E_mes_train[i] - k
+        Prop_train.append(k)
+    E_mes_train = list(E_mes_train)
+
+    Prop_test = []
+    E_mes_test = np.ones(len(split_test_elec_F))
+    u = np.zeros(len(split_test_elec_F))
+    for i in range(len(split_test_elec_F)):
+        u = split_test_elec_F[i] / split_test_plot_F[i]
+        E_mes_test[i] = E_mes_test[i] - u
+        Prop_test.append(u)
+    E_mes_test = list(E_mes_test)
+
+    # Plot distribution of elec and window count in splits (bars)
+    x = list(np.arange(1, len(Prop_train) + 1))
+    # Plot results - train
+    plt.bar(x, Prop_train, 0.6, color='r', label="elec")
+    plt.bar(x, E_mes_train, 0.6, bottom=Prop_train, color='b', label="null")
+    plt.legend(loc="upper left")
+    plt.title('Train_splits')
+    plt.xlabel('Split')
+    plt.ylabel('Distribution')
+    plt.savefig("Train_splits.count - Cross validation.png")
+    plt.show()
+
+    x2 = list(np.arange(1, len(Prop_test) + 1))
+    # Plot results - test
+    plt.bar(x2, Prop_test, 0.6, color='r', label="elec")
+    plt.bar(x2, E_mes_test, 0.6, bottom=Prop_test, color='b')
+    plt.legend(loc="upper left")
+    plt.title('Test_splits')
+    plt.xlabel('Split')
+    plt.ylabel('Distribution')
+    plt.savefig("Test_splits.count - Cross validation.png")
+    plt.show()
+
+    # Plot distribution of elec and window count in splits (scatter)
+    try:
+        C = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'lime', 'indigo', 'violet']
+        for k in range(len(split_train_plot_F)):
+            plt.scatter(split_train_plot_F[k], split_train_elec_F[k], color=C[k])
+            plt.scatter(split_test_plot_F[k], split_test_elec_F[k], color=C[k])
+        plt.xlabel('Window_count')
+        plt.ylabel('elec_count')
+        plt.savefig("Splits_scatter.png")
+        plt.show()
+    except:
+        print("The plot sucks - max splits is 10")
+
+    # Plot distrubution of gender in outter layer of splits
+    y1 = np.array(male_count_train_F)
+    y2 = np.array(female_count_train_F)
+    y3 = np.array(unknown_count_train_F)
+    plt.bar(x, y1, color='r')
+    plt.bar(x, y2, bottom=y1, color='b')
+    plt.bar(x, y3, bottom=y1 + y2, color='y')
+    plt.xlabel("Splits")
+    plt.ylabel("Patients")
+    plt.legend(["Male", "Female", "Unknown"])
+    plt.title("Train_splits gender distribution - Cross validation")
+    plt.savefig("Train_splits gender distribution - Cross validation.png")
+    plt.show()
+
+    y1 = np.array(male_count_test_F)
+    y2 = np.array(female_count_test_F)
+    y3 = np.array(unknown_count_test_F)
+    plt.bar(x, y1, color='r')
+    plt.bar(x, y2, bottom=y1, color='b')
+    plt.bar(x, y3, bottom=y1 + y2, color='y')
+    plt.xlabel("Splits")
+    plt.ylabel("Patients")
+    plt.legend(["Male", "Female", "Unknown"])
+    plt.title("Test_splits gender distribution - Cross validation")
+    plt.savefig("Test_splits gender distribution - Cross validation.png")
+    plt.show()
+
+    # Plot distribution of age in splitss
+    bins = np.linspace(0, 100, 100)
+    for i in range(len(x)):
+        plt.hist(age_train_F[i], bins, label=i)
+    plt.legend(loc='upper right')
+    plt.xlabel("Age")
+    plt.ylabel("Occurrence")
+    plt.savefig("Train_splits age distribution - Cross validation.png")
+    plt.show()
+
+    for i in range(len(x)):
+        plt.hist(age_test_F[i], bins, label=i)
+    plt.legend(loc='upper right')
+    plt.xlabel("Age")
+    plt.ylabel("Occurrence")
+    plt.savefig("Test_splits age distribution - Cross validation.png")
+    plt.show()
+
+    # summarize the estimated performance of the model
+    print('Accuracy: %.3f (%.3f)' % (np.mean(outer_results), std(outer_results)))
+    print('f1 score: %.3f (%.3f)' % (np.mean(outer_results_f1), std(outer_results_f1)))
+    print('Balanced accuracy: %.3f (%.3f)' % (np.mean(outer_results_BA), std(outer_results_BA)))
+    # report the best configuration
+    print('Best Config based in acc: %s for model %s' % (best_model_params, best_model_))
+
+    # put all performance metrics into a dataframe
+    # performance_metrics = pd.DataFrame(
+    #    {'Accuracy': outer_results,
+    #        'f1_score': outer_results_f1,
+    #        'Balanced accuracy': outer_results_BA})
+    # performance_metrics.index = outer_results_BA.index
+    # save to a txt file with the name of the classifier
+    # performance_metrics.to_csv(str(best_model_) + '_performance_metrics_cross_validation.csv')
+    # print('Performance metrics saved to performance_metrics_cross_validation.csv')
+    # print('---------------------------------------------------------------------------------------------------------------------')
+    return [np.mean(outer_results), std(outer_results), best_model_]
+
 if __name__ == "__main__":
     pass
     #Xtrain, Xtest, ytrain, ytest = splitDataset(TUH.index_patient_df, ratio=0.2, shuffle=True)
