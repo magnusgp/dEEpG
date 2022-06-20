@@ -6,6 +6,9 @@ The project is a part of the course 02466 Project work - Bachelor of Artificial 
 The main part of the repository is the pipeline folder. Here, you will find all the utility functions needed for carrying out the experiments described in the 'Experiments' section. The python script pipelineMain.py is the main script for the project and is used to run the whole dynamic pipeline. This is the only file needed to be run in order to carry out the experiments.
 
 All dependencies for the project can be found in and installed with the requirements.txt file. 
+```python
+python3 -m pip install -r requirements.txt
+```
 
 To reproduce our results, use the seed 42 and the following dataset. 
 
