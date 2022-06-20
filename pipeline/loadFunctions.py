@@ -18,38 +18,9 @@ import pickle as pickle
 from os.path import exists
 import random
 
-#plt.rcParams["font.family"] = "Times New Roman"
-
-##These functions are either inspired from or modified copies of code written by David Nyrnberg:
+##Some of the functions are inspired from David Nyrnberg:
 # https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG/tree/0bfd1a9349f60f44e6f7df5aa6820434e44263a2/Transfer%20learning%20project
 
-class Gaussian:
-    def plot(mean, std, name, lower_bound=None, upper_bound=None, resolution=None,
-             title=None, x_label=None, y_label=None, legend_label=None, legend_location="best"):
-        lower_bound = (mean - 4 * std) if lower_bound is None else lower_bound
-        upper_bound = (mean + 4 * std) if upper_bound is None else upper_bound
-        resolution = 100
-
-        title = title or "Gaussian Distribution"
-        x_label = x_label or "x"
-        y_label = y_label or "N(x|mu,sigma)"
-        legend_label = legend_label or "mu={}, sigma={}, type={}".format(mean, std, name)
-
-        X = np.linspace(lower_bound, upper_bound, resolution)
-        dist_X = Gaussian._distribution(X, mean, std)
-
-        plt.title(title)
-
-        plt.plot(X, dist_X, label=legend_label)
-
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
-        plt.legend(loc=legend_location)
-
-        return plt
-
-    def _distribution(X, mean, std):
-        return 1. / (np.sqrt(2 * np.pi) * std) * np.exp(-0.5 * (1. / std * (X - mean)) ** 2)
 
 class TUH_data:
     def __init__(self, path):
@@ -77,99 +48,6 @@ class TUH_data:
         self.index_patient_df = index_patient_df
         self.EEG_dict = EEG_dict
         self.EEG_count = EEG_count
-
-    def sessionStat(self):
-        session_lengths = []
-        sfreqs = []
-        nchans = []
-        years = []
-        age = []
-        gender = []
-
-        for k in self.EEG_dict.keys():
-            # Collect data about the files:
-            data = self.EEG_dict[k]["rawData"]
-            session_lengths.append(data.n_times / data.info['sfreq'])
-            sfreqs.append(data.info['sfreq'])
-            nchans.append(data.info['nchan'])
-            years.append(data.info['meas_date'].year)
-
-            # Collect data about the patients:
-            txtPath = os.path.splitext(self.EEG_dict[k]["path"])[0][:-5] + '.txt'
-            with open(txtPath, "rb") as file:
-                s = file.read().decode('latin-1').lower()
-                try:
-                    # Find age:
-                    if s.find('year') != -1:
-                        index = s.find('year')
-                        age.append(int("".join(filter(str.isdigit, s[index - 10: index]))))
-                    elif s.find('yr') != -1:
-                        index = s.find('yr')
-                        age.append(int("".join(filter(str.isdigit, s[index - 10: index]))))
-                    elif s.find('yo ') != -1:
-                        index = s.find('yo ')
-                        age.append(int("".join(filter(str.isdigit, s[index - 10: index]))))
-                    self.index_patient_df['Age'][k] = age[-1]
-                except:
-                    pass
-
-
-
-                try:
-                    # Find gender:
-                    if s.find('female') != -1:
-                        gender.append('Female')
-                    elif s.find('woman') != -1:
-                        gender.append('Female')
-                    elif s.find('girl') != -1:
-                        gender.append('Female')
-                    elif s.find('male') != -1:
-                        gender.append('Male')
-                    elif s.find('man') != -1:
-                        gender.append('Male')
-                    elif s.find('boy') != -1:
-                        gender.append('Male')
-                    else:
-                        gender.append('Unknown')
-                    self.index_patient_df['Gender'][k] = gender[-1]
-                except:
-                    pass
-
-
-
-        print("Average session length: {:.3f}".format(np.mean(session_lengths)))
-        print("Average patient age: {:.3f}".format(np.mean(age)))
-
-        #Check that all years are fairly recent.
-        years=np.asarray(years)
-        old_record=years[years<=1975]
-        print("Found old recordings from:")
-        print(old_record)
-        print("These are not included in plot")
-        years=years[years >= 1975].tolist()
-
-        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(8, 8))
-
-        ax[0,0].hist(session_lengths, bins=20, rwidth=0.90, color="#000088")
-        ax[0,0].grid(axis='y')
-        ax[0,0].set_ylabel(r'Count', size=18)
-        ax[0,0].set_xlabel(r'Session length', size=18)
-        # ax[0].set_yscale('log')
-        ax[0,1].hist(years, bins=20, rwidth=0.90, color="#000088")
-        ax[0,1].grid(axis='y')
-        ax[0,1].set_xlabel(r'Year of recording', size=18)
-        ax[1,0].hist(age, bins=20, rwidth=0.90, color="#000088")
-        ax[1,0].grid(axis='y')
-        ax[1,0].set_ylabel(r'Count', size=18)
-        ax[1,0].set_xlabel(r'Age of patient', size=18)
-        #ax[1,1].bar(, y1, color='r')
-        ax[1,1].hist(gender, bins=3, rwidth=0.90, color="#000088")
-        ax[1,1].grid(axis='y')
-        ax[1,1].set_xlabel(r'Gender of patient', size=18)
-        #plt.tight_layout()
-        plt.savefig("patient_statistics.png", dpi=1000, bbox_inches='tight')
-        plt.show()
-
 
 
     def readRawEdf(self, edfDict=None, tWindow=120, tStep=30,
@@ -386,83 +264,6 @@ class TUH_data:
                     self.EEG_dict[id] = pickle.load(saved_dict)
                     self.index_patient_df = pd.concat([self.index_patient_df,temp_df])
 
-
-    def parallelElectrodeCLFPrepVer3(self, tWindow=100, tStep=100 *.25):
-        tic = time.time()
-
-        tasks_to_do = multiprocessing.Queue()
-        results = multiprocessing.Queue()
-        processes=[]
-
-        for k in range(len(self.EEG_dict)):
-            tasks_to_do.put(k)
-
-        for w in range(multiprocessing.cpu_count()):
-            p=multiprocessing.Process(target=self.doParallelJob,args=(tasks_to_do,tWindow,tStep,results))
-            processes.append(p)
-            p.start()
-
-        for p in processes:
-            p.join()
-
-        k=0
-        while not results.empty():
-            result=results.get()
-            self.EEG_dict[k] = result[0]
-            self.index_patient_df["window_count"][k] = result[1]
-            self.index_patient_df["elec_count"][k] = result[2]
-            k+=1
-
-        toc = time.time()
-        print("\n~~~~~~~~~~~~~~~~~~~~\n"
-              "it took %imin:%is to run electrode classifier preprocess-pipeline for %i file(s)\nwith window length [%.2fs] and t_step [%.2fs]"
-              "\n~~~~~~~~~~~~~~~~~~~~\n" % (int((toc - tic) / 60), int((toc - tic) % 60), len(self.EEG_dict),
-                                            tWindow, tStep))
-
-    def doParallelJob(self,tasks_to_do,tWindow=100, tStep=100 *.25,results=None):
-        while True:
-            try:
-                k = tasks_to_do.get_nowait()
-
-
-            except queue.Empty:
-                break
-            else:
-                #Run preprocessing on this file:
-                result=self.parallelPrepVer3(k,tWindow,tStep)
-                #if no exception has been raised, add the result to results queue
-                print(f"Task no. {k} is done.")
-                results.put(result)
-                time.sleep(.5)
-        return True
-
-    def parallelPrepVer3(self,k,tWindow=100, tStep=100 *.25):
-
-        print(f"Initializing prep of file {k}.")
-        annotations = solveLabelChannelRelation(self.EEG_dict[k]['csvpath'])
-
-        self.EEG_dict[k] = self.readRawEdf(self.EEG_dict[k], tWindow=tWindow, tStep=tStep,
-                                           read_raw_edf_param={'preload': True})
-
-        self.EEG_dict[k]["rawData"] = TUH_rename_ch(self.EEG_dict[k]["rawData"])
-        TUH_pick = ['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4', 'O1', 'O2',
-                    'F7', 'F8', 'T3', 'T4', 'T5', 'T6', 'Cz']  # A1, A2 removed
-        self.EEG_dict[k]["rawData"].pick_channels(ch_names=TUH_pick)
-        self.EEG_dict[k]["rawData"].reorder_channels(TUH_pick)
-
-        simplePreprocess(self.EEG_dict[k]["rawData"], cap_setup="standard_1005", lpfq=1, hpfq=100, notchfq=60,
-                         downSam=250)
-
-        # Generate output windows for (X,y) as (array, label)
-        self.EEG_dict[k]["labeled_windows"], self.index_patient_df["window_count"][k],\
-        self.index_patient_df["elec_count"][k] = slidingRawWindow(self.EEG_dict[k],
-                                                                  t_max=self.EEG_dict[k]["rawData"].times[-1],
-                                                                  tStep=self.EEG_dict[k]["tStep"],
-                                                                  electrodeCLF=True, df=annotations)
-        print(f"Finished prep of file {k}.")
-
-        return (self.EEG_dict[k],self.index_patient_df["window_count"][k],self.index_patient_df["elec_count"][k])
-
     def collectWindows(self,id=None):
         # Helper funtion to makeDatasetFromIds
         # Collects all windows from one session into list
@@ -505,6 +306,99 @@ class TUH_data:
 
         for k in range(len(Xwindows)):
             spectrogramMake(Xwindows[k], Freq,FFToverlap=overlap,tWindow=tWindow, show_chan_num=1,chan_names=self.ch_names)
+
+    def sessionStat(self):
+        session_lengths = []
+        sfreqs = []
+        nchans = []
+        years = []
+        age = []
+        gender = []
+
+        for k in self.EEG_dict.keys():
+            # Collect data about the files:
+            data = self.EEG_dict[k]["rawData"]
+            session_lengths.append(data.n_times / data.info['sfreq'])
+            sfreqs.append(data.info['sfreq'])
+            nchans.append(data.info['nchan'])
+            years.append(data.info['meas_date'].year)
+
+            # Collect data about the patients:
+            txtPath = os.path.splitext(self.EEG_dict[k]["path"])[0][:-5] + '.txt'
+            with open(txtPath, "rb") as file:
+                s = file.read().decode('latin-1').lower()
+                try:
+                    # Find age:
+                    if s.find('year') != -1:
+                        index = s.find('year')
+                        age.append(int("".join(filter(str.isdigit, s[index - 10: index]))))
+                    elif s.find('yr') != -1:
+                        index = s.find('yr')
+                        age.append(int("".join(filter(str.isdigit, s[index - 10: index]))))
+                    elif s.find('yo ') != -1:
+                        index = s.find('yo ')
+                        age.append(int("".join(filter(str.isdigit, s[index - 10: index]))))
+                    self.index_patient_df['Age'][k] = age[-1]
+                except:
+                    pass
+
+
+
+                try:
+                    # Find gender:
+                    if s.find('female') != -1:
+                        gender.append('Female')
+                    elif s.find('woman') != -1:
+                        gender.append('Female')
+                    elif s.find('girl') != -1:
+                        gender.append('Female')
+                    elif s.find('male') != -1:
+                        gender.append('Male')
+                    elif s.find('man') != -1:
+                        gender.append('Male')
+                    elif s.find('boy') != -1:
+                        gender.append('Male')
+                    else:
+                        gender.append('Unknown')
+                    self.index_patient_df['Gender'][k] = gender[-1]
+                except:
+                    pass
+
+
+
+        print("Average session length: {:.3f}".format(np.mean(session_lengths)))
+        print("Average patient age: {:.3f}".format(np.mean(age)))
+
+        #Check that all years are fairly recent.
+        years=np.asarray(years)
+        old_record=years[years<=1975]
+        print("Found old recordings from:")
+        print(old_record)
+        print("These are not included in plot")
+        years=years[years >= 1975].tolist()
+
+        fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(8, 8))
+
+        ax[0,0].hist(session_lengths, bins=20, rwidth=0.90, color="#000088")
+        ax[0,0].grid(axis='y')
+        ax[0,0].set_ylabel(r'Count', size=18)
+        ax[0,0].set_xlabel(r'Session length', size=18)
+        # ax[0].set_yscale('log')
+        ax[0,1].hist(years, bins=20, rwidth=0.90, color="#000088")
+        ax[0,1].grid(axis='y')
+        ax[0,1].set_xlabel(r'Year of recording', size=18)
+        ax[1,0].hist(age, bins=20, rwidth=0.90, color="#000088")
+        ax[1,0].grid(axis='y')
+        ax[1,0].set_ylabel(r'Count', size=18)
+        ax[1,0].set_xlabel(r'Age of patient', size=18)
+        #ax[1,1].bar(, y1, color='r')
+        ax[1,1].hist(gender, bins=3, rwidth=0.90, color="#000088")
+        ax[1,1].grid(axis='y')
+        ax[1,1].set_xlabel(r'Gender of patient', size=18)
+        #plt.tight_layout()
+        plt.savefig("patient_statistics.png", dpi=1000, bbox_inches='tight')
+        plt.show()
+
 
 # renames TUH channels to conventional 10-20 system
 def TUH_rename_ch(MNE_raw=False):
@@ -656,35 +550,6 @@ def plotWindow(EEG_series,label="null", t_max=0, t_step=1):
         if len(window_label)==1 & window_label[0]==label:
             return EEG_series["rawData"].plot(t_start=t_start, t_end=t_end)
     return None
-
-def spectrogramMake(MNE_window=None, freq = None, tWindow=100, crop_fq=45, FFToverlap=None, show_chan_num=None,chan_names=None):
-    try:
-        edfFs = freq
-        chWindows = MNE_window
-
-        if FFToverlap is None:
-            specOption = {"x": chWindows, "fs": edfFs, "mode": "psd"}
-        else:
-            window = signal.get_window(window=('tukey', 0.25), Nx=int(tWindow))  # TODO: error in 'Nx' & 'noverlap' proportions
-            specOption = {"x": chWindows, "fs": edfFs, "window": window, "noverlap": int(tWindow*FFToverlap), "mode": "psd"}
-
-        fAx, tAx, Sxx = signal.spectrogram(**specOption)
-        normSxx = stats.zscore(np.log(Sxx[:, fAx <= crop_fq, :] + 2**-52)) #np.finfo(float).eps))
-        if isinstance(show_chan_num, int):
-            plot_spec = plotSpec(ch_names=chan_names, chan=show_chan_num,
-                                 fAx=fAx[fAx <= crop_fq], tAx=tAx, Sxx=normSxx)
-            plot_spec.show()
-    except:
-        print("pause here")
-        # fTemp, tTemp, SxxTemp = signal.spectrogram(chWindows[0], fs=edfFs)
-        # plt.pcolormesh(tTemp, fTemp, np.log(SxxTemp))
-        # plt.ylabel('Frequency [Hz]')
-        # plt.xlabel('Time [sec]')
-        # plt.title("channel spectrogram: "+MNE_raw.ch_names[0])
-        # plt.ylim(0,45)
-        # plt.show()
-
-    return torch.tensor(normSxx.astype(np.float16)) # for np delete torch.tensor
 
 def plotSpec(ch_names=False, chan=False, fAx=False, tAx=False, Sxx=False):
     # fTemp, tTemp, SxxTemp = signal.spectrogram(chWindows[0], fs=edfFs)
