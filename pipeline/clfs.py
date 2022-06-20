@@ -16,11 +16,12 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.linear_model import LogisticRegression
 from tabulate import tabulate
+from picklePatch import patch_mp_connection_bpo_17560
 import pandas as pd
 from operator import itemgetter
 #import pickle5 as pickle
 import pickle
-from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2, finalGroupKFold, stratGroupKFold2
+from cvFunctions import CrossValidation_1, CrossValidation_2, splitDataset, GroupKFoldCV, GroupKFold_2, finalGroupKFold, stratifiedGroupKFold
 from collections import defaultdict
 from tqdm import *
 import time
@@ -29,7 +30,7 @@ import argparse
 import os
 import random
 
-def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = False, Evaluation = False, n_splits_outer = 5, n_splits_inner = 5):
+def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = False, Evaluation = False, n_outer_splits = 5, n_inner_splits = 5, stratify = 0):
     # Define start time for time measurement:
     start_time = time.time()
     h = 0.02  # step size in the mesh
@@ -63,21 +64,28 @@ def electrodeCLF(TUH, index_df, name = "Nearest Neighbors", Cross_validation = F
     #Create dict for classification
     models = dict(zip(names, classifiers))
 
-    if Cross_validation == True:
-        print("\n\nInitializing Group Kfold Cross Validation with n = {} outer splits and n = {} inner splits".format(n_splits_outer, n_splits_inner))
-        name = name
-        mean, std, best_model = finalGroupKFold(name, TUH.index_patient_df, TUH, n_splits_outer=n_splits_outer, n_splits_inner=n_splits_inner, random_state=None)
+    # Patch pickle, hopefully this will fix the problem with multiprocessing
+    #patch_mp_connection_bpo_17560()
 
+    if Cross_validation == True:
+        print("\n\nInitializing Group Kfold Cross Validation with n = {} outer splits and n = {} inner splits".format(n_outer_splits, n_inner_splits))
+        name = name
+        if stratify != 0:
+            mean, std, best_model = stratifiedGroupKFold(name, TUH.index_patient_df, TUH, n_splits_outer=n_outer_splits, n_splits_inner=n_inner_splits)
+        else:
+            mean, std, best_model = finalGroupKFold(name, TUH.index_patient_df, TUH, n_splits_outer=n_outer_splits, n_splits_inner=n_inner_splits, random_state=None)
         # Print the results:
         print("\n\nBest model: {}".format(best_model))
+        print("\n\nMean performance of model: {}".format(mean))
+        print("\n\nStd.: {}".format(std))
         print("Training best model on all data")
-
-        Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=0.2, shuffle=True)
+        ratio = 0.2
+        Xtrain, Xtest, ytrain, ytest = splitDataset(data = TUH.EEG_dict, ratio=ratio, shuffle=True)
 
         # Print lengths of test and train datasetes in a table
         print("\n\nTrain and Test dataset sizes:")
         print(tabulate([["Train", len(Xtrain)], ["Test", len(Xtest)]], headers=['Dataset', 'Size'], numalign='left'))
-
+        print(ratio)
         # Fit new best model and summarize findings
         new_model = best_model.fit(Xtrain, ytrain)
         score = new_model.score(Xtest, ytest)
@@ -106,28 +114,31 @@ if __name__ == "__main__":
     np.random.seed(seed)
     random.seed(seed)
     # Comment this in for bash arguments
-    """
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('--classifier', action='store', type=str, required=True)
     parser.add_argument('--outer_splits', action='store', type=int, required=True)
     parser.add_argument('--inner_splits', action='store', type=int, required=True)
+    parser.add_argument('--stratify', action='store', type=int, required=False)
 
     args = parser.parse_args()
 
     name = args.classifier
     n_outer_splits = args.outer_splits
     n_inner_splits = args.inner_splits
+    stratify = args.stratify
+    
     """
     # Comment this out for bash arguments
     name = "Nearest Neighbors"
-    n_outer_splits = 5
-    n_inner_splits = 5
-
+    n_outer_splits = 2
+    n_inner_splits = 2
+    """
     # Remember to set this before run
     pickling = True
     # non pickle stuff
     if not pickling:
-        path = "../TUH_data_sample"
+        path = "../data_mini"
         TUH = TUH_data(path=path)
         windowssz = 100
         #TUH.parallelElectrodeCLFPrepVer2(tWindow=windowssz, tStep=windowssz * .25)
@@ -145,6 +156,6 @@ if __name__ == "__main__":
         #TUH.sessionStat()
 
     # scoring
-    score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = name, Cross_validation=True, Evaluation=False, n_splits_outer=n_outer_splits, n_splits_inner   =n_inner_splits)
+    score = electrodeCLF(TUH=TUH, index_df= TUH.index_patient_df, name = name, Cross_validation=True, Evaluation=False, n_outer_splits=n_outer_splits, n_inner_splits=n_inner_splits, stratify = stratify)
     print("Script is done, this is the score:")
     print(score)

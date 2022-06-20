@@ -5,12 +5,13 @@ import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import KFold
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import GroupKFold, StratifiedGroupKFold
+from sklearn.model_selection import GroupKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
 
 from plot_cv import plot_cv_indices
+
 
 # classifiers
 from sklearn.neural_network import MLPClassifier
@@ -33,6 +34,7 @@ import random
 import pandas as pd
 from loadFunctions import TUH_data
 import matplotlib.pyplot as plt
+import sklearn.metrics as metrics
 from matplotlib.patches import Patch
 
 def CrossValidation_2(model, name, X, Y, n_splits_outer=3, n_splits_inner=2, random_state=None):
@@ -567,6 +569,9 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
     cmap_cv = plt.cm.coolwarm
     n_splits = 5
     
+    print("n_splits: ", n_splits)
+    print("Set of groups: ", set(groups))
+            
     for cv in cvs:
         fig, ax = plt.subplots(figsize=(6,3))
         plot_cv_indices(cv(n_splits), X, Y, allgroups, ax, n_splits)
@@ -808,6 +813,24 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
     plt.ylabel("Occurrence")
     plt.savefig("Test_splits age distribution - Cross validation.png")
     plt.show()
+    
+    # calculate the fpr and tpr for all thresholds of the classification
+    probs = best_model_.predict_proba(X_test)
+    preds = probs[:,1]
+    fpr, tpr, threshold = metrics.roc_curve(Y_test, preds)
+    roc_auc = metrics.auc(fpr, tpr)
+
+    # method I: plt
+    plt.title('Receiver Operating Characteristic')
+    plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+    plt.legend(loc = 'lower right')
+    plt.plot([0, 1], [0, 1],'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.savefig("ROC_AUC.png")
+    plt.show()
 
     # summarize the estimated performance of the model
     print('Accuracy: %.3f (%.3f)' % (np.mean(outer_results), std(outer_results)))
@@ -827,8 +850,10 @@ def finalGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_s
     #print('Performance metrics saved to performance_metrics_cross_validation.csv')
     #print('---------------------------------------------------------------------------------------------------------------------')
     return [np.mean(outer_results), std(outer_results), best_model_]
+    
+def stratifiedGroupKFold(name, ids, TUH, n_splits_outer=3, n_splits_inner=2):
+    from sklearn.model_selection import StratifiedGroupKFold
 
-def stratGroupKFold2(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_state=None, stratMethod="patient"):
     names = [
         "Nearest Neighbors",
         "Linear SVM",
@@ -838,9 +863,6 @@ def stratGroupKFold2(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_
         "Random Forest",
         "Neural Net",
         "Logistic Regression",
-        #    "AdaBoost",
-        #    "Naive Bayes",
-        #    "QDA",
     ]
     if name not in names:
         print("The selected model is not valid. Please try again mark")
@@ -852,91 +874,53 @@ def stratGroupKFold2(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_
         GaussianProcessClassifier(1.0 * RBF(1.0)),
         DecisionTreeClassifier(max_depth=5),
         RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, verbose=True),
-        MLPClassifier(alpha=1, max_iter=1000, verbose=True)
+        MLPClassifier(alpha=1, max_iter=1000, verbose=True),
+        LogisticRegression(random_state=0),
     ]
 
-    if stratMethod == "patient":
-        groups = defaultdict(list)
-        for i in ids.index:
-            groups[ids['patient_id'][i]].append(ids['index'][i])
+    groups = defaultdict(list)
+    for i in ids.index:
+        groups[ids['patient_id'][i]].append(ids['index'][i])
 
-        allgroups, X, Y = [], [], []
-        # All windows in the same group should have the same group index
-        for j in groups.values():
-            Xt, Yt, windowInfo = TUH.makeDatasetFromIds(j)
-            c = 0
-            for k in range(len(j)):
-                X=X+Xt[k]
-                Y=Y+Yt[k]
-                c += len(Xt[k])
-            allgroups=allgroups + c * [list(groups.keys())[list(groups.values()).index(j)]]
+    allgroups, X, Y = [], [], []
+    # All windows in the same group should have the same group index
+    for j in groups.values():
+        Xt, Yt, windowInfo = TUH.makeDatasetFromIds(j)
+        c = 0
+        for k in range(len(j)):
+            X.append(Xt[k])
+            Y.append(Yt[k])
+            c += len(Xt[k])
+        allgroups.append([c * [list(groups.keys())[list(groups.values()).index(j)]]])
 
-    #allgroups =[g for gs in allgroups for g in gs]
-    #allgroups = [g for gs in allgroups for g in gs]
-
-    #MApping every patient id to a number, however it did not seem to help the splits and caused trouble with plots:
-    #unique_patients = list(set(allgroups))
-    #pat_dict = dict(zip(unique_patients, range(len(unique_patients))))
-    #allgroups = list(map(pat_dict.get, allgroups))
-
-    allgroups=np.asarray(allgroups, dtype='object')
-
-    # g2 = []
-    # for i in range(5):
-    #    for j in range(len(allgroups)):
-    #        if allgroups[j] in list(set(allgroups))[i*((len(list(set(allgroups)))//5)):(i+1)*(len(list(set(allgroups)))//5)]:
-    #            g2.append(i)
+    allgroups = [g for gs in allgroups for g in gs]
+    allgroups = [g for gs in allgroups for g in gs]
 
     # X = np.squeeze(X)
-    #X = [[x] for x in X]
-    #X = [x for xs in X for x in xs]
-    X = np.asarray(X, dtype='object')
-    Y = np.squeeze(Y)
-    #Y = [y for ys in Y for y in ys]
-    #Y = np.asarray(Y, dtype='object')
+    X = [x for xs in X for x in xs]
+    # Y = np.squeeze(Y)
+    Y = [y for ys in Y for y in ys]
 
     group_kfold_outer = StratifiedGroupKFold(n_splits=n_splits_outer)
     group_kfold_outer.get_n_splits(X, Y, groups)
 
-    outer_results = list()
-    outer_results_f1 = list()
-    outer_results_BA = list()
-    best_modeL_score = 0
+    outer_results, outer_results_f1, outer_results_BA, best_modeL_score = [], [], [], 0
+    split_train_plot, split_train_plot_elec, split_train_plot_F, split_train_elec_F, split_test_plot, split_test_plot_elec, split_test_plot_F, split_test_elec_F = [], [], [], [], [], [], [], []
 
-    split_train_plot = []
-    split_train_plot_elec = []
-    split_train_plot_F = []
-    split_train_elec_F = []
-    split_test_plot = []
-    split_test_plot_elec = []
-    split_test_plot_F = []
-    split_test_elec_F = []
+    male_count_train, female_count_train, unknown_count_train = 0, 0, 0
+    male_count_train_F, female_count_train_F, unknown_count_train_F = [], [], []
 
-    male_count_train = 0
-    female_count_train = 0
-    unknown_count_train = 0
-    male_count_train_F = []
-    female_count_train_F = []
-    unknown_count_train_F = []
+    male_count_test, female_count_test, unknown_count_test = 0, 0, 0
+    male_count_test_F, female_count_test_F, unknown_count_test_F = [], [], []
 
-    male_count_test = 0
-    female_count_test = 0
-    unknown_count_test = 0
-    male_count_test_F = []
-    female_count_test_F = []
-    unknown_count_test_F = []
+    age_train, age_train_F, age_test, age_test_F = [], [], [], []
 
-    age_train = []
-    age_train_F = []
-    age_test = []
-    age_test_F = []
-
-    cvs = [GroupKFold]
+    cvs = [StratifiedGroupKFold]
 
     rng = np.random.RandomState(1338)
     cmap_data = plt.cm.Paired
     cmap_cv = plt.cm.coolwarm
-    n_splits = 3
+    n_splits = 5
 
     for cv in cvs:
         fig, ax = plt.subplots(figsize=(6, 3))
@@ -1012,14 +996,10 @@ def stratGroupKFold2(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_
 
         X_train, X_test = list(map(X.__getitem__, train_index)), list(map(X.__getitem__, test_index))
         Y_train, Y_test = list(map(Y.__getitem__, train_index)), list(map(Y.__getitem__, test_index))
-        X_train = np.asarray(X_train, dtype='object')
-        X_test = np.asarray(X_test, dtype='object')
-        Y_train = np.asarray(Y_train, dtype='object')
-        Y_test = np.asarray(Y_test, dtype='object')
 
         # configure the cross-validation procedure
-        group_kfold_inner = GroupKFold(n_splits=n_splits_inner)
-        group_kfold_inner.get_n_splits(X_train, Y_train, np.asarray(list(map(allgroups.__getitem__, train_index)),dtype='object'))
+        group_kfold_inner = StratifiedGroupKFold(n_splits=n_splits_inner)
+        group_kfold_inner.get_n_splits(X_train, Y_train, list(map(allgroups.__getitem__, train_index)))
 
         space = dict()
 
@@ -1056,7 +1036,8 @@ def stratGroupKFold2(name, ids, TUH, n_splits_outer=3, n_splits_inner=2, random_
 
         # define search
         # We can do more jobs here, check documentation
-        search = GridSearchCV(model, space, scoring='balanced_accuracy', cv=group_kfold_inner, refit=True, n_jobs=-1)
+        search = GridSearchCV(model, space, scoring='balanced_accuracy', cv=group_kfold_inner, refit=True,
+                              n_jobs=-1)
         # execute search
         print("\n\nTraining model: ", name)
 

@@ -3,10 +3,10 @@
 #BSUB -o torch_%J.out
 #BSUB -e torch_%J.err
 #BSUB -q hpc
-#BSUB -n 16
+#BSUB -n 32
 #BSUB -R "rusage[mem=20G]"
 #BSUB -R "span[hosts=1]"
-#BSUB -W 500
+#BSUB -W 1440
 #BSUB -u s204075@student.dtu.dk
 #BSUB -B
 #BSUB -N
@@ -23,5 +23,5 @@
 
 source my_env/bin/activate
 
-python3 clfs.py --classifier "Nearest Neighbors" --outer_splits 5 --inner_splits 5
+python3 clfs.py --classifier "Nearest Neighbors" --outer_splits 5 --inner_splits 5 --stratify 0
 
