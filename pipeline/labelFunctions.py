@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 #from tqdm import *
 from collections import defaultdict
-import mne
+import mne,os
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -107,16 +107,18 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
             df = df.drop(index=i)
         #Join the df with removed doublelabels with the dataframe with the separated single annotations:
         df=pd.concat([df, rows_two_labels], ignore_index=True)
-
+    #Print csv here to check if double labels:
+    #df.to_csv(path_or_buf='csv'+os.path.split(annoPath)[1][:-14]+'session'+os.path.split(annoPath)[1][10:13]+'.csv')
     #Creating data frame:
     anno_df=pd.DataFrame(columns=['channel','t_start','t_end','label'])
 
     if plot:
         # Should we drop the NaN values?
-        plotmat = np.zeros((len(df), int(round(df['stop_time'].max()*256,0))))
+        plotmat = np.zeros((len(df)+1, int(round(float(df['stop_time'].max())*256,0))))
+        row_index=dict(zip(df.index,range(len(df))))
+        for i in df.index:
+            plotmat[row_index[i], int(round(float(df['start_time'][i]) * 256 , 0)):int(round(float(df['stop_time'][i]) * 256, 0))] = 1
 
-        for i in range(len(df)):
-            plotmat[i, int(round(df['start_time'][i] * 256, 0)):int(round(df['stop_time'][i] * 256, 0))] = 1
 
     #checking every entry in label data:
     for i in df.index:
@@ -167,20 +169,26 @@ def solveLabelChannelRelation(annoPath, header = None, plot=False):
                                              't_end': [new_t_end], 'label': [df['label'][i]]})
                     if plot:
                         # Heatmap matrix
-                        plotmat[i, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
-                        plotmat[k, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
+                        plotmat[row_index[i], int(round(float(anno_new['t_start']) * 256, 0)):int(round(float(anno_new['t_end']) * 256, 0))] = 2
+                        plotmat[row_index[k], int(round(float(anno_new['t_start']) * 256, 0)):int(round(float(anno_new['t_end']) * 256, 0))] = 2
                     anno_df = pd.concat([anno_df, anno_new], ignore_index=True)
                 # if no duplicates/overlaps found, then just save annotation for channel:
                 else:
                     anno_new = pd.DataFrame({'channel': [channel], 't_start': [t_start],
                                              't_end': [t_end], 'label': [df['label'][i]]})
                     if plot:
-                        plotmat[i, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
-                        plotmat[k, int(round(anno_new['t_start'] * 256, 0)):int(round(anno_new['t_end'] * 256, 0))] = 2
+                        plotmat[row_index[i], int(round(float(anno_new['t_start']) * 256, 0)):int(round(float(anno_new['t_end']) * 256, 0))] = 2
+                        plotmat[row_index[k], int(round(float(anno_new['t_start']) * 256, 0)):int(round(float(anno_new['t_end']) * 256, 0))] = 2
                     anno_df = pd.concat([anno_df,anno_new],ignore_index=True)
 
     if plot:
-        sns.heatmap(plotmat)
+        f, ax = plt.subplots(figsize=(10, 8))
+        ax = sns.heatmap(plotmat)
+        #plt.savefig(f"annotation_exp{os.path.split(annoPath)[1][:-4]}.pdf", dpi=220)
+        ax.set_xlabel('Timesteps, 256 per sec',size=14)
+        ax.set_ylabel('Index of annotation row', size=14)
+        ax.set_title('Result of annotation algorithm on patient '+os.path.split(annoPath)[1][:-14]+' session '+os.path.split(annoPath)[1][10:13],size=18)
+        #f.savefig(f"annotation_exp{os.path.split(annoPath)[1][:-4]}.pdf", dpi=220)
         plt.show()
 
     print(anno_df)
