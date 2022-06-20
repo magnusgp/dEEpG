@@ -13,7 +13,7 @@ python3 -m pip install -r requirements.txt
 To reproduce our results, use the seed 42 and the following dataset. 
 
 ## Data
-To run the code and the experiments, the TUH EEG Artifact Corpus v2.0.0 is needed. It is freely available at here: 
+To run the code and the experiments, the TUH EEG Artifact Corpus v2.0.0 is needed. It is pubicly available at here: 
 https://www.isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml
 
 In order to create the .pkl files for running experiment code, please run the following:
