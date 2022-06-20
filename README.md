@@ -23,6 +23,7 @@ Where the limit argument is the limit of windows in the downsampled dataset. To 
 To preprocess the raw .edf EEG data files, we use preprocessing tools which are inspired by tools created by David Nyrnberg. 
 Those tools can be found in the following repository:
 https://github.com/DavidEnslevNyrnberg/DTU_DL_EEG
+The code that inspired this project can also be found in the directory 'David'.
 
 The preprocessing of the files is done automatically when running the pipelineMain script:
 ```python
